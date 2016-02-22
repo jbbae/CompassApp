@@ -1,0 +1,264 @@
+body {
+  font-family: 'Roboto', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+.LandingFeatureWrap {
+  display: block;
+}
+#loginDivs {
+  display: inline-block;
+}
+#loginAvatar {
+  display: inline-block;
+  vertical-align: top;
+  margin: 5px 8% auto auto;
+}
+#navbarLinks {
+  font-size: 11px;
+  cursor: pointer;
+  margin: 5px auto 3px auto;
+}
+#navProfileName {
+  font-size: 15px;
+  margin: 3px;
+}
+#navProfileDetails {
+  font-size: 11px;
+  margin: 3px;
+}
+#profileButton {
+  margin: 10px auto 6px auto;
+}
+#loginButton {
+  display: inline-block;
+  margin: 5px 10% 10px 10%;
+  vertical-align: top;
+}
+#logoutLink {
+  font-size: 11px;
+  cursor: pointer;
+  text-align: center;
+  margin: auto auto 6px auto;
+}
+.buttonWrapper {
+  display: inline-block;
+  margin: 10px;
+  float: right;
+}
+.popupText {
+  font-size: 15px;
+  margin: 2px;
+}
+.tabcontent {
+  margin: 5px;
+  color: #000000;
+  font-weight: normal;
+  font-family: 'Roboto', sans-serif;
+}
+.requiredListBlock {
+  display: inline-block;
+  width: 50%
+}
+#undeclareButton {
+  margin-left: auto;
+  margin-right: 1%;
+  width: 90px;
+}
+.skillBlock {
+  margin: 15px;
+  padding: 20px;
+  display: inline-block;
+  cursor: pointer;
+}
+#industryBlockWrap {
+  display: block;
+  margin-left: 2%
+}
+#industryBlock {
+  display: inline-block;
+  margin: 10px;
+  padding: 5px;
+  cursor: pointer;
+}
+.careerPlan {
+  display: inline-block;
+  margin: 15px;
+  margin-bottom: 30px;
+  padding: 24px;
+  cursor: pointer;
+}
+.nameAndIcon {
+  width: 20%;
+  display: inline-block;
+  text-align: center;
+  margin-top: 0px;
+  vertical-align: top;
+}
+#nameAndIcon2 {
+  display: block;
+  margin-bottom: 10px;
+}
+#profileAvatar {
+  margin: 0 auto;
+}
+#planBlock {
+  display: inline-block;
+  width: 60%;
+  text-align: center;
+  margin-top: 60px;
+}
+#planHeading {
+  margin-bottom: 0px;
+}
+#planWrapper {
+  display: inline-block;
+  margin: auto;
+}
+#detailsFiller {
+  height: 80px;
+  width: auto;
+}
+.profileDetails {
+  width: 80%;
+  display: inline-block;
+}
+.detailsBlock {
+  display: inline-block;
+  width: 40%;
+}
+#emptySkillsMsg {
+  text-align: center;
+}
+#IndustryRow {
+  width: 96%;
+  display: inline-block;
+  margin: auto;
+}
+#planIndustry {
+  height: 120px;
+  width: 120px;
+  margin: 20px;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 90px;
+  display: inline-block;
+}
+#pathDropCont {
+  display: inline-block;
+}
+#pathDrop {
+  width: 200px;
+}
+#pathButtonCont {
+  display: inline-block;
+}
+#pathButtonDiv {
+  display: block;
+  margin: auto;
+}
+#pathButtonCap {
+  margin-top: 0;
+  font-size: 10px;
+}
+#exploreCareerButton {
+  width: 70%;
+  margin: 0 auto 3px auto;
+}
+.checkboxWrap {
+  display: inline-block;
+  margin: 5px;
+}
+.Header {
+  margin-bottom: 40px;
+  text-align: center;
+}
+.backButton {
+  display: inline-block;
+  width: 5%;
+}
+#planTitle {
+  margin-bottom: 0;
+  display: inline-block;
+  width: 90%;
+}
+.HeaderButtons {
+  display: flex;
+  margin-bottom: 10px;
+  justify-content: space-between;
+}
+.headerDetails {
+  position: relative;
+  margin-left: 50px;
+  padding: 20px;
+}
+.descPTitle {
+  font-size: 30px;
+  color: #000000;
+  line-height: 32px;
+  font-weight: normal;
+  font-family: 'Roboto', sans-serif;
+  margin: 0px 0px 15px 15px;
+}
+.descPSubtitle {
+  margin: 3px 0px 3px 25px;
+}
+.bulletAligner {
+  margin-left: 5%
+}
+.popupH3 {
+  font-size: 16px;
+  color: #000000;
+  line-height: 32px;
+  font-weight: normal;
+  font-family: 'Roboto', sans-serif;
+  margin: 0px 0px 15px 15px;
+}
+.popupP {
+  font-size: 13px;
+  color: #000000;
+  line-height: 32px;
+  font-weight: normal;
+  font-family: 'Roboto', sans-serif;
+  margin: 0px 0px 15px 15px;
+}
+.planDecPopupDiv {
+  text-align: center;
+}
+.planDecbutton {
+  display: inline-block;
+  margin: 6px;
+}
+#explorerScrollablePart {
+  overflow-y: auto;
+  max-height: 530px;
+}
+#profilePic {
+  display: none;
+}
+#picChangeWrap {
+  width: 300px;
+  text-align: center;
+  display: block;
+  margin: auto;
+}
+#picPrevWrap {
+  display: inline-block;
+}
+#picPreviewHolder {
+  display: inline-block;
+  width: 180px;
+  height: 180px;
+  line-height: 180px;
+  margin-bottom: 10px;
+  text-align: center;
+  font-size: 15px;
+}
+#removePicButton {
+  display: inline-block;
+  vertical-align: top;
+}
+#picPrevFiller {
+  display: inline-block;
+  width: 48px;
+}
