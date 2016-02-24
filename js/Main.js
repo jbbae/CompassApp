@@ -40,10 +40,11 @@ export default class AppComponent extends Component {
     })
   }
 
+  //Initial state-link to user information
   componentDidMount() {
     if (authData) {
       let userEndPoint = 'users/' + authData.uid;
-      base.bindToState(userEndPoint, {
+      this.ref = base.bindToState(userEndPoint, {
         context: this,
         state: 'userInfo'
       });
@@ -96,22 +97,15 @@ export default class AppComponent extends Component {
 //    this.props.history.isActive('explorerwithnav') ? 'Explore' :
 //    this.props.history.isActive('profile') ? 'Profile' : '';
 
+    //Title rendering (according to active Page)
     let title =
     this.state.selectedPage === '/' ? 'Compass' :
     this.state.selectedPage === 'howworks' ? 'How Compass Works' :
     this.state.selectedPage === 'explorerwithnav' ? 'Explore' :
     this.state.selectedPage === 'profile' ? 'Profile' : 'Compass';
 
-    let githubButton = (
-      <IconButton
-        iconStyle={styles.iconButton}
-        iconClassName="muidocs-icon-custom-github"
-        href="https://github.com/callemall/material-ui"
-        linkButton={true} />
-    );
-
+    //Render in User's Focus list
     let focusList;
-
     if (this.state.userInfo) {
       if (this.state.userInfo.Focus) {
         let focusListPre = Object.keys(this.state.userInfo.Focus)
@@ -121,8 +115,8 @@ export default class AppComponent extends Component {
       }
     }
 
+    //User-Login display (changes depending on login state)
     let userSection;
-
     if (this.state.userInfo !== null) {
       userSection = (
         <div style={{margin: 'auto 7% auto 7%'}}>
@@ -177,13 +171,13 @@ export default class AppComponent extends Component {
 
 //Dashboard item in navigation
 //<MenuItem value='dashboard' primaryText='Dashboard' style={this.state.selectedPage === 'dashboard' ? {color: Colors.pink500} : null} onTouchTap={this.onLeftNavChange.bind(null, 'dashboard')} />
+
     return (
       <AppCanvas>
         <AppBar
           onLeftIconButtonTouchTap={this.onLeftIconButtonTouchTap}
           title={title}
-          zDepth={0}
-          iconElementRight={githubButton} />
+          zDepth={0} />
 
         <Dialog
           ref="registerPopup"
@@ -216,7 +210,6 @@ export default class AppComponent extends Component {
         <p style={styles.p}>
           Working hard to maximize the human potential.
         </p>
-        {githubButton}
       </FullWidthSection>
       </AppCanvas>
     );
@@ -264,7 +257,6 @@ export default class AppComponent extends Component {
     } else {
       this.setState({ error: 'Please enter all fields' });
     }
-    authData = base.getAuth();
     setTimeout(function(){
       this.setState({navOpen: false});
     }.bind(this),500);
@@ -272,9 +264,12 @@ export default class AppComponent extends Component {
 
   handleLogout() {
     base.unauth();
-    authData = base.getAuth();
+    base.removeBinding(this.ref);
     setTimeout(function(){
-      this.setState({navOpen: false});
+      this.setState({
+        navOpen: false,
+        userInfo: null
+      });
     }.bind(this),500);
   }
 
@@ -285,6 +280,11 @@ export default class AppComponent extends Component {
       this.setState({ error: 'Login Failed!' });
     } else {
       console.log("Authenticated successfully with payload:", authData);
+      let userEndPoint = 'users/' + authData.uid;
+      this.ref = base.bindToState(userEndPoint, {
+        context: this,
+        state: 'userInfo'
+      });
     }
   }
 
@@ -354,6 +354,7 @@ export default class AppComponent extends Component {
     });
   }
 
+  //Supposed to be "on click Enter, close navbar"
   keyDown(e) {
     if (e.keyCode === 13) {
       this.onLoginClick();
