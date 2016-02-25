@@ -27,7 +27,7 @@ export default class ExplorerWithNav extends Component {
     this.handleFetchItems = this.handleFetchItems.bind(this);
     this.state = {
       selecteditem: '',
-      selectedPref: {},
+      selectedObj: {},
       exploreType: '',
       querySwitch: '',
       likeShow: true,
@@ -120,21 +120,25 @@ export default class ExplorerWithNav extends Component {
         for (var key2 in this.state.currentList[key1].level2) {
           let lvl2Switch = null;
           let filterResult2;
-          let userPrefObject2;
+          let listObject2;
           let lvl2Icon;
           let lvl3items=[];
+
+          if (lookup === 'Focus') {
+            listObject2 = this.state.currentList[key1].level2[key2];
+          }
 
           //Use Level 3 to determine render for Level 2 (if Path/Industry)
           if (lookup === 'Path' || lookup === 'Industry') {
             let totalPref3 = 1;
             //Start Level 3 unbundle
-            for (var key3 in this.state.currentList[key1][key2]) {
+            for (var key3 in this.state.currentList[key1][key2].level3) {
               //Apply filter
               let filterResult3 = (
                 <ExplorerListFilter
                   exploreType={lookup}
                   filtertarget={key3}
-                  targetIndustries={this.state.currentList[key1][key2].Industries}
+                  targetIndustries={this.state.currentList[key1].level2[key2].level3[key3].Industries}
                   likeShow={this.state.likeShow}
                   neutralShow={this.state.neutralShow}
                   dislikeShow={this.state.dislikeShow}
@@ -146,13 +150,12 @@ export default class ExplorerWithNav extends Component {
                 pathSignal = true;
 
                 let lvl3Switch = null;
-                let userPrefObject3;
+                let listObject3 = this.state.currentList[key1].level2[key2].level3[key3];
                 let lvl3Icon;
 
                 for (var keyU in this.state.userInfo[lookup]) {
                   if (!this.state.userInfo[lookup].hasOwnProperty(keyU)) { continue; }
                   if (key3 === keyU) {
-                    userPrefObject3 = this.state.userInfo[lookup][keyU];
                     if (this.state.userInfo[lookup][keyU].likeStatus === true) {
                       lvl3Switch = true;
                       lvl2Switch = lvl2Switch + 1;
@@ -176,7 +179,7 @@ export default class ExplorerWithNav extends Component {
                     primaryText={key3}
                     style={this.state.selecteditem === key3 ? {color: Colors.pink500} : null}
                     leftIcon={lvl3Icon}
-                    onTouchTap={this.onListItemClick.bind(null, key3, userPrefObject3)} />
+                    onTouchTap={this.onListItemClick.bind(null, key3, listObject3)} />
                 );
               }
             }
@@ -197,15 +200,13 @@ export default class ExplorerWithNav extends Component {
                 filtertarget={key2}
                 likeShow={this.state.likeShow}
                 neutralShow={this.state.neutralShow}
-                dislikeShow={this.state.dislikeShow}
-                 />
+                dislikeShow={this.state.dislikeShow} />
              );
 
              if (filterResult2) {
                for (var keyU in this.state.userInfo[lookup]) {
                  if (!this.state.userInfo[lookup].hasOwnProperty(keyU)) { continue; }
                  if (key2 === keyU) {
-                   userPrefObject2 = this.state.userInfo[lookup][keyU];
                    if (this.state.userInfo[lookup][keyU].likeStatus === true) {
                      lvl2Switch = true;
                      break;
@@ -228,9 +229,10 @@ export default class ExplorerWithNav extends Component {
             lvl2items.push(
               <ListItem
                 primaryText={key2}
+                disabled={this.state.exploreType === 'Focus'? false : true}
                 style={this.state.selecteditem === key2 ? {color: Colors.pink500} : null}
                 leftIcon={lvl2Icon}
-                onTouchTap={this.onListItemClick.bind(null, key2, userPrefObject2)}
+                onTouchTap={this.onListItemClick.bind(null, key2, listObject2)}
                 nestedItems={lvl3items} />
             );
           }
@@ -266,7 +268,8 @@ export default class ExplorerWithNav extends Component {
         <ExplorerDescription
         selecteditem={this.state.selecteditem}
         exploreType={this.state.exploreType}
-        backFunction={this.handleDescPageExit} />
+        backFunction={this.handleDescPageExit}
+        selectedObj={this.state.selectedObj} />
     }
 
     let careerButton;
@@ -346,10 +349,10 @@ export default class ExplorerWithNav extends Component {
     );
   }
 
-  onListItemClick(name, pref) {
+  onListItemClick(name, obj) {
     this.setState({
       selecteditem: name,
-      selectedPref: pref,
+      selectedObj: obj,
       showDescPage: false
     });
     setTimeout(function(){

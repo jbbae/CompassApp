@@ -37,8 +37,6 @@ let { Colors, Typography } = Styles;
 var base = new Rebase.createClass('https://sageview.firebaseio.com');
 var authData = base.getAuth();
 
-let userLike = null;
-
 export default class ExplorerDescription extends Component {
   //Need to call in observe() with the "User Skills Joint Table" to update status (have/not have)
   constructor() {
@@ -62,26 +60,28 @@ export default class ExplorerDescription extends Component {
       fullsnackopen: false,
       refresh: false,
       selectedSkill: '',
-      selectedDescription: '',
       openSkillsPopup: false,
       openDeclarePopup: false,
       assetLike: false,
-      selectedAssObj: null
+      userPref: null,
+      userAssets: null
     })
   }
 
-  observe() {
-    var selectedType = this.props.exploreType;
-    let crossQuery = new Parse.Query('assetCross').include('asset');
-    if (selectedType !== 'Industry') {
-      crossQuery.equalTo('crossType',selectedType);
+  componentDidMount() {
+    if (authData) {
+      let userEndPoint = 'users/' + authData.uid + '/' + this.props.exploreType + '/' + this.props.selecteditem;
+      this.ref = base.syncState(userEndPoint, {
+        context: this,
+        state: 'userPref'
+      });
+
+      let assetEndPt = 'users/' + authData.uid + '/Assets';
+      base.syncState(assetEndPt, {
+        context: this,
+        state: 'userAssets'
+      });
     }
-    return {
-      assetCross: crossQuery,
-      descList: new Parse.Query('Descriptions').equalTo('parent',this.props.selecteditem),
-      userList: new Parse.Query('userPref').equalTo('type',selectedType),
-      userAssetList: new Parse.Query('userAssets')
-    };
   }
 
   getStyles() {
@@ -146,87 +146,81 @@ export default class ExplorerDescription extends Component {
   }
 
     render() {
+      let styles = this.getStyles();
+
       //Input the userList object into a global variable + Count the # of Declared while at it.
       let declareCount = 0;
-      if (this.data.userList.length) {
-        for (let w=0; w < this.data.userList.length; w++) {
-          if (this.data.userList[w].name === this.props.selecteditem) {
-            userLike = this.data.userList[w];
+      if (this.state.userPref) {
+        let counterEndPt = 'users/' + authData.uid + '/' + this.props.exploreType;
+        base.fetch(counterEndPt, {
+          context: this,
+          then(data) {
+            for (let key in data) {
+              if (data[key].userTied) { declareCount++; }
+            }
           }
-          if (this.data.userList[w].userTied) {
-            declareCount++;
-          }
-        }
-      } else {
-        userLike = null;
-      }
-
-      let styles = this.getStyles();
+        });
 
       //Prepare the likeDropDown and declareButton accordingly
       let likeDropDown;
       let declareButton;
-      if (this.pendingQueries().length) {
-        likeDropDown = <CircularProgress mode="indeterminate" value={60} size={0.5} />;
-      } else {
-        if (!this.props.childIndicate) {
-          likeDropDown = (
-            <DropDownMenu value={userLike ? userLike.likeStatus : null} onChange={Parse.User.current() ? this.handleFavorite : this.handleNeedLogin}>
-              <MenuItem value={null} primaryText='Not Sure...' />
-              <MenuItem value={true} primaryText='Like!' />
-              <MenuItem value={false} primaryText='Nope!' />
-            </DropDownMenu>
-          );
-        }
-        if (userLike !== null && !this.props.childIndicate) {
-          if (userLike.likeStatus === true && userLike.userTied === false) {
+
+      if (this.state.userPref && this.props.selectedObj) {
+        likeDropDown = (
+          <DropDownMenu value={this.state.userPref ? this.state.userPref.likeStatus : null} onChange={Parse.User.current() ? this.handleFavorite : this.handleNeedLogin}>
+            <MenuItem value={null} primaryText='Not Sure...' />
+            <MenuItem value={true} primaryText='Like!' />
+            <MenuItem value={false} primaryText='Nope!' />
+          </DropDownMenu>
+        );
+
+        if (this.state.userPref.likeStatus === true) {
+          if (this.state.userPref.userTied === false) {
             declareButton = <RaisedButton label="Make Primary!" secondary={true} onTouchTap={this.handleDeclare.bind(null, declareCount)} />;
-          } else if (userLike.likeStatus === true && userLike.userTied === true) {
+          } else if (this.state.userPref.userTied === true) {
             declareButton = <RaisedButton label="Already Primary" onTouchTap={this.handleAlreadyMsg} />;
           }
         }
       }
 
       //Section 1 Items
-      let overview = [];
-      let IFbullets1 = [];
-      let IFbullets2 = [];
-      let Pbullets = [];
-      let workEnvDesc = [];
-
+      let overview;
+      let IFbullets1;
+      let IFbullets2;
+      let Pbullets;
+      let workEnvDesc;
       //Section 2 Items
-      let howToBDesc = [];
-      let licensesDesc = [];
-
+      let howToBDesc;
+      let licensesDesc;
       //Section 3 Items
-      let jobOutDesc = [];
-      let jobProsp = [];
+      let jobOutDesc;
+      let jobProsp;
 
       //Unbundle Descriptions
-      for (let j = 0; j < this.data.descList.length; j++) {
-        if (this.data.descList[j].parent === this.props.selecteditem && this.data.descList[j].type === this.props.exploreType ) {
-          if (this.data.descList[j].section === "Overview") {
-            overview = this.data.descList[j].content;
-          } else if (this.data.descList[j].section === 'Concentrations' || this.data.descList[j].section === 'Products & Services') {
-            for (let b=0; b < this.data.descList[j].content.length; b++) {
-              if (this.data.descList[j].content[b].parent === null) {
-                IFbullets1.push(this.data.descList[j].content[b]);
+      if (this.props.selectedObj) {
+        for (let key in this.props.selectedObj.Description) {
+          if (key === "Overview") {
+            overview = this.props.selectedObj.Description[key];
+          } else if (key === 'Concentrations' || key === 'Products & Services') {
+            for (keyBull in this.props.selectedObj.Description[key]) {
+              if (this.props.selectedObj.Description[key][keyBull]) {
+                IFbullets2.push({keyBull: this.props.selectedObj.Description[key][keyBull]});
               } else {
-                IFbullets2.push(this.data.descList[j].content[b]);
+                IFbullets1.push({keyBull: this.props.selectedObj.Description[key][keyBull]});
               }
             }
-          } else if (this.data.descList[j].section === 'Duties') {
-            Pbullets = this.data.descList[j].content;
-          } else if (this.data.descList[j].section === 'Work Environment') {
-            workEnvDesc = this.data.descList[j].content;
-          } else if (this.data.descList[j].section === 'How to Become') {
-            howToBDesc = this.data.descList[j].content;
-          } else if (this.data.descList[j].section === 'Licenses') {
-            licensesDesc = this.data.descList[j].content;
-          } else if (this.data.descList[j].section === 'Job Outlook') {
-            jobOutDesc = this.data.descList[j].content;
-          } else if (this.data.descList[j].section === 'Job Prospects') {
-            jobProsp = this.data.descList[j].content;
+          } else if (key === 'Duties') {
+            Pbullets = this.props.selectedObj.Description[key];
+          } else if (key === 'Work Environment') {
+            workEnvDesc = this.props.selectedObj.Description[key];
+          } else if (key === 'How to Become') {
+            howToBDesc = this.props.selectedObj.Description[key];
+          } else if (key === 'Licenses') {
+            licensesDesc = this.props.selectedObj.Description[key];
+          } else if (key === 'Job Outlook') {
+            jobOutDesc = this.props.selectedObj.Description[key];
+          } else if (key === 'Job Prospects') {
+            jobProsp = this.props.selectedObj.Description[key];
           }
         }
       }
@@ -240,57 +234,50 @@ export default class ExplorerDescription extends Component {
       ];
 
       //Unbundle Assets for Focus/Path
-      let assets;
+      let assets = [];
 
       if (this.props.exploreType !== 'Industry') {
-        assets = this.data.assetCross.map(function(crossHolder) {
-          if (crossHolder.crossName === this.props.selecteditem) {
-            return (
-              <Paper
-                className="skillBlock"
-                zDepth={2}
-                onTouchTap={this.handleSkillsPopup.bind(null, crossHolder.asset.name, 'Javascript is a Lang', crossHolder.asset)}>
-                {crossHolder.asset.name}
-              </Paper>
-            );
-          }
-        }, this);
+        for (let key in this.props.selectedObj.Assets) {
+          assets.push(
+            <Paper
+              className="skillBlock"
+              zDepth={2}
+              onTouchTap={this.handleSkillsPopup.bind(null, key)}>
+              {key}
+            </Paper>
+          );
+        }
       }
 
       //Structure Overview content to render in as object
       let tabOneContent;
-      let tabOneOverview = overview.map(function(description) {
-        return (
-            <p>{description}</p>
-        );
-      }, this);
+      let tabOneOverview;
+      for (key in overview) {
+        tabOneOverview.push(<p>{overview[key]}</p>);
+      }
 
-      //Structurer for Concentrations/P&S (for Focus & Industry) VS Duties + Work Env (Paths)
+      //Tab 1 Start
       let tabOneBullets = [];
       let tabOneWorkEnv = [];
-      if (this.props.exploreType !== 'Paths') {
-        tabOneBullets = IFbullets1.map(function(lvlOneBullet) {
+      //Tab One Content (I/F)
+      if (this.props.exploreType !== 'Path') {
+        for (let key in IFbullets1) {
           let lvlTwoBullets = [];
-          for (let t=0; t < IFbullets2.length; t++) {
-            if (lvlOneBullet.content === IFbullets2[t].parent) {
-              lvlTwoBullets.push(<li>{IFbullets2[t].content}</li>);
-            }
+          for (let key2 in IFbullets2) {
+            if(key === IFbullets2[key2]) { lvlTwoBullets.push(<li>{key2}</li>); }
           }
-          return (
-            <li>{lvlOneBullet.content}
+          tabOneBullets.push(
+            <li>{key}
               <ul>{lvlTwoBullets.length > 0 ? lvlTwoBullets : null }</ul>
             </li>
           );
-        }, this);
-
-        let tabOneBulletHeading;
-
-        if (this.props.exploreType === 'Industry') {
-          tabOneBulletHeading = <h3>Products & Services</h3>;
-        } else if (this.props.exploreType === 'Focus') {
-          tabOneBulletHeading = <h3>Concentrations</h3>;
         }
+        //Determine Tab 1's bullet subsection heading
+        let tabOneBulletHeading;
+        if (this.props.exploreType === 'Industry') { tabOneBulletHeading = <h3>Products & Services</h3>;}
+        else if (this.props.exploreType === 'Focus') { tabOneBulletHeading = <h3>Concentrations</h3>; }
 
+        //Tab 1 Content (I/F) Compiler
         tabOneContent =
           <div className="tabcontent">
             {tabOneOverview.length > 0 ? tabOneOverview : null}
@@ -299,14 +286,13 @@ export default class ExplorerDescription extends Component {
               {tabOneBullets.length > 0 ? tabOneBullets : null}
             </div>
           </div>;
-      } else if (this.props.exploreType === 'Paths') {
-        tabOneBullets = Pbullets.map(function(bullet) {
-          return (<li>{bullet}</li>);
-        }, this);
-        tabOneWorkEnv = workEnvDesc.map(function(parg) {
-          return (<p>{parg}</p>);
-        }, this);
 
+      //Tab 1 Content (Path)
+      } else if (this.props.exploreType === 'Path') {
+        for (let key in Pbullets) { tabOneBullets.push(<li>{Pbullets[key]}</li>); }
+        for (let key in workEnvDesc) { tabOneWorkEnv.push(<p>{workEnvDesc[key]}</p>); }
+
+        //Tab 1 Content (Path) Compiler
         tabOneContent =
           <div className="tabcontent">
             {tabOneOverview.length > 0 ? tabOneOverview : null}
@@ -316,12 +302,15 @@ export default class ExplorerDescription extends Component {
             {tabOneWorkEnv.length > 0 ? tabOneWorkEnv : null}
           </div>;
       }
+      //Tab 1 End
 
+      //Tab 2 & 3 Start
       let tabTwoContent;
       let labeltwo;
       let tabThreeContent;
       let tabComponents;
 
+      //Tab 2 - Industry
       if(this.props.exploreType === 'Industry') {
         labeltwo = 'Companies';
 
@@ -355,32 +344,27 @@ export default class ExplorerDescription extends Component {
 
           tabThreeContent = null;
       }
-
+      //Tab 2 - Focus
       else if (this.props.exploreType === 'Focus') {
         labeltwo = 'Skills';
 
+        //Tab 2 (Focus) Compiler
         tabTwoContent =
           <div className="tabcontent">
             {assets.length > 0 ? assets : null}
           </div>;
         tabThreeContent = null;
       }
-
-      else if (this.props.exploreType === 'Paths') {
+      //Tab 2 & 3 - Path
+      else if (this.props.exploreType === 'Path') {
         labeltwo = 'How to Become';
+        let tabTwoPartA;
+        let tabTwoPartB;
 
-        let tabTwoPartA = howToBDesc.map(function(howToD) {
-          return (
-              <p>{howToD}</p>
-          );
-        }, this);
+        for (let key in howToBDesc) { tabTwoPartA.push(<p>{howToBDesc[key]}</p>); }
+        for (let key in licensesDesc) { tabTwoPartB.push(<p>{licensesD[key]}</p>); }
 
-        let tabTwoPartB = licensesDesc.map(function(licensesD) {
-          return (
-              <p>{licensesD}</p>
-          );
-        }, this);
-
+        //Tab 2 (Path) Compiler
         tabTwoContent =
           <div className="tabcontent">
             {tabTwoPartA.length > 0 ? <h3>How to Become</h3> : null}
@@ -393,18 +377,14 @@ export default class ExplorerDescription extends Component {
             {assets}
           </div>;
 
-          let tabThreePartA = jobOutDesc.map(function(outlookD) {
-            return (
-              <p>{outlookD}</p>
-            );
-          }, this);
+          //Tab 3 Start
+          let tabThreePartA;
+          let tabThreePartB;
 
-          let tabThreePartB = jobProsp.map(function(prospD) {
-            return (
-              <p>{prospD}</p>
-            );
-          }, this);
+          for (let key in jobOutDesc) { tabThreePartA.push(<p>{jobOutDesc[key]}</p>); }
+          for (let key in jobProsp) { tabThreePartB.push(<p>{jobProsp[key]}</p>); }
 
+          //Tab 3 Compiler
           tabThreeContent =
             <Tab label="Job Prospects">
               <h3>Job Outlook</h3>
@@ -414,7 +394,9 @@ export default class ExplorerDescription extends Component {
               {tabThreePartA.length + tabThreePartB.length === 0 ? <EmptyContent /> : null}
             </Tab>
       }
+      //Tab 3 End
 
+      //Final Compiler
       if (this.props.exploreType === 'Industry' || this.props.exploreType === 'Focus') {
         tabComponents =
           <Tabs>
@@ -425,7 +407,7 @@ export default class ExplorerDescription extends Component {
               {tabTwoContent}
             </Tab>
           </Tabs>
-      } else if (this.props.exploreType === 'Paths') {
+      } else if (this.props.exploreType === 'Path') {
         tabComponents =
           <Tabs>
             <Tab label="Overview" >
@@ -438,6 +420,7 @@ export default class ExplorerDescription extends Component {
           </Tabs>
       }
 
+      //Control buttons for Skills Popup
       let skillsPopupButton = [
           <FlatButton
             label="Close"
@@ -458,7 +441,7 @@ export default class ExplorerDescription extends Component {
               open={this.state.openSkillsPopup}
               onRequestClose={this._handleRequestClose}>
               <SkillPopup
-                description= {this.state.selectedDescription} />
+                description= {this.state.selectedSkill} />
             </Dialog>
             <Dialog
               title="Declare Career Path"
@@ -470,6 +453,7 @@ export default class ExplorerDescription extends Component {
                 selecteditem= {this.props.selecteditem}
                 exploreType= {this.props.exploreType}
                 declarefunction= {this.handleDeclareFinal}
+                selectedObj={this.props.selectedObj}
                 closePopup= {this.declarePopupBack}/>
             </Dialog>
             <div className="Header">
@@ -530,34 +514,33 @@ export default class ExplorerDescription extends Component {
     }
 
     handleFavorite(e, index, value) {
-      //let msgFeed;
-      if (value === null && userLike != null) {
-        ParseReact.Mutation.Destroy(userLike).dispatch();
-        userLike = null;
-        this.setState({
-          updateMsg: 'You no longer like/dislike this category!',
-          snackopen: true
-        });
-      } else if (value != null && userLike === null) {
-        let acl = new Parse.ACL(Parse.User.current());
-        ParseReact.Mutation.Create('userPref', {
-          name: this.props.selecteditem,
-          type: this.props.exploreType,
-          likeStatus: value,
-          userTied: false,
-          ACL: acl
-        }).dispatch();
-        this.setState({
-          updateMsg: 'Added to your preferences!',
-          snackopen: true
-        });
-      } else if (value != null && userLike != null) {
-        ParseReact.Mutation.Set(userLike, { likeStatus: value }).dispatch();
-        this.setState({
-          updateMsg: 'Preferences changed!',
-          snackopen: true
-        });
+      let self = this;
+      if (authData) {
+        if (value === null && this.state.userPref != null) {
+          this.setState({userPref: null});
+
+        } else if (value != null && this.state.userPref === null) {
+          let newEndPoint = authData.uid + '/' + this.props.exploreType + '/' + this.props.selecteditem;
+
+          base.post(newEndPoint, {
+            data: {
+              name: this.props.selecteditem,
+              likeStatus: value,
+              userTied: false
+            },
+            then() {
+              self.setState({
+                updateMsg: 'Added to your preferences!',
+                snackopen: true
+              });
+            }
+          });
+        } else if (value != null && this.state.userPref != null) {
+          let newPref = React.addons.update(this.state.userPref, {likeStatus: {$set: value}});
+          this.setState({userPref: newPref});
+        }
       }
+
       this.refreshQueries();
       setTimeout(function(){
         this.setState({refresh: true});
@@ -572,7 +555,7 @@ export default class ExplorerDescription extends Component {
         let message2;
         if (this.props.exploreType === 'Focus') { message2 = 'Foci' }
         else if (this.props.exploreType === 'Industry') { message2 = 'Industries' }
-        else if (this.props.exploreType === 'Paths') { message2 = 'Career Paths' }
+        else if (this.props.exploreType === 'Path') { message2 = 'Career Paths' }
         let message3 = '! You need to undeclare at least one (from Profile) to declare this.';
         this.setState({
           updateFullMsg: message1.concat(message2,message3),
@@ -587,7 +570,9 @@ export default class ExplorerDescription extends Component {
 
     handleDeclareFinal() {
       let str1 = 'Declared ';
-      ParseReact.Mutation.Set(userLike, { userTied: true }).dispatch();
+      let newPref = React.addons.update(this.state.userPref, {userTied: {$set: true}});
+      this.setState({userPref: newPref});
+
       let message = str1.concat(this.props.exploreType,'!');
       this.setState({
         updateMsg: message,
@@ -607,20 +592,16 @@ export default class ExplorerDescription extends Component {
       this.props.backFunction();
     }
 
-    handleSkillsPopup(skillname, skilldesc, assetobj) {
+    handleSkillsPopup(skillname) {
       let liked = false;
-      for (let s=0; s < this.data.userAssetList.length; s++) {
-        if (skillname === this.data.userAssetList[s].name) {
-          liked = true;
-        }
+      for (let key in this.state.userAssets) {
+        if (skillname === key) { liked = true; }
       }
 
       this.setState({
         selectedSkill: skillname,
-        selectedDescription: skilldesc,
         openSkillsPopup: true,
-        assetLike: liked,
-        selectedAssObj: assetobj
+        assetLike: liked
       });
     }
 
@@ -632,14 +613,10 @@ export default class ExplorerDescription extends Component {
 
     _handleSkillLike() {
       if (!this.state.assetLike) {
-        let acl = new Parse.ACL(Parse.User.current());
-        ParseReact.Mutation.Create('userAssets', {
-          name: this.state.selectedSkill,
-          asset: this.state.selectedAssObj,
-          level: 0,
-          ACL: acl
-        }).dispatch();
+        let newAssets = this.state.userAssets;
+        newAssets[this.state.selectedSkill] = 0;
         this.setState({
+          userAssets: newAssets.
           assetLike: true,
           openSkillsPopup: false,
           updateMsg: 'Skill Added!',
@@ -666,5 +643,6 @@ export default class ExplorerDescription extends Component {
 ExplorerDescription.propTypes = {
   selecteditem: PropTypes.string,
   exploreType: PropTypes.string,
-  backFunction: PropTypes.func
+  backFunction: PropTypes.func,
+  selectedObj: PropTypes.object
 };
