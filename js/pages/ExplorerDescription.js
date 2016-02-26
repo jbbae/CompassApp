@@ -371,7 +371,7 @@ export default class ExplorerDescription extends Component {
             {tabTwoPartA.length > 0 ? tabTwoPartA : null}
             {tabTwoPartB.length > 0 ? <h3>Licences & Certifications</h3> : null}
             {tabTwoPartB.length > 0 ? tabTwoPartB : null}
-            <RequiredIFDisplay selecteditem={this.props.selecteditem} />
+            <RequiredIFDisplay selecteditem={this.props.selecteditem} selectedindustries={this.props.selectedObj.crossIndustry} selectedfocus={this.props.selectedObj.crossFocus} />
             {assets.length > 0 ? <h3>Skills</h3> : null}
             <Divider />
             {assets}

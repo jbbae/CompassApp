@@ -20,8 +20,6 @@ export default class ExplorerListFilter extends Component {
         context: this,
         state: 'userInfo'
       });
-    } else {
-      this.setState({userInfo: null});
     }
   }
 

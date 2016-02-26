@@ -46,8 +46,6 @@ export default class ExplorerWithNav extends Component {
         context: this,
         state: 'userInfo'
       });
-    } else {
-      this.setState({userInfo: null});
     }
   }
 
@@ -82,27 +80,28 @@ export default class ExplorerWithNav extends Component {
 
     //Part I - Check if exploreType = Careers is an option (disable button?)
     let careerAllow = false;
-
-    if (this.state.userInfo.Industry && this.state.userInfo.Focus) {
-      let industryCheck = false;
-      let focusCheck = false;
-      for (var key in this.state.userInfo.Industry) {
-        if (!this.state.userInfo.Industry.hasOwnProperty(key)) { continue; }
-        if (this.state.userInfo.Industry[key].likeStatus === true) {
-          industryCheck = true;
-          break;
+    if (this.state.useInfo) {
+      if (this.state.userInfo.Industry && this.state.userInfo.Focus) {
+        let industryCheck = false;
+        let focusCheck = false;
+        for (var key in this.state.userInfo.Industry) {
+          if (!this.state.userInfo.Industry.hasOwnProperty(key)) { continue; }
+          if (this.state.userInfo.Industry[key].likeStatus === true) {
+            industryCheck = true;
+            break;
+          }
         }
-      }
 
-      for (var key in this.state.userInfo.Focus) {
-        if (!this.state.userInfo.Focus.hasOwnProperty(key)) { continue; }
-        if (this.state.userInfo.Focus[key].likeStatus === true) {
-          focusCheck = true;
-          break;
+        for (var key in this.state.userInfo.Focus) {
+          if (!this.state.userInfo.Focus.hasOwnProperty(key)) { continue; }
+          if (this.state.userInfo.Focus[key].likeStatus === true) {
+            focusCheck = true;
+            break;
+          }
         }
-      }
 
-      if (industryCheck && focusCheck || this.state.exploreType === 'Path') { careerAllow = true; }
+        if (industryCheck && focusCheck || this.state.exploreType === 'Path') { careerAllow = true; }
+      }
     }
 
     //Part II - Populate with ListItem Components
