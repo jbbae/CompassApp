@@ -1,5 +1,3 @@
-//require('styles/pages/Profile.sass');
-
 import React, {Component, PropTypes } from 'react';
 import Firebase from 'firebase';
 import Rebase from 're-base';
@@ -56,99 +54,89 @@ export default class Profile extends Component {
     };
   }
 
-getStyles() {
-  let padding = 400;
+  getStyles() {
+    let padding = 400;
 
-  let styles = {
-    root: {
-      paddingTop: Spacing.desktopKeylineIncrement + 'px'
-    },
-    rootWhenMedium: {
-      paddingTop: Spacing.desktopKeylineIncrement + 'px',
-      position: 'relative'
-    },
-    contentContainerStyle: {
-      marginLeft: -padding
-    },
-    div: {
-      position: 'absolute',
-      left: 48,
-      backgroundColor: Colors.cyan500,
-      width: padding,
-      height: 48
-    },
-    headline: {
-      fontSize: 24,
-      lineHeight: '32px',
-      paddingTop: 16,
-      marginBottom: 12,
-      letterSpacing: 0,
-      fontWeight: Typography.fontWeightNormal,
-      color: Typography.textDarkBlack
-    },
-    iconButton: {
-      position: 'absolute',
-      left: 0,
-      backgroundColor: Colors.cyan500,
-      color: 'white',
-      marginRight: padding
-    },
-    iconStyle: {
-      color: Colors.white
-    },
-    tabs: {
-      position: 'relative'
-    },
-    tabsContainer: {
-      position: 'relative',
-      paddingLeft: padding
-    }
-  };
+    let styles = {
+      root: {
+        paddingTop: Spacing.desktopKeylineIncrement + 'px'
+      },
+      rootWhenMedium: {
+        paddingTop: Spacing.desktopKeylineIncrement + 'px',
+        position: 'relative'
+      },
+      contentContainerStyle: {
+        marginLeft: -padding
+      },
+      div: {
+        position: 'absolute',
+        left: 48,
+        backgroundColor: Colors.cyan500,
+        width: padding,
+        height: 48
+      },
+      headline: {
+        fontSize: 24,
+        lineHeight: '32px',
+        paddingTop: 16,
+        marginBottom: 12,
+        letterSpacing: 0,
+        fontWeight: Typography.fontWeightNormal,
+        color: Typography.textDarkBlack
+      },
+      iconButton: {
+        position: 'absolute',
+        left: 0,
+        backgroundColor: Colors.cyan500,
+        color: 'white',
+        marginRight: padding
+      },
+      iconStyle: {
+        color: Colors.white
+      },
+      tabs: {
+        position: 'relative'
+      },
+      tabsContainer: {
+        position: 'relative',
+        paddingLeft: padding
+      }
+    };
 
-//  if (this.isDeviceSize(StyleResizable.statics.Sizes.MEDIUM) ||
-//      this.isDeviceSize(StyleResizable.statics.Sizes.LARGE)) {
-//    styles.root = this.mergeStyles(styles.root, styles.rootWhenMedium);
-//  }
+  //  if (this.isDeviceSize(StyleResizable.statics.Sizes.MEDIUM) ||
+  //      this.isDeviceSize(StyleResizable.statics.Sizes.LARGE)) {
+  //    styles.root = this.mergeStyles(styles.root, styles.rootWhenMedium);
+  //  }
 
-  return styles;
-}
+    return styles;
+  }
 
   render() {
     let styles = this.getStyles();
 
+    //Part I - Unbundle user preferences into their respective categories (Industry/Focus/Path)
     let industryList = [];
     let focusList= [];
     let pathHolder = [];
-
     let planlist;
     let tabsContent = [];
 
-    //Unbundle user preferences into their respective categories (Industry/Focus/Path)
     for (keyI in this.props.userInfo.Industry) {
       if (this.props.userInfo.Industry[keyI].userTied === true) {
-        industryList.push(
-          <Paper id="industryBlock" zDepth={1} onTouchTap={self.handleProfileIndPop.bind(null,keyI)}>{keyI}</Paper>
-        );
+        industryList.push( <Paper id="industryBlock" zDepth={1} onTouchTap={self.handleProfileIndPop.bind(null,keyI)}>{keyI}</Paper> );
       }
     }
-
     for (keyF in this.props.userInfo.Focus) {
-      if (this.props.userInfo.Focus[keyF].userTied === true) {
-        focusList.push(keyF);
-      }
+      if (this.props.userInfo.Focus[keyF].userTied === true) { focusList.push(keyF); }
     }
-
     for (keyP in this.props.userInfo.Path) {
-      if (this.props.userInfo.Path[keyP].userTied === true) {
-        pathHolder.push(keyP);
-      }
+      if (this.props.userInfo.Path[keyP].userTied === true) { pathHolder.push(keyP); }
     }
 
-    //Unbundle selected paths into plan buttons
+    //Part II - Unbundle selected paths into plan buttons
     if (pathHolder.length > 0) {
       let self = this;
-      planlist = (
-        pathHolder.map(function(pathPref) {
+      planlist = pathHolder.map(function(pathPref) {
           return (
             <div id="planWrapper">
               <Paper className="careerPlan" zDepth={1} onTouchTap={self.handlePlanPopup.bind(null,pathPref)}>
@@ -156,9 +144,8 @@ getStyles() {
               </Paper>
             </div>
           );
-      }));
-    }
-    else if (pathHolder.length === 0) {
+      });
+    } else if (pathHolder.length === 0) {
       planlist = (
         <div>
           <p>You still don't have any career plans...</p>
@@ -167,147 +154,139 @@ getStyles() {
       );
     }
 
-//Unbundle skills into their respective Foci
-let takenSkills = [];
-let generalList = [];
-let generalSkills = [];
-let generalKnowledge = [];
+    //Part III - Unbundle skills into their respective Foci
+    let takenSkills = [];
+    let generalList = [];
+    let generalSkills = [];
+    let generalKnowledge = [];
 
-base.fetch('Asset', {
-  context: this,
-  then(data) {
-    for (let i=0; i < 3; i++) {
-      if (focusList[i]) {
-        let focusSkills = [];
-        let focusKnowledge = [];
-
-        for (let keyU in this.props.userInfo.Asset) {
-          for (let keyC in data) {
-            //Insert under corresponding Focus, and dump into a general List if not.
-            //Assets being separated into focusSkills and generalList.
-            if (keyC === keyU) {
-              let focusMatch = false;
-              for (keyF in data[keyC].crossFocus) {
-                if (keyF === focusList[i]) {
-                  focusMatch = true;
-                }
-              }
-              if (focusMatch) {
-                takenSkills.push(keyU);
-                for (var b=0; b < generalList.length; b++) {
-                  if (keyU === generalList[b].name) {
-                    generalList.splice(b,1);
+    //First fetch the general Asset list (to extract Cross-information)
+    base.fetch('Asset', {
+      context: this,
+      then(data) {
+        //Loop through all Foci
+        for (let i=0; i < 3; i++) {
+          if (focusList[i]) {
+            let focusSkills = [];
+            let focusKnowledge = [];
+            //Loop through user Assets
+            for (let keyU in this.props.userInfo.Asset) {
+              //Loop through general Asset
+              for (let keyC in data) {
+                if (keyC === keyU) {
+                  let focusMatch = false;
+                  //Check if it's within this loop's Focus
+                  for (keyF in data[keyC].crossFocus) {
+                    if (keyF === focusList[i]) { focusMatch = true; }
                   }
-                }
-                if (data[keyC].type === 'Skill') {
-                  focusSkills.push(
-                    <Paper
-                      className="skillBlock"
-                      zDepth={2}
-                      onTouchTap={this.handleSkillsPopup.bind(null, keyU)}>
-                      {keyU}
-                    </Paper>
-                  );
-                } else if (data[keyC].type === 'Knowledge') {
-                  focusKnowledge.push(
-                    <Paper
-                      className="skillBlock"
-                      zDepth={2}
-                      onTouchTap={this.handleSkillsPopup.bind(null, keyU)}>
-                      {keyU}
-                    </Paper>
-                  );
-                }
-              } else {
-                let duplicateSwitch = false;
-                for (var c=0; c < takenSkills.length; c++) {
-                  if (keyU === takenSkills[c]) {
-                    duplicateSwitch = true;
+                  //If yes, (1) push into takenSkills, (2) remove from generalList (if exists), (3) categorize into Skill/Knowledge
+                  if (focusMatch) {
+                    takenSkills.push(keyU);
+                    for (var b=0; b < generalList.length; b++) {
+                      if (keyU === generalList[b].name) { generalList.splice(b,1); }
+                    }
+                    if (data[keyC].type === 'Skill') {
+                      focusSkills.push(
+                        <Paper
+                          className="skillBlock"
+                          zDepth={2}
+                          onTouchTap={this.handleSkillsPopup.bind(null, keyU)}>
+                          {keyU}
+                        </Paper>
+                      );
+                    } else if (data[keyC].type === 'Knowledge') {
+                      focusKnowledge.push(
+                        <Paper
+                          className="skillBlock"
+                          zDepth={2}
+                          onTouchTap={this.handleSkillsPopup.bind(null, keyU)}>
+                          {keyU}
+                        </Paper>
+                      );
+                    }
+                  } else {
+                    let duplicateSwitch = false;
+                    for (var c=0; c < takenSkills.length; c++) {
+                      if (keyU === takenSkills[c]) { duplicateSwitch = true; }
+                    }
+                    for (let g=0; g < generalList.length; g++) {
+                      if (keyU === generalList[g].name) { duplicateSwitch = true; }
+                    }
+                    if (!duplicateSwitch) {
+                      generalList.push({ name: keyU, type: data[keyC].type });
+                    }
                   }
-                }
-                for (let g=0; g < generalList.length; g++) {
-                  if (keyU === generalList[g].name) {
-                    duplicateSwitch = true;
-                  }
-                }
-                if (!duplicateSwitch) {
-                  generalList.push({ name: keyU, type: data[keyC].type });
                 }
               }
             }
-          }
-        }
 
-        //Message for when no skills for a particular Focus
-        if (focusSkills.length === 0) {
-          focusSkills.push(
-            <h3 id='emptySkillsMsg'>You have no skills in this focus. Time to start building!</h3>
-          );
-        }
+            //Message for when no skills/knowledge for a particular Focus
+            if (focusSkills.length === 0) {
+              focusSkills.push(
+                <h3 id='emptySkillsMsg'>You have no skills in this focus. Time to start building!</h3>
+              );
+            }
 
-        if (focusKnowledge.length === 0) {
-          focusKnowledge.push(
-            <h3 id='emptySkillsMsg'>You have no knowledge in this focus. Time to start building!</h3>
-          );
-        }
+            if (focusKnowledge.length === 0) {
+              focusKnowledge.push(
+                <h3 id='emptySkillsMsg'>You have no knowledge in this focus. Time to start building!</h3>
+              );
+            }
 
-        //Push categorized skills under the current Focus and General (at the end of loop)
-        tabsContent.push(
-          <Tab label={focusList[i]}>
-            <div className="tabcontent">
-              <h3>Skills</h3>
-              <Divider />
-              {focusSkills}
-              <Divider />
-              <h3>Knowledge</h3>
-              <Divider />
-              {focusKnowledge}
-              <div id='undeclareButton'>
-                <FlatButton label="Undeclare" primary={true} onTouchTap={this.handleUndTargetFoc.bind(null, focusList[i])} />
-              </div>
-            </div>
-          </Tab>
-        );
-      } else {
-        generalSkills = generalList.map(function(skill) {
-          if (skill.type === 'Skill') {
-            return (
-              <Paper
-                className="skillBlock"
-                zDepth={2}
-                onTouchTap={this.handleSkillsPopup.bind(null, skill.name)}>
-                {skill.name}
-              </Paper>
+            //Push categorized assets under the current Focus (at the end of loop)
+            tabsContent.push(
+              <Tab label={focusList[i]}>
+                <div className="tabcontent">
+                  <h3>Skills</h3>
+                  <Divider />
+                  {focusSkills}
+                  <Divider />
+                  <h3>Knowledge</h3>
+                  <Divider />
+                  {focusKnowledge}
+                  <div id='undeclareButton'>
+                    <FlatButton label="Undeclare" primary={true} onTouchTap={this.handleUndTargetFoc.bind(null, focusList[i])} />
+                  </div>
+                </div>
+              </Tab>
             );
+            //Once all Focus have been scanned, render the general Assets (categorized)
+          } else {
+            generalSkills = generalList.map(function(skill) {
+              if (skill.type === 'Skill') {
+                return (
+                  <Paper
+                    className="skillBlock"
+                    zDepth={2}
+                    onTouchTap={this.handleSkillsPopup.bind(null, skill.name)}>
+                    {skill.name}
+                  </Paper>
+                );
+              }
+            }, this);
+            generalKnowledge = generalList.map(function(skill) {
+              if (skill.type === 'Knowledge') {
+                return (
+                  <Paper
+                    className="skillBlock"
+                    zDepth={2}
+                    onTouchTap={this.handleSkillsPopup.bind(null, skill.name)}>
+                    {skill.name}
+                  </Paper>
+                );
+              }
+            }, this);
           }
-        }, this);
-        generalKnowledge = generalList.map(function(skill) {
-          if (skill.type === 'Knowledge') {
-            return (
-              <Paper
-                className="skillBlock"
-                zDepth={2}
-                onTouchTap={this.handleSkillsPopup.bind(null, skill.name)}>
-                {skill.name}
-              </Paper>
-            );
-          }
-        }, this);
+        }
       }
-    }
-  }
-});
+    });
 
+    //Message if general assets are empty
     if (generalSkills.length === 0) {
-      generalSkills.push(
-        <h3 id='emptySkillsMsg'>You have no general skills. Time to start building!</h3>
-      );
+      generalSkills.push( <h3 id='emptySkillsMsg'>You have no general skills. Time to start building!</h3> );
     }
-
     if (generalKnowledge.length === 0) {
-      generalKnowledge.push(
-        <h3 id='emptySkillsMsg'>You have no general knowledge. Time to start building!</h3>
-      );
+      generalKnowledge.push( <h3 id='emptySkillsMsg'>You have no general knowledge. Time to start building!</h3> );
     }
 
     let skillsPopupButton = [
@@ -346,10 +325,7 @@ base.fetch('Asset', {
         onTouchTap={this._handleMoreInfoDialogCancel} />
     ]
 
-    let planDialogStyle = {
-      width: '86%',
-      maxWidth: 'none'
-    };
+    let planDialogStyle = { width: '86%', maxWidth: 'none' };
 
     return (
       <div className="Profile" style={styles.rootWhenMedium}>
@@ -516,9 +492,7 @@ base.fetch('Asset', {
   }
 
   _handlePlanDialogClose() {
-    this.setState({
-      openPlanPopup: false
-    });
+    this.setState({ openPlanPopup: false });
   }
 
   _handlePlanRemove() {
@@ -537,21 +511,15 @@ base.fetch('Asset', {
   }
 
   handleMoreInfoPop() {
-    this.setState({
-      openMoreInfoPop: true
-    })
+    this.setState({ openMoreInfoPop: true });
   }
 
   _handleMoreInfoDialogCancel() {
-    this.setState({
-      openMoreInfoPop: false
-    });
+    this.setState({ openMoreInfoPop: false });
   }
 
   _handleMoreInfoUpdater() {
-    this.setState({
-      openMoreInfoPop: false
-    });
+    this.setState({ openMoreInfoPop: false });
   }
 
   handleUndTargetFoc(focusName) {
@@ -562,9 +530,7 @@ base.fetch('Asset', {
   }
 
   _handleVerifyCancel() {
-    this.setState({
-      openVerifyPopup: false
-    });
+    this.setState({ openVerifyPopup: false });
   }
 
   _handleFinalRemove() {
@@ -613,6 +579,5 @@ base.fetch('Asset', {
 }
 
 Profile.propTypes = {
-  history: PropTypes.object,
   userInfo: PropTypes.object
 };

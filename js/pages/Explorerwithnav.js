@@ -81,9 +81,9 @@ export default class ExplorerWithNav extends Component {
           }
         }
 
-        for (var key in this.props.userInfo.Focus) {
-          if (!this.props.userInfo.Focus.hasOwnProperty(key)) { continue; }
-          if (this.props.userInfo.Focus[key].likeStatus === true) {
+        for (var key2 in this.props.userInfo.Focus) {
+          if (!this.props.userInfo.Focus.hasOwnProperty(key2)) { continue; }
+          if (this.props.userInfo.Focus[key2].likeStatus === true) {
             focusCheck = true;
             break;
           }
@@ -118,9 +118,9 @@ export default class ExplorerWithNav extends Component {
 
           //Use Level 3 to determine render for Level 2 (if Path/Industry)
           if (lookup === 'Path' || lookup === 'Industry') {
-            let totalPref3 = 1;
+            let totalPref3 = 0;
             //Start Level 3 unbundle
-            for (var key3 in this.state.currentList[key1][key2].level3) {
+            for (var key3 in this.state.currentList[key1].level2[key2].level3) {
               //Apply filter
               let filterResult3 = (
                 <ExplorerListFilter
@@ -141,17 +141,19 @@ export default class ExplorerWithNav extends Component {
                 let listObject3 = this.state.currentList[key1].level2[key2].level3[key3];
                 let lvl3Icon;
 
-                for (var keyU in this.props.userInfo[lookup]) {
-                  if (!this.props.userInfo[lookup].hasOwnProperty(keyU)) { continue; }
-                  if (key3 === keyU) {
-                    if (this.props.userInfo[lookup][keyU].likeStatus === true) {
-                      lvl3Switch = true;
-                      lvl2Switch = lvl2Switch + 1;
-                      break;
-                    } else {
-                      lvl3Switch = false;
-                      lvl2Switch = lvl2Switch - 1;
-                      break;
+                if (authData) {
+                  for (var keyU in this.props.userInfo[lookup]) {
+                    if (!this.props.userInfo[lookup].hasOwnProperty(keyU)) { continue; }
+                    if (key3 === keyU) {
+                      if (this.props.userInfo[lookup][keyU].likeStatus === true) {
+                        lvl3Switch = true;
+                        totalPref3 = totalPref3 + 1;
+                        break;
+                      } else {
+                        lvl3Switch = false;
+                        totalPref3 = totalPref3 - 1;
+                        break;
+                      }
                     }
                   }
                 }
@@ -191,16 +193,18 @@ export default class ExplorerWithNav extends Component {
                 dislikeShow={this.state.dislikeShow} />
              );
 
-             if (filterResult2) {
-               for (var keyU in this.props.userInfo[lookup]) {
-                 if (!this.props.userInfo[lookup].hasOwnProperty(keyU)) { continue; }
-                 if (key2 === keyU) {
-                   if (this.props.userInfo[lookup][keyU].likeStatus === true) {
-                     lvl2Switch = true;
-                     break;
-                   } else {
-                     lvl2Switch = false;
-                     break;
+             if (authData) {
+               if (filterResult2) {
+                 for (var keyU in this.props.userInfo[lookup]) {
+                   if (!this.props.userInfo[lookup].hasOwnProperty(keyU)) { continue; }
+                   if (key2 === keyU) {
+                     if (this.props.userInfo[lookup][keyU].likeStatus === true) {
+                       lvl2Switch = true;
+                       break;
+                     } else {
+                       lvl2Switch = false;
+                       break;
+                     }
                    }
                  }
                }
@@ -250,7 +254,7 @@ export default class ExplorerWithNav extends Component {
 
     let itemDescription;
 
-    //Just pass the entire item object instead of its pieces! (See "Description" page for processor)
+    //Part III - Show the Description Page (while passing in props)
     if (this.state.showDescPage) {
       itemDescription =
         <ExplorerDescription
@@ -261,8 +265,8 @@ export default class ExplorerWithNav extends Component {
           selectedObj={this.state.selectedObj} />
     }
 
+    // Part IV - ExploreType Career enable/disable
     let careerButton;
-
     if (careerAllow) {
       careerButton = (
         <FloatingActionButton disabled={careerAllow ? false : true } disabledColor={Colors.pink50} onTouchTap={this.handleCareerExp} mini={true}>
@@ -277,6 +281,7 @@ export default class ExplorerWithNav extends Component {
       );
     }
 
+    //Part V - Return components
     return (
       <div style={styles.rootWhenMedium}>
         <div style={styles.contentWhenMedium}>
@@ -375,15 +380,21 @@ export default class ExplorerWithNav extends Component {
     let ListEndPt;
     if (this.state.exploreType === 'Industry') {
       ListEndPt = 'Industry';
+      base.fetch(ListEndPt, {
+        context: this,
+        then(data) {
+          this.setState({currentList: data});
+        }
+      });
     } else if (this.state.exploreType === 'Focus' || this.state.exploreType === 'Path') {
       ListEndPt = 'Path';
+      base.fetch(ListEndPt, {
+        context: this,
+        then(data) {
+          this.setState({currentList: data});
+        }
+      });
     }
-    base.fetch(ListEndPt, {
-      context: this,
-      then(data) {
-        this.setState({currentList: data});
-      }
-    })
   }
 
   handleLikeCheck() {
@@ -417,3 +428,7 @@ export default class ExplorerWithNav extends Component {
     });
   }
 }
+
+ExplorerWithNav.propTypes = {
+  userInfo: PropTypes.object
+};

@@ -1,6 +1,3 @@
-//require('normalize.css');
-//require('styles/App.css');
-
 import React, { Component, PropTypes } from 'react';
 import Firebase from 'firebase';
 import Rebase from 're-base';
