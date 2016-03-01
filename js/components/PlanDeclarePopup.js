@@ -16,13 +16,6 @@ export default class PlanDeclarePopup extends Component {
     this.handleClose = this.handleClose.bind(this);
   }
 
-  observe() {
-    return {
-      userPref: new Parse.Query('userPref').equalTo('userTied', true),
-      crossList: new Parse.Query('PathCross').equalTo('name',this.props.selecteditem)
-    };
-  }
-
   render() {
     let renderPage;
 

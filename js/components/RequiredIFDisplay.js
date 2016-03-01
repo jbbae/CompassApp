@@ -1,9 +1,4 @@
-import React, { PropTypes } from 'react';
-import Firebase from 'firebase';
-import Rebase from 're-base';
-
-var base = new Rebase.createClass('https://sageview.firebaseio.com');
-var authData = base.getAuth();
+import React, { Component, PropTypes } from 'react';
 
 export default class RequiredIFDisplay extends Component {
 

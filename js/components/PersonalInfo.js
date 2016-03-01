@@ -25,27 +25,11 @@ export default class PersonalInfoPopup extends Component {
     };
   }
 
-  componentDidMount() {
-    if (authData) {
-      let userEndPoint = 'users/' + authData.uid;
-      this.ref = base.bindToState(userEndPoint, {
-        context: this,
-        state: 'userInfo'
-      });
-    }
-  }
-
-  observe() {
-    return {
-      user: ParseReact.currentUser
-    };
-  }
-
   render() {
     let {imagePreviewUrl} = this.state;
     let $imagePreview =
-      <Avatar color={Colors.deepOrange300} backgroundColor={Colors.purple500} size={180} src={this.state.userInfo.profilePic ? this.state.userInfo.profilePic.url() : null}>
-        { this.state.userInfo.profilePic ? null : this.state.userInfo.firstName.substring(0,1).concat(this.state.userInfo.lastName.substring(0,1)) }
+      <Avatar color={Colors.deepOrange300} backgroundColor={Colors.purple500} size={180} src={this.props.userInfo.profilePic ? this.props.userInfo.profilePic.url() : null}>
+        { this.props.userInfo.profilePic ? null : this.props.userInfo.firstName.substring(0,1).concat(this.props.userInfo.lastName.substring(0,1)) }
       </Avatar>;
     if (imagePreviewUrl) {
       $imagePreview = (<Avatar size={180} src={imagePreviewUrl} />);
@@ -70,32 +54,32 @@ export default class PersonalInfoPopup extends Component {
             style={{margin:'0px 20px 0px 20px'}}
             hintText="Enter your First Name"
             floatingLabelText="First Name"
-            defaultValue={this.state.userInfo.firstName}
+            defaultValue={this.props.userInfo.firstName}
             onChange={this._handleFloatingInputChange} />
           <TextField
             ref='lastname'
             style={{margin:'0px 20px 0px 20px'}}
             hintText="Enter your Last Name"
             floatingLabelText="Last Name"
-            defaultValue={this.state.userInfo.lastName}
+            defaultValue={this.props.userInfo.lastName}
             onChange={this._handleFloatingInputChange} />
           <TextField
             ref='id'
             style={{margin:'0px 20px 0px 20px'}}
             hintText="Enter your ID"
             floatingLabelText="ID"
-            defaultValue={this.state.userInfo.username}
+            defaultValue={this.props.userInfo.username}
             onChange={this._handleFloatingInputChange} />
           <TextField
             ref='email'
             style={{margin:'0px 20px 0px 20px'}}
             hintText="Enter Email"
             floatingLabelText="Email"
-            defaultValue={this.state.userInfo.email}
+            defaultValue={this.props.userInfo.email}
             onChange={this._handleFloatingInputChange} />
           <SelectField
             style={{margin:'0px 20px 0px 20px'}}
-            value={this.state.occValue === undefined ? this.state.userInfo.occupation : this.state.occValue}
+            value={this.state.occValue === undefined ? this.props.userInfo.occupation : this.state.occValue}
             onChange={this.handleOccChange}
             floatingLabelText="Occupation">
             <MenuItem value='Student' primaryText='Student' />
@@ -109,7 +93,7 @@ export default class PersonalInfoPopup extends Component {
             style={{margin:'0px 20px 0px 20px'}}
             hintText="Enter your Organization"
             floatingLabelText="Organization"
-            defaultValue={this.state.userInfo.organization}
+            defaultValue={this.props.userInfo.organization}
             onChange={this._handleFloatingInputChange} />
         </div>
         <div className='buttonWrapper'>
@@ -138,7 +122,6 @@ export default class PersonalInfoPopup extends Component {
         imagePreviewUrl: reader.result
       });
     }
-
     reader.readAsDataURL(file)
   }
 
@@ -161,14 +144,14 @@ export default class PersonalInfoPopup extends Component {
     let email = this.refs.email.getValue();
     let occupation;
     if (this.state.occValue === undefined) {
-      this.setState({ occValue: this.data.user.occupation });
-      occupation = this.data.user.occupation;
+      this.setState({ occValue: this.props.userInfo.occupation });
+      occupation = this.props.userInfo.occupation;
     } else {
       occupation = this.state.occValue;
     }
     let id = this.refs.id.getValue();
 
-    let newUserInfo = this.state.userInfo;
+    let newUserInfo = this.props.userInfo;
     newUserInfo.username = id;
     newUserInfo.firstName = firstname;
     newUserInfo.lastName = lastname;
@@ -177,16 +160,28 @@ export default class PersonalInfoPopup extends Component {
     newUserInfo.occupation = occupation;
     newUserInfo.profilePic = this.state.imagePreviewUrl;
 
-    this.setState({ userInfo: newUserInfo });
-    self.props.closePopup();
+    let newuserEP = 'users/' + authData.uid;
+    base.post(newuserEP, {
+      data: newUserInfo,
+      then() {
+        self.props.closePopup();
+      }
+    });
   }
 
   handleremovePic() {
-    let newUserInfo = React.addons.update(this.state.userInfo, {profilePic: {$set: null}});
-    this.setState({ userInfo: newUserInfo });
+    let newUserInfo = React.addons.update(this.props.userInfo, {profilePic: {$set: null}});
+    let newuserEP = 'users/' + authData.uid;
+    base.post(newuserEP, {
+      data: newUserInfo,
+      then() {
+        self.props.closePopup();
+      }
+    });
   }
 }
 
 PersonalInfoPopup.propTypes = {
+  userInfo: PropTypes.object,
   closePopup: PropTypes.func
 };

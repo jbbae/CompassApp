@@ -63,8 +63,7 @@ export default class ExplorerDescription extends Component {
       openSkillsPopup: false,
       openDeclarePopup: false,
       assetLike: false,
-      userPref: null,
-      userAssets: null
+      userPref: null
     })
   }
 
@@ -74,12 +73,6 @@ export default class ExplorerDescription extends Component {
       this.ref = base.syncState(userEndPoint, {
         context: this,
         state: 'userPref'
-      });
-
-      let assetEndPt = 'users/' + authData.uid + '/Assets';
-      base.syncState(assetEndPt, {
-        context: this,
-        state: 'userAssets'
       });
     }
   }
@@ -520,7 +513,10 @@ export default class ExplorerDescription extends Component {
           this.setState({userPref: null});
 
         } else if (value != null && this.state.userPref === null) {
-          let newEndPoint = authData.uid + '/' + this.props.exploreType + '/' + this.props.selecteditem;
+          let listType;
+          if (this.props.exploreType === 'Focus' || this.props.exploreType === 'Path') { listType = 'Path'; }
+
+          let newEndPoint = authData.uid + '/' + listType + '/' + this.props.selecteditem;
 
           base.post(newEndPoint, {
             data: {
@@ -594,7 +590,7 @@ export default class ExplorerDescription extends Component {
 
     handleSkillsPopup(skillname) {
       let liked = false;
-      for (let key in this.state.userAssets) {
+      for (let key in this.props.userInfo.Asset) {
         if (skillname === key) { liked = true; }
       }
 
@@ -613,14 +609,18 @@ export default class ExplorerDescription extends Component {
 
     _handleSkillLike() {
       if (!this.state.assetLike) {
-        let newAssets = this.state.userAssets;
-        newAssets[this.state.selectedSkill] = 0;
-        this.setState({
-          userAssets: newAssets.
-          assetLike: true,
-          openSkillsPopup: false,
-          updateMsg: 'Skill Added!',
-          snackopen: true
+        let newAssets = this.props.userInfo.Asset;
+        newAssets[this.state.selectedSkill] = true;
+        base.post('users/' + authData.uid + '/Asset', {
+          data: newAssets,
+          then() {
+            this.setState({
+              assetLike: true,
+              openSkillsPopup: false,
+              updateMsg: 'Skill Added!',
+              snackopen: true
+            });
+          }
         });
       }
     }
@@ -641,6 +641,7 @@ export default class ExplorerDescription extends Component {
 }
 
 ExplorerDescription.propTypes = {
+  userInfo: PropTypes.object,
   selecteditem: PropTypes.string,
   exploreType: PropTypes.string,
   backFunction: PropTypes.func,

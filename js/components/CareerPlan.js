@@ -30,9 +30,7 @@ export default class CareerPlan extends Component {
       selectedSkill: '',
       openSkillsPopup: false,
       openIndustryPopup: false,
-      openVerifyPopup: false,
-      userPath: null,
-      userAssets: null
+      openVerifyPopup: false
     }
   }
 

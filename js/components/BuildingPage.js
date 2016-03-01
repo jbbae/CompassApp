@@ -43,7 +43,7 @@ export default class BuildingPage extends Component {
           }
         }
       }
-    })
+    });
 
     return (
       <div style={{textAlign: 'center'}}>

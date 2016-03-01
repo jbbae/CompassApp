@@ -200,7 +200,7 @@ export default class AppComponent extends Component {
           <MenuItem value='explorerwithnav' primaryText='Explore' style={this.state.selectedPage === 'explorerwithnav' ? {color: Colors.pink500} : null} onTouchTap={this.onLeftNavChange.bind(null, 'explorerwithnav')} />
         </LeftNav>
 
-      {this.props.children}
+      {React.cloneElement(this.props.children, {userInfo: this.state.userInfo})}
 
       <FullWidthSection style={styles.footer}>
         <p style={styles.p}>

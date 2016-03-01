@@ -34,19 +34,8 @@ export default class ExplorerWithNav extends Component {
       neutralShow: true,
       dislikeShow: true,
       showDescPage: false,
-      userInfo: null,
       currentList: null
     };
-  }
-
-  componentDidMount() {
-    if (authData) {
-      let userEndPoint = 'users/' + authData.uid;
-      this.ref = base.bindToState(userEndPoint, {
-        context: this,
-        state: 'userInfo'
-      });
-    }
   }
 
   getStyles() {
@@ -80,21 +69,21 @@ export default class ExplorerWithNav extends Component {
 
     //Part I - Check if exploreType = Careers is an option (disable button?)
     let careerAllow = false;
-    if (this.state.useInfo) {
-      if (this.state.userInfo.Industry && this.state.userInfo.Focus) {
+    if (this.props.useInfo) {
+      if (this.props.userInfo.Industry && this.props.userInfo.Focus) {
         let industryCheck = false;
         let focusCheck = false;
-        for (var key in this.state.userInfo.Industry) {
-          if (!this.state.userInfo.Industry.hasOwnProperty(key)) { continue; }
-          if (this.state.userInfo.Industry[key].likeStatus === true) {
+        for (var key in this.props.userInfo.Industry) {
+          if (!this.props.userInfo.Industry.hasOwnProperty(key)) { continue; }
+          if (this.props.userInfo.Industry[key].likeStatus === true) {
             industryCheck = true;
             break;
           }
         }
 
-        for (var key in this.state.userInfo.Focus) {
-          if (!this.state.userInfo.Focus.hasOwnProperty(key)) { continue; }
-          if (this.state.userInfo.Focus[key].likeStatus === true) {
+        for (var key in this.props.userInfo.Focus) {
+          if (!this.props.userInfo.Focus.hasOwnProperty(key)) { continue; }
+          if (this.props.userInfo.Focus[key].likeStatus === true) {
             focusCheck = true;
             break;
           }
@@ -152,10 +141,10 @@ export default class ExplorerWithNav extends Component {
                 let listObject3 = this.state.currentList[key1].level2[key2].level3[key3];
                 let lvl3Icon;
 
-                for (var keyU in this.state.userInfo[lookup]) {
-                  if (!this.state.userInfo[lookup].hasOwnProperty(keyU)) { continue; }
+                for (var keyU in this.props.userInfo[lookup]) {
+                  if (!this.props.userInfo[lookup].hasOwnProperty(keyU)) { continue; }
                   if (key3 === keyU) {
-                    if (this.state.userInfo[lookup][keyU].likeStatus === true) {
+                    if (this.props.userInfo[lookup][keyU].likeStatus === true) {
                       lvl3Switch = true;
                       lvl2Switch = lvl2Switch + 1;
                       break;
@@ -203,10 +192,10 @@ export default class ExplorerWithNav extends Component {
              );
 
              if (filterResult2) {
-               for (var keyU in this.state.userInfo[lookup]) {
-                 if (!this.state.userInfo[lookup].hasOwnProperty(keyU)) { continue; }
+               for (var keyU in this.props.userInfo[lookup]) {
+                 if (!this.props.userInfo[lookup].hasOwnProperty(keyU)) { continue; }
                  if (key2 === keyU) {
-                   if (this.state.userInfo[lookup][keyU].likeStatus === true) {
+                   if (this.props.userInfo[lookup][keyU].likeStatus === true) {
                      lvl2Switch = true;
                      break;
                    } else {
@@ -265,10 +254,11 @@ export default class ExplorerWithNav extends Component {
     if (this.state.showDescPage) {
       itemDescription =
         <ExplorerDescription
-        selecteditem={this.state.selecteditem}
-        exploreType={this.state.exploreType}
-        backFunction={this.handleDescPageExit}
-        selectedObj={this.state.selectedObj} />
+          userInfo={this.props.userInfo}
+          selecteditem={this.state.selecteditem}
+          exploreType={this.state.exploreType}
+          backFunction={this.handleDescPageExit}
+          selectedObj={this.state.selectedObj} />
     }
 
     let careerButton;
@@ -366,7 +356,7 @@ export default class ExplorerWithNav extends Component {
     });
     this.handleFetchItems();
     setTimeout(function(){
-      this.setState({querySwitch: 'selecting focus'});
+      this.setState({querySwitch: 'selecting Focus'});
     }.bind(this),300);
   }
 
@@ -377,7 +367,7 @@ export default class ExplorerWithNav extends Component {
     });
     this.handleFetchItems();
     setTimeout(function(){
-      this.setState({querySwitch: 'selecting paths'});
+      this.setState({querySwitch: 'selecting Paths'});
     }.bind(this),300);
   }
 
