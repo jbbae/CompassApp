@@ -325,6 +325,7 @@ export default class AppComponent extends Component {
           base.post(childEndPoint, {
             data: {
               username: id,
+              email: email,
               firstName: firstname,
               lastName: lastname,
               organization: org,

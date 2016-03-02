@@ -5,6 +5,9 @@ import Rebase from 're-base';
 import { FontIcon, Popover, RaisedButton, Snackbar, Styles, TextField } from 'material-ui';
 let { Colors, Typography } = Styles;
 
+var base = new Rebase.createClass('https://sageview.firebaseio.com');
+var authData = base.getAuth();
+
 export default class BuildingPage extends Component {
   constructor() {
     super();
@@ -13,33 +16,22 @@ export default class BuildingPage extends Component {
     this.handleSnackClose = this.handleSnackClose.bind(this);
 
     this.state = {
-      emailList: null,
       snackopen: false,
       activePopover: false,
       anchorEl: null
     };
   }
 
-  componentDidMount() {
-    if (authData) {
-      this.ref = base.syncState('emailList', {
-        context: this,
-        state: 'emailList'
-      });
-    }
-  }
-
   render() {
     let listStatusCheck = false;
-    let userEmail = '';
 
-    base.fetch('users/'+authData.uid, {
+    base.fetch('emailList', {
       context: this,
       then(data) {
-        userEmail = data.email;
-        for (let key in this.state.emailList) {
-          if (emailList[key] = data.email) {
+        for (let key in data) {
+          if (this.props.userInfo.email === data[key]) {
             listStatusCheck = true;
+            break;
           }
         }
       }
@@ -56,7 +48,7 @@ export default class BuildingPage extends Component {
           label={ listStatusCheck ? 'Already in List!' : 'Yes, let me know!'}
           secondary={true}
           disabled={ listStatusCheck ? true : false }
-          onTouchTap={ authData ? this.handleAddtoList.bind(null, userEmail) : this.handleAddButton.bind(this)} />
+          onTouchTap={ authData ? this.handleAddtoList.bind(null, this.props.userInfo.email) : this.handleAddButton.bind(this)} />
 
         <Popover
           open={this.state.activePopover}
@@ -97,12 +89,11 @@ export default class BuildingPage extends Component {
       emailFinal = emailEntry;
     }
 
-    let newList = this.state.emailList;
-    newList[authData.uid] = emailFinal;
-
-    this.setState({
-      emailList: newList,
-      snackopen: true
+    base.post('emailList/' + authData.uid, {
+      data: emailFinal,
+      then() {
+        this.setState({ snackopen: true });
+      }
     });
   }
 
@@ -116,4 +107,5 @@ export default class BuildingPage extends Component {
 }
 
 BuildingPage.propTypes = {
-}
+  userInfo: PropTypes.object
+};

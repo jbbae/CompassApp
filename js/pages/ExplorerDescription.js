@@ -236,8 +236,8 @@ export default class ExplorerDescription extends Component {
 
     //Part V - Render tab contents
     let tabOneContent;
-    let tabOneOverview;
-    for (key in overview) {
+    let tabOneOverview = [];
+    for (let key in overview) {
       tabOneOverview.push(<p>{overview[key]}</p>);
     }
 
@@ -298,7 +298,7 @@ export default class ExplorerDescription extends Component {
     //Tab 2 - Industry
     if(this.props.exploreType === 'Industry') {
       labeltwo = 'Companies';
-      tabTwoContent = <BuildingPage />
+      tabTwoContent = <BuildingPage userInfo={this.props.userInfo} />
 
 //        let tabTwoRows = companies.map(function(company) {
 //          return (
@@ -528,6 +528,7 @@ export default class ExplorerDescription extends Component {
           let newPref = React.addons.update(userPref, {likeStatus: {$set: value}});
           base.post(newEndPoint, { data: newPref });
         }
+      }
 
       setTimeout(function(){
         this.setState({refresh: true});

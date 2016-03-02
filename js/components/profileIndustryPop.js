@@ -8,7 +8,7 @@ import VerifyUndeclare from './VerifyUndeclare';
 
 var base = new Rebase.createClass('https://sageview.firebaseio.com');
 
-export default class ProfileIndustryPop extends ParseComponent {
+export default class ProfileIndustryPop extends Component {
   constructor(props) {
     super(props);
     this._handleRequestClose = this._handleRequestClose.bind(this);

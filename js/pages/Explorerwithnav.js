@@ -8,7 +8,7 @@ import { Checkbox, CircularProgress, Divider, DropDownMenu, FontIcon, FloatingAc
 let { Spacing, Colors } = Styles;
 
 import ExplorerListFilter from '../components/ExplorerListFilter';
-//import ExplorerDescription from './ExplorerDescription.js';
+import ExplorerDescription from './ExplorerDescription.js';
 
 var base = new Rebase.createClass('https://sageview.firebaseio.com');
 var authData = base.getAuth();

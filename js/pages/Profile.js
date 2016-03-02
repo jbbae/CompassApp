@@ -121,16 +121,18 @@ export default class Profile extends Component {
     let planlist;
     let tabsContent = [];
 
-    for (keyI in this.props.userInfo.Industry) {
-      if (this.props.userInfo.Industry[keyI].userTied === true) {
-        industryList.push( <Paper id="industryBlock" zDepth={1} onTouchTap={self.handleProfileIndPop.bind(null,keyI)}>{keyI}</Paper> );
+    if (this.props.userInfo) {
+      for (let keyI in this.props.userInfo.Industry) {
+        if (this.props.userInfo.Industry[keyI].userTied === true) {
+          industryList.push( <Paper id="industryBlock" zDepth={1} onTouchTap={self.handleProfileIndPop.bind(null,keyI)}>{keyI}</Paper> );
+        }
       }
-    }
-    for (keyF in this.props.userInfo.Focus) {
-      if (this.props.userInfo.Focus[keyF].userTied === true) { focusList.push(keyF); }
-    }
-    for (keyP in this.props.userInfo.Path) {
-      if (this.props.userInfo.Path[keyP].userTied === true) { pathHolder.push(keyP); }
+      for (let keyF in this.props.userInfo.Focus) {
+        if (this.props.userInfo.Focus[keyF].userTied === true) { focusList.push(keyF); }
+      }
+      for (let keyP in this.props.userInfo.Path) {
+        if (this.props.userInfo.Path[keyP].userTied === true) { pathHolder.push(keyP); }
+      }
     }
 
     //Part II - Unbundle selected paths into plan buttons
@@ -176,7 +178,7 @@ export default class Profile extends Component {
                 if (keyC === keyU) {
                   let focusMatch = false;
                   //Check if it's within this loop's Focus
-                  for (keyF in data[keyC].crossFocus) {
+                  for (let keyF in data[keyC].crossFocus) {
                     if (keyF === focusList[i]) { focusMatch = true; }
                   }
                   //If yes, (1) push into takenSkills, (2) remove from generalList (if exists), (3) categorize into Skill/Knowledge
@@ -579,5 +581,5 @@ export default class Profile extends Component {
 }
 
 Profile.propTypes = {
-  userInfo: PropTypes.object
+  userInfo: PropTypes.object.isRequired
 };

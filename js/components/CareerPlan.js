@@ -5,7 +5,6 @@ import Rebase from 're-base';
 var { Dialog, FlatButton, FloatingActionButton, FontIcon, Paper, RaisedButton, Styles, Tab, Tabs } = require('material-ui');
 
 import SkillPopup from './SkillPopup';
-import AddIndustryPopup from './AddIndustry';
 import BuildingPage from './BuildingPage';
 import VerifyUndeclare from './VerifyUndeclare';
 
@@ -120,7 +119,7 @@ export default class CareerPlan extends Component {
   render() {
     let styles = this.getStyles();
 
-    let skillsContainer [];
+    let skillsContainer = [];
 
     base.fetch('Asset', {
       context: this,
