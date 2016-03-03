@@ -105,10 +105,11 @@ export default class AppComponent extends Component {
     let focusList;
     if (this.state.userInfo) {
       if (this.state.userInfo.Focus) {
-        let focusListPre = Object.keys(this.state.userInfo.Focus)
-        focusList = focusListPre.map(function(focus) {
-          return (<p id="navProfileDetails">{focus}</p>);
-        }, this);
+        for (let key in this.state.userInfo.Focus) {
+          if (this.state.userInfo.Focus.userTied === true) {
+            focusList.push(<p id="navProfileDetails">{focus}</p>);
+          }
+        }
       }
     }
 

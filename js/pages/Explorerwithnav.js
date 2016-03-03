@@ -160,7 +160,7 @@ export default class ExplorerWithNav extends Component {
 
                 if (lvl3Switch) {
                   lvl3Icon=<FontIcon className="material-icons" color={Colors.blue500}>star</FontIcon>;
-                } else if (!lvl3Switch) {
+                } else if (lvl3Switch === false) {
                   lvl3Icon=<FontIcon className="material-icons" color={Colors.red500}>block</FontIcon>;
                 }
 
@@ -214,7 +214,7 @@ export default class ExplorerWithNav extends Component {
           if (filterResult2) {
             if (lvl2Switch) {
               lvl2Icon=<FontIcon className="material-icons" color={Colors.blue500}>star</FontIcon>;
-            } else if (!lvl2Switch) {
+            } else if (lvl2Switch === false) {
               lvl2Icon=<FontIcon className="material-icons" color={Colors.red500}>block</FontIcon>;
             }
 
@@ -310,9 +310,6 @@ export default class ExplorerWithNav extends Component {
                 </div>
               </td>
             </table>
-          </List>
-          <Divider />
-          <List subheader="Show me my...">
             <div className='checkboxWrap'>
               <Checkbox
                 label="Likes"
@@ -360,9 +357,6 @@ export default class ExplorerWithNav extends Component {
       showDescPage: false
     });
     this.handleFetchItems();
-    setTimeout(function(){
-      this.setState({querySwitch: 'selecting Focus'});
-    }.bind(this),300);
   }
 
   handleCareerExp() {
@@ -371,9 +365,6 @@ export default class ExplorerWithNav extends Component {
       showDescPage: false
     });
     this.handleFetchItems();
-    setTimeout(function(){
-      this.setState({querySwitch: 'selecting Paths'});
-    }.bind(this),300);
   }
 
   handleFetchItems() {
@@ -384,6 +375,9 @@ export default class ExplorerWithNav extends Component {
         context: this,
         then(data) {
           this.setState({currentList: data});
+          setTimeout(function(){
+            this.setState({querySwitch: 'selecting Paths'});
+          }.bind(this),300);
         }
       });
     } else if (this.state.exploreType === 'Focus' || this.state.exploreType === 'Path') {
@@ -392,9 +386,15 @@ export default class ExplorerWithNav extends Component {
         context: this,
         then(data) {
           this.setState({currentList: data});
+          setTimeout(function(){
+            this.setState({querySwitch: 'selecting Paths'});
+          }.bind(this),300);
         }
       });
     }
+    setTimeout(function(){
+      this.setState({querySwitch: 'selecting Paths'});
+    }.bind(this),300);
   }
 
   handleLikeCheck() {

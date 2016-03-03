@@ -124,7 +124,7 @@ export default class Profile extends Component {
     if (this.props.userInfo) {
       for (let keyI in this.props.userInfo.Industry) {
         if (this.props.userInfo.Industry[keyI].userTied === true) {
-          industryList.push( <Paper id="industryBlock" zDepth={1} onTouchTap={self.handleProfileIndPop.bind(null,keyI)}>{keyI}</Paper> );
+          industryList.push( <Paper id="industryBlock" zDepth={1} onTouchTap={this.handleProfileIndPop.bind(null,keyI)}>{keyI}</Paper> );
         }
       }
       for (let keyF in this.props.userInfo.Focus) {
@@ -536,12 +536,13 @@ export default class Profile extends Component {
   }
 
   _handleFinalRemove() {
+    let self = this;
     if (this.state.targetUndFoc) {
       let focPrefEP = 'users/' + authData.uid + '/Focus/' + this.state.targetUndFoc + '/userTied';
       base.post(focPrefEP, {
         data: false,
         then() {
-          this.setState({
+          self.setState({
             updateMsg: 'Focus was undeclared!',
             snackopen: true,
             openVerifyPopup: false,
@@ -554,7 +555,7 @@ export default class Profile extends Component {
       base.post(indPrefEP, {
         data: false,
         then() {
-          this.setState({
+          self.setState({
             updateMsg: 'Industry was undeclared!',
             snackopen: true,
             openProfileIndPop: false,

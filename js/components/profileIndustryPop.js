@@ -30,23 +30,25 @@ export default class ProfileIndustryPop extends Component {
   render() {
     let descContent;
 
-    base.fetch('Industry', {
-      context: this,
-      then(data) {
-        for (let key1 in data) {
-          for (let key2 in data[key1].level2) {
-            for (let key3 in data[key1].level2[key2].level3) {
-              if (key3 === this.props.selectedindustry) {
-                for (keyD in data[key1].level2[key2].level3[key3].description) {
-                  descContent.push(<p>{paragraph}</p>);
-                  break;
+    if (this.props.selectedindustry) {
+      base.fetch('Industry', {
+        context: this,
+        then(data) {
+          for (let key1 in data) {
+            for (let key2 in data[key1].level2) {
+              for (let key3 in data[key1].level2[key2].level3) {
+                if (key3 === this.props.selectedindustry) {
+                  for (keyD in data[key1].level2[key2].level3[key3].description) {
+                    descContent.push(<p>{paragraph}</p>);
+                    break;
+                  }
                 }
               }
             }
           }
         }
-      }
-    });
+      });
+    }
 
     let verifyPopupButton = [
         <FlatButton

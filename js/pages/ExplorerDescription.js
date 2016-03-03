@@ -133,7 +133,7 @@ export default class ExplorerDescription extends Component {
 
     //Part I - Input the userList object into a global variable + Count the # of Declared while at it.
     let declareCount = 0;
-    if (this.props.userInfo[this.props.exploreType][this.props.selecteditem]) { userPref = this.props.userInfo[this.props.exploreType][this.props.selecteditem] }
+    if (this.props.userInfo[this.props.exploreType][this.props.selecteditem]) { userPref = this.props.userInfo[this.props.exploreType][this.props.selecteditem]; }
     if (userPref) {
       let counterEndPt = 'users/' + authData.uid + '/' + this.props.exploreType;
       base.fetch(counterEndPt, {
@@ -150,7 +150,7 @@ export default class ExplorerDescription extends Component {
     let likeDropDown;
     let declareButton;
 
-    if (userPref && this.props.selectedObj) {
+    if (this.props.selectedObj) {
       likeDropDown = (
         <DropDownMenu value={userPref ? userPref.likeStatus : null} onChange={authData ? this.handleFavorite : this.handleNeedLogin}>
           <MenuItem value={null} primaryText='Not Sure...' />
@@ -159,11 +159,13 @@ export default class ExplorerDescription extends Component {
         </DropDownMenu>
       );
 
-      if (userPref.likeStatus === true) {
-        if (userPref.userTied === false) {
-          declareButton = <RaisedButton label="Make Primary!" secondary={true} onTouchTap={this.handleDeclare.bind(null, declareCount)} />;
-        } else if (userPref.userTied === true) {
-          declareButton = <RaisedButton label="Already Primary" onTouchTap={this.handleAlreadyMsg} />;
+      if (userPref) {
+        if (userPref.likeStatus === true) {
+          if (userPref.userTied === false) {
+            declareButton = <RaisedButton label="Make Primary!" secondary={true} onTouchTap={this.handleDeclare.bind(null, declareCount)} />;
+          } else if (userPref.userTied === true) {
+            declareButton = <RaisedButton label="Already Primary" onTouchTap={this.handleAlreadyMsg} />;
+          }
         }
       }
     }
@@ -503,7 +505,7 @@ export default class ExplorerDescription extends Component {
       } else if (this.props.exploreType === 'Industry') {
         listType = this.props.exploreType;
       }
-      let newEndPoint = authData.uid + '/' + listType + '/' + this.props.selecteditem;
+      let newEndPoint = 'users/' + authData.uid + '/' + listType + '/' + this.props.selecteditem;
 
       if (authData) {
         if (value === null && userPref !== null) {
@@ -525,8 +527,7 @@ export default class ExplorerDescription extends Component {
           });
 
         } else if (value != null && userPref != null) {
-          let newPref = React.addons.update(userPref, {likeStatus: {$set: value}});
-          base.post(newEndPoint, { data: newPref });
+          base.post(newEndPoint+'/likeStatus', { data: null });
         }
       }
 
@@ -557,16 +558,8 @@ export default class ExplorerDescription extends Component {
     }
 
     handleDeclareFinal() {
-      let listType;
-      if (this.props.exploreType === 'Focus' || this.props.exploreType === 'Path') {
-        listType = 'Path';
-      } else if (this.props.exploreType === 'Industry') {
-        listType = this.props.exploreType;
-      }
-      let newEndPoint = authData.uid + '/' + listType + '/' + this.props.selecteditem;
-
-      let newPref = React.addons.update(userPref, {userTied: {$set: true}});
-      base.post(newEndPoint, { data: newPref });
+      let newEndPoint = 'users/' + authData.uid + '/' + this.props.exploreType + '/' + this.props.selecteditem + '/userTied';
+      base.post(newEndPoint, { data: true });
 
       let str1 = 'Declared ';
       let message = str1.concat(this.props.exploreType,'!');

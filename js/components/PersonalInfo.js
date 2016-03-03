@@ -43,8 +43,8 @@ export default class PersonalInfoPopup extends Component {
             <div id='picPrevWrap'>
               <div id='picPrevFiller'></div>
               <Paper id='picPreviewHolder' zDepth={3} circle={true}>{$imagePreview}</Paper>
-              <IconButton id='removePicButton' tooltip="Remove Profile Pic" tooltipPosition="bottom-right" onTouchTap={this.handleremovePic}>
-                <FontIcon className="material-icons" color={Colors.redA700}>clear</FontIcon>
+              <IconButton id='removePicButton' tooltip={this.props.userInfo.profilePic ? "Remove Profile Pic" : null} tooltipPosition="bottom-right" onTouchTap={this.handleremovePic}>
+                <FontIcon className="material-icons" color={this.props.userInfo.profilePic ? Colors.redA700 : Colors.pink50}>clear</FontIcon>
               </IconButton>
             </div>
             <RaisedButton label="Change Image" secondary={true} onTouchTap={this.handleImageInput} />
@@ -170,10 +170,9 @@ export default class PersonalInfoPopup extends Component {
   }
 
   handleremovePic() {
-    let newUserInfo = React.addons.update(this.props.userInfo, {profilePic: {$set: null}});
-    let newuserEP = 'users/' + authData.uid;
+    let newuserEP = 'users/' + authData.uid + '/profilePic';
     base.post(newuserEP, {
-      data: newUserInfo,
+      data: null,
       then() {
         self.props.closePopup();
       }
