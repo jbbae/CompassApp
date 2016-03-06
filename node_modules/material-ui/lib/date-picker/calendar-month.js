@@ -28,6 +28,7 @@ var CalendarMonth = _react2.default.createClass({
   propTypes: {
     autoOk: _react2.default.PropTypes.bool,
     displayDate: _react2.default.PropTypes.object.isRequired,
+    firstDayOfWeek: _react2.default.PropTypes.number,
     maxDate: _react2.default.PropTypes.object,
     minDate: _react2.default.PropTypes.object,
     onDayTouchTap: _react2.default.PropTypes.func,
@@ -41,7 +42,7 @@ var CalendarMonth = _react2.default.createClass({
   _getWeekElements: function _getWeekElements() {
     var _this = this;
 
-    var weekArray = _dateTime2.default.getWeekArray(this.props.displayDate);
+    var weekArray = _dateTime2.default.getWeekArray(this.props.displayDate, this.props.firstDayOfWeek);
 
     return weekArray.map(function (week, i) {
       return _react2.default.createElement(
@@ -72,7 +73,8 @@ var CalendarMonth = _react2.default.createClass({
         date: day,
         onTouchTap: _this2._handleDayTouchTap,
         selected: selected,
-        disabled: disabled });
+        disabled: disabled
+      });
     }, this);
   },
   _handleDayTouchTap: function _handleDayTouchTap(e, date) {

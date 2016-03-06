@@ -41,7 +41,8 @@ var ClearFix = function ClearFix(_ref) {
     _extends({}, other, {
       beforeStyle: styles.before,
       afterStyle: styles.after,
-      style: style }),
+      style: style
+    }),
     children
   );
 };

@@ -8,6 +8,7 @@ const CalendarMonth = React.createClass({
   propTypes: {
     autoOk: React.PropTypes.bool,
     displayDate: React.PropTypes.object.isRequired,
+    firstDayOfWeek: React.PropTypes.number,
     maxDate: React.PropTypes.object,
     minDate: React.PropTypes.object,
     onDayTouchTap: React.PropTypes.func,
@@ -20,7 +21,7 @@ const CalendarMonth = React.createClass({
   },
 
   _getWeekElements() {
-    let weekArray = DateTime.getWeekArray(this.props.displayDate);
+    let weekArray = DateTime.getWeekArray(this.props.displayDate, this.props.firstDayOfWeek);
 
     return weekArray.map((week, i) => {
       return (
@@ -40,8 +41,7 @@ const CalendarMonth = React.createClass({
       if (isSameDate) {
         if (disabled) {
           this._selectedDateDisabled = true;
-        }
-        else {
+        } else {
           this._selectedDateDisabled = false;
         }
       }
@@ -52,7 +52,8 @@ const CalendarMonth = React.createClass({
           date={day}
           onTouchTap={this._handleDayTouchTap}
           selected={selected}
-          disabled={disabled} />
+          disabled={disabled}
+        />
       );
     }, this);
   },

@@ -26,17 +26,13 @@ var _menuItem = require('../menus/menu-item');
 
 var _menuItem2 = _interopRequireDefault(_menuItem);
 
-var _lightRawTheme = require('../styles/raw-themes/light-raw-theme');
-
-var _lightRawTheme2 = _interopRequireDefault(_lightRawTheme);
-
 var _clearfix = require('../clearfix');
 
 var _clearfix2 = _interopRequireDefault(_clearfix);
 
-var _themeManager = require('../styles/theme-manager');
+var _getMuiTheme = require('../styles/getMuiTheme');
 
-var _themeManager2 = _interopRequireDefault(_themeManager);
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 
 var _popover = require('../popover/popover');
 
@@ -47,8 +43,6 @@ var _popoverAnimationFromTop = require('../popover/popover-animation-from-top');
 var _popoverAnimationFromTop2 = _interopRequireDefault(_popoverAnimationFromTop);
 
 var _styles = require('../utils/styles');
-
-var _styles2 = _interopRequireDefault(_styles);
 
 var _warning = require('warning');
 
@@ -191,7 +185,7 @@ var DropDownMenu = _react2.default.createClass({
     return {
       open: this.props.openImmediately,
       selectedIndex: this._isControlled() ? null : this.props.selectedIndex || 0,
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : _themeManager2.default.getMuiTheme(_lightRawTheme2.default)
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)()
     };
   },
   getChildContext: function getChildContext() {
@@ -416,7 +410,8 @@ var DropDownMenu = _react2.default.createClass({
         key: idx,
         primaryText: item[displayMember || 'text'],
         value: item[valueMember],
-        onTouchTap: _this2._onMenuItemTouchTap.bind(_this2, idx, item) });
+        onTouchTap: _this2._onMenuItemTouchTap.bind(_this2, idx, item)
+      });
     }) : _react2.default.Children.map(children, function (child) {
       var clone = _react2.default.cloneElement(child, {
         onTouchTap: _this2._onMenuItemTouchTap.bind(_this2, index, child.props.value)
@@ -435,18 +430,18 @@ var DropDownMenu = _react2.default.createClass({
       _extends({}, other, {
         ref: 'root',
         className: className,
-        style: _styles2.default.prepareStyles(muiTheme, styles.root, open && styles.rootWhenOpen, style)
+        style: (0, _styles.prepareStyles)(muiTheme, (0, _styles.mergeStyles)(styles.root, open && styles.rootWhenOpen, style))
       }),
       _react2.default.createElement(
         _clearfix2.default,
-        { style: _styles2.default.merge(styles.control), onTouchTap: this._onControlTouchTap },
+        { style: (0, _styles.mergeStyles)(styles.control), onTouchTap: this._onControlTouchTap },
         _react2.default.createElement(
           'div',
-          { style: _styles2.default.prepareStyles(muiTheme, styles.label, open && styles.labelWhenOpen, labelStyle) },
+          { style: (0, _styles.prepareStyles)(muiTheme, (0, _styles.mergeStyles)(styles.label, open && styles.labelWhenOpen, labelStyle)) },
           displayValue
         ),
-        _react2.default.createElement(_arrowDropDown2.default, { style: _styles2.default.merge(styles.icon, iconStyle) }),
-        _react2.default.createElement('div', { style: _styles2.default.prepareStyles(muiTheme, styles.underline, underlineStyle) })
+        _react2.default.createElement(_arrowDropDown2.default, { style: (0, _styles.mergeStyles)(styles.icon, iconStyle) }),
+        _react2.default.createElement('div', { style: (0, _styles.prepareStyles)(muiTheme, (0, _styles.mergeStyles)(styles.underline, underlineStyle)) })
       ),
       _react2.default.createElement(
         _popover2.default,
@@ -456,7 +451,8 @@ var DropDownMenu = _react2.default.createClass({
           style: popoverStyle,
           animation: _popoverAnimationFromTop2.default,
           open: open,
-          onRequestClose: this._onMenuRequestClose },
+          onRequestClose: this._onMenuRequestClose
+        },
         _react2.default.createElement(
           _menu2.default,
           {

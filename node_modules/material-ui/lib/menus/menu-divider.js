@@ -16,8 +16,6 @@ var _divider2 = _interopRequireDefault(_divider);
 
 var _styles = require('../utils/styles');
 
-var _styles2 = _interopRequireDefault(_styles);
-
 var _warning = require('warning');
 
 var _warning2 = _interopRequireDefault(_warning);
@@ -56,7 +54,7 @@ var MenuDivider = _react2.default.createClass({
 
     var styles = this.getStyles();
 
-    return _react2.default.createElement(_divider2.default, _extends({}, this.props, { style: _styles2.default.merge(styles.root, style) }));
+    return _react2.default.createElement(_divider2.default, _extends({}, this.props, { style: (0, _styles.mergeStyles)(styles.root, style) }));
   }
 });
 

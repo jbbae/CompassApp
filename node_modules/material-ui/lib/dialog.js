@@ -46,13 +46,9 @@ var _paper = require('./paper');
 
 var _paper2 = _interopRequireDefault(_paper);
 
-var _lightRawTheme = require('./styles/raw-themes/light-raw-theme');
+var _getMuiTheme = require('./styles/getMuiTheme');
 
-var _lightRawTheme2 = _interopRequireDefault(_lightRawTheme);
-
-var _themeManager = require('./styles/theme-manager');
-
-var _themeManager2 = _interopRequireDefault(_themeManager);
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 
 var _warning = require('warning');
 
@@ -92,7 +88,7 @@ var TransitionItem = _react2.default.createClass({
   getInitialState: function getInitialState() {
     return {
       style: {},
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : _themeManager2.default.getMuiTheme(_lightRawTheme2.default)
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)()
     };
   },
   getChildContext: function getChildContext() {
@@ -193,7 +189,7 @@ var DialogInline = _react2.default.createClass({
 
   getInitialState: function getInitialState() {
     return {
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : _themeManager2.default.getMuiTheme(_lightRawTheme2.default)
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)()
     };
   },
   getChildContext: function getChildContext() {
@@ -468,19 +464,23 @@ var DialogInline = _react2.default.createClass({
       { className: className, style: this.prepareStyles(styles.root) },
       _react2.default.createElement(
         _reactAddonsTransitionGroup2.default,
-        { component: 'div', ref: 'dialogWindow',
+        {
+          component: 'div', ref: 'dialogWindow',
           transitionAppear: true, transitionAppearTimeout: 450,
-          transitionEnter: true, transitionEnterTimeout: 450 },
+          transitionEnter: true, transitionEnterTimeout: 450
+        },
         open && _react2.default.createElement(
           TransitionItem,
           {
             className: contentClassName,
-            style: styles.content },
+            style: styles.content
+          },
           _react2.default.createElement(
             _paper2.default,
             {
               style: styles.paper,
-              zDepth: 4 },
+              zDepth: 4
+            },
             titleElement,
             _react2.default.createElement(
               'div',
@@ -499,7 +499,8 @@ var DialogInline = _react2.default.createClass({
         show: open,
         className: overlayClassName,
         style: styles.overlay,
-        onTouchTap: this._handleOverlayTouchTap })
+        onTouchTap: this._handleOverlayTouchTap
+      })
     );
   }
 });
@@ -577,7 +578,9 @@ var Dialog = _react2.default.createClass({
     modal: _react2.default.PropTypes.bool,
 
     /**
-     * Fired when the `Dialog is requested to be closed by a click outside the `Dialog` or on the buttons.
+     * Fired when the `Dialog` is requested to be closed by a click outside the `Dialog` or on the buttons.
+     *
+     * @param {bool} buttonClicked Determines whether a button click triggered this request.
      */
     onRequestClose: _react2.default.PropTypes.func,
 

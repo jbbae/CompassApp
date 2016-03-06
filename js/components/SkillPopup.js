@@ -17,7 +17,7 @@ export default class SkillPopup extends Component {
     let assType;
     let assLevel;
 
-    base.fetch('Asset/'+this.props.selectedSkill, {
+    base.fetch('Asset/' + this.props.selectedSkill, {
       context: this,
       then(data) {
         assType = data.Type;
@@ -53,7 +53,7 @@ export default class SkillPopup extends Component {
             {description}
           </Tab>
           <Tab label="How to Improve">
-            <BuildingPage />
+            <BuildingPage userInfo={this.props.userInfo} />
           </Tab>
         </Tabs>
       </div>
@@ -62,5 +62,6 @@ export default class SkillPopup extends Component {
 }
 
 SkillPopup.propTypes = {
-    selectedSkill: PropTypes.string
+  selectedSkill: PropTypes.string,
+  userInfo: PropTypes.object
 }

@@ -20,13 +20,9 @@ var _tableHeaderColumn = require('./table-header-column');
 
 var _tableHeaderColumn2 = _interopRequireDefault(_tableHeaderColumn);
 
-var _lightRawTheme = require('../styles/raw-themes/light-raw-theme');
+var _getMuiTheme = require('../styles/getMuiTheme');
 
-var _lightRawTheme2 = _interopRequireDefault(_lightRawTheme);
-
-var _themeManager = require('../styles/theme-manager');
-
-var _themeManager2 = _interopRequireDefault(_themeManager);
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -36,16 +32,47 @@ var TableHeader = _react2.default.createClass({
   displayName: 'TableHeader',
 
   propTypes: {
+    /**
+     * Controls whether or not header rows should be
+     * adjusted for a checkbox column. If the select all
+     * checkbox is true, this property will not influence
+     * the number of columns. This is mainly useful for
+     * "super header" rows so that the checkbox column
+     * does not create an offset that needs to be accounted
+     * for manually.
+     */
     adjustForCheckbox: _react2.default.PropTypes.bool,
+
+    /**
+     * Children passed to table header.
+     */
     children: _react2.default.PropTypes.node,
 
     /**
      * The css class name of the root element.
      */
     className: _react2.default.PropTypes.string,
+
+    /**
+     * Controls whether or not the select all checkbox is displayed.
+     */
     displaySelectAll: _react2.default.PropTypes.bool,
+
+    /**
+     * If set to true, the select all button will be interactable.
+     * If set to false, the button will not be interactable.
+     * To hide the checkbox, set displaySelectAll to false.
+     */
     enableSelectAll: _react2.default.PropTypes.bool,
+
+    /**
+     * Callback when select all has been checked.
+     */
     onSelectAll: _react2.default.PropTypes.func,
+
+    /**
+     * True when select all has been checked.
+     */
     selectAllSelected: _react2.default.PropTypes.bool,
 
     /**
@@ -75,7 +102,7 @@ var TableHeader = _react2.default.createClass({
   },
   getInitialState: function getInitialState() {
     return {
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : _themeManager2.default.getMuiTheme(_lightRawTheme2.default)
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)()
     };
   },
   getChildContext: function getChildContext() {
@@ -113,7 +140,6 @@ var TableHeader = _react2.default.createClass({
       if (!_react2.default.isValidElement(child)) continue;
 
       var props = {
-        displayRowCheckbox: false,
         key: 'sh' + index,
         rowNumber: index
       };

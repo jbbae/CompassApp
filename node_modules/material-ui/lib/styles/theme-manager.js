@@ -8,9 +8,9 @@ var _reactAddonsUpdate = require('react-addons-update');
 
 var _reactAddonsUpdate2 = _interopRequireDefault(_reactAddonsUpdate);
 
-var _extend = require('../utils/extend');
+var _lodash = require('lodash.merge');
 
-var _extend2 = _interopRequireDefault(_extend);
+var _lodash2 = _interopRequireDefault(_lodash);
 
 var _getMuiTheme = require('./getMuiTheme');
 
@@ -27,7 +27,7 @@ exports.default = // deprecatedExport(
     return (0, _getMuiTheme2.default)((0, _reactAddonsUpdate2.default)(muiTheme.baseTheme, { spacing: { $set: spacing } }));
   },
   modifyRawThemePalette: function modifyRawThemePalette(muiTheme, palette) {
-    var newPalette = (0, _extend2.default)(muiTheme.baseTheme.palette, palette);
+    var newPalette = (0, _lodash2.default)(muiTheme.baseTheme.palette, palette);
     return (0, _getMuiTheme2.default)((0, _reactAddonsUpdate2.default)(muiTheme.baseTheme, { palette: { $set: newPalette } }));
   },
   modifyRawThemeFontFamily: function modifyRawThemeFontFamily(muiTheme, fontFamily) {

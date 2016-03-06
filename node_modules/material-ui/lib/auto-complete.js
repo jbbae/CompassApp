@@ -52,6 +52,10 @@ var _deprecatedPropType = require('./utils/deprecatedPropType');
 
 var _deprecatedPropType2 = _interopRequireDefault(_deprecatedPropType);
 
+var _getMuiTheme = require('./styles/getMuiTheme');
+
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
@@ -60,33 +64,125 @@ var AutoComplete = _react2.default.createClass({
   displayName: 'AutoComplete',
 
   propTypes: {
+    /**
+     * Location of the anchor for the auto complete.
+     */
     anchorOrigin: _propTypes2.default.origin,
+
+    /**
+     * Whether or not the auto complete is animated as it is toggled.
+     */
     animated: _react2.default.PropTypes.bool,
+
+    /**
+     * Array of strings or nodes used to populate the list.
+     */
     dataSource: _react2.default.PropTypes.array,
+
+    /**
+     * Disables focus ripple when true.
+     */
     disableFocusRipple: _react2.default.PropTypes.bool,
+
+    /**
+     * Override style prop for error.
+     */
     errorStyle: _react2.default.PropTypes.object,
+
+    /**
+     * The error content to display.
+     */
     errorText: _react2.default.PropTypes.string,
+
+    /**
+     * Function used to filter the auto complete.
+     */
     filter: _react2.default.PropTypes.func,
+
+    /**
+     * The content to use for adding floating label element.
+     */
     floatingLabelText: _react2.default.PropTypes.string,
+
+    /**
+     * If true, the field receives the property `width: 100%`.
+     */
     fullWidth: _react2.default.PropTypes.bool,
+
+    /**
+     * The hint content to display.
+     */
     hintText: _react2.default.PropTypes.string,
+
+    /**
+     * Override style for list.
+     */
     listStyle: _react2.default.PropTypes.object,
+
+    /**
+     * Delay for closing time of the menu.
+     */
     menuCloseDelay: _react2.default.PropTypes.number,
+
+    /**
+     * Props to be passed to menu.
+     */
     menuProps: _react2.default.PropTypes.object,
+
+    /**
+     * Override style for menu.
+     */
     menuStyle: _react2.default.PropTypes.object,
+
+    /**
+     * Gets called when list item is clicked or pressed enter.
+     */
     onNewRequest: _react2.default.PropTypes.func,
+
+    /**
+     * Gets called each time the user updates the text field.
+     */
     onUpdateInput: _react2.default.PropTypes.func,
+
+    /**
+     * Auto complete menu is open if true.
+     */
     open: _react2.default.PropTypes.bool,
+
+    /**
+     * Text being input to auto complete.
+     */
     searchText: _react2.default.PropTypes.string,
     showAllItems: (0, _deprecatedPropType2.default)(_react2.default.PropTypes.bool, 'showAllItems is deprecated, use noFilter instead'),
+
+    /**
+     * Override the inline-styles of the root element.
+     */
     style: _react2.default.PropTypes.object,
+
+    /**
+     * Origin for location of target.
+     */
     targetOrigin: _propTypes2.default.origin,
+
+    /**
+     * Delay for touch tap event closing of auto complete.
+     */
     touchTapCloseDelay: _react2.default.PropTypes.number,
+
+    /**
+     * If true, will update when focus event triggers.
+     */
     triggerUpdateOnFocus: _react2.default.PropTypes.bool,
     updateWhenFocused: (0, _deprecatedPropType2.default)(_react2.default.PropTypes.bool, 'updateWhenFocused has been renamed to triggerUpdateOnFocus')
   },
 
   contextTypes: {
+    muiTheme: _react2.default.PropTypes.object
+  },
+
+  //for passing default theme context to children
+  childContextTypes: {
     muiTheme: _react2.default.PropTypes.object
   },
 
@@ -120,7 +216,13 @@ var AutoComplete = _react2.default.createClass({
     return {
       searchText: this.props.searchText,
       open: this.props.open,
-      anchorEl: null
+      anchorEl: null,
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)()
+    };
+  },
+  getChildContext: function getChildContext() {
+    return {
+      muiTheme: this.state.muiTheme
     };
   },
   componentWillMount: function componentWillMount() {
@@ -181,9 +283,9 @@ var AutoComplete = _react2.default.createClass({
 
     var dataSource = this.props.dataSource;
 
-    var chosenRequest = undefined,
-        index = undefined,
-        searchText = undefined;
+    var chosenRequest = undefined;
+    var index = undefined;
+    var searchText = undefined;
     if (typeof dataSource[0] === 'string') {
       chosenRequest = this.requestsList[parseInt(child.key, 10)];
       index = dataSource.indexOf(chosenRequest);
@@ -256,15 +358,15 @@ var AutoComplete = _react2.default.createClass({
     };
 
     var textFieldProps = {
-      style: this.mergeAndPrefix(styles.input, style),
+      style: this.mergeStyles(styles.input, style),
       floatingLabelText: floatingLabelText,
       hintText: !hintText && !floatingLabelText ? '' : hintText,
       fullWidth: true,
       multiLine: false,
-      errorStyle: this.mergeAndPrefix(styles.error, errorStyle)
+      errorStyle: this.mergeStyles(styles.error, errorStyle)
     };
 
-    var mergedRootStyles = this.mergeAndPrefix(styles.root, style);
+    var mergedRootStyles = this.mergeStyles(styles.root, style);
     var mergedMenuStyles = this.mergeStyles(styles.menu, menuStyle);
 
     var requestsList = [];
@@ -303,8 +405,9 @@ var AutoComplete = _react2.default.createClass({
         onEscKeyDown: this._close,
         initiallyKeyboardFocused: false,
         onItemTouchTap: this._handleItemTouchTap,
-        listStyle: this.mergeAndPrefix(styles.list, listStyle),
-        style: mergedMenuStyles }),
+        listStyle: this.mergeStyles(styles.list, listStyle),
+        style: mergedMenuStyles
+      }),
       requestsList.map(function (request, index) {
         switch (typeof request === 'undefined' ? 'undefined' : _typeof(request)) {
           case 'string':
@@ -339,14 +442,17 @@ var AutoComplete = _react2.default.createClass({
 
     return _react2.default.createElement(
       'div',
-      { style: mergedRootStyles,
-        onKeyDown: this._handleKeyDown },
+      {
+        style: this.prepareStyles(mergedRootStyles),
+        onKeyDown: this._handleKeyDown
+      },
       _react2.default.createElement(
         'div',
         {
           style: {
             width: '100%'
-          } },
+          }
+        },
         _react2.default.createElement(_textField2.default, _extends({}, other, {
           ref: 'searchTextField',
           value: this.state.searchText,
@@ -382,7 +488,8 @@ var AutoComplete = _react2.default.createClass({
           open: open,
           anchorEl: anchorEl,
           useLayerForClickAway: false,
-          onRequestClose: this._close },
+          onRequestClose: this._close
+        },
         menu
       )
     );
@@ -390,9 +497,10 @@ var AutoComplete = _react2.default.createClass({
 });
 
 AutoComplete.levenshteinDistance = function (searchText, key) {
-  var current = [],
-      prev = undefined,
-      value = undefined;
+  var current = [];
+  var prev = undefined;
+  var value = undefined;
+
   for (var i = 0; i <= key.length; i++) {
     for (var j = 0; j <= searchText.length; j++) {
       if (i && j) {

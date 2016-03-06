@@ -28,26 +28,21 @@ export default class ProfileIndustryPop extends Component {
   }
 
   render() {
-    let descContent;
+    let descContent = [];
 
-    if (this.props.selectedindustry) {
-      base.fetch('Industry', {
-        context: this,
-        then(data) {
-          for (let key1 in data) {
-            for (let key2 in data[key1].level2) {
-              for (let key3 in data[key1].level2[key2].level3) {
-                if (key3 === this.props.selectedindustry) {
-                  for (keyD in data[key1].level2[key2].level3[key3].description) {
-                    descContent.push(<p>{paragraph}</p>);
-                    break;
-                  }
-                }
+    for (let key1 in this.state.allIndustries) {
+      for (let key2 in this.state.allIndustries[key1].level2) {
+        for (let key3 in this.state.allIndustries[key1].level2[key2].level3) {
+          if (key3 === this.props.selectedindustry) {
+            for (let keyD in this.state.allIndustries[key1].level2[key2].level3[key3].description) {
+              if (keyD === 'Overview') {
+                descContent.push(<p>{this.state.allIndustries[key1].level2[key2].level3[key3].description[keyD]}</p>);
+                break;
               }
             }
           }
         }
-      });
+      }
     }
 
     let verifyPopupButton = [
@@ -92,6 +87,10 @@ export default class ProfileIndustryPop extends Component {
       openPlanPopup: false,
       openProfileIndPop: false
     });
+  }
+
+  componentWillUnmount() {
+    base.removeBinding(this.ref);
   }
 }
 

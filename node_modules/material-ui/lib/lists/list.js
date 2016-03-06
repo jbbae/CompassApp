@@ -30,13 +30,9 @@ var _paper = require('../paper');
 
 var _paper2 = _interopRequireDefault(_paper);
 
-var _lightRawTheme = require('../styles/raw-themes/light-raw-theme');
+var _getMuiTheme = require('../styles/getMuiTheme');
 
-var _lightRawTheme2 = _interopRequireDefault(_lightRawTheme);
-
-var _themeManager = require('../styles/theme-manager');
-
-var _themeManager2 = _interopRequireDefault(_themeManager);
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -97,7 +93,7 @@ var List = _react2.default.createClass({
   },
   getInitialState: function getInitialState() {
     return {
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : _themeManager2.default.getMuiTheme(_lightRawTheme2.default)
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)()
     };
   },
   getChildContext: function getChildContext() {
@@ -141,10 +137,10 @@ var List = _react2.default.createClass({
 
     var subheaderElement = undefined;
     if (subheader) {
-      var mergedSubheaderStyles = this.prepareStyles(styles.subheader, subheaderStyle);
+      var mergedSubheaderStyles = this.mergeStyles(styles.subheader, subheaderStyle);
       subheaderElement = _react2.default.createElement(
         'div',
-        { style: mergedSubheaderStyles },
+        { style: this.prepareStyles(mergedSubheaderStyles) },
         subheader
       );
     }
@@ -153,7 +149,8 @@ var List = _react2.default.createClass({
       _paper2.default,
       _extends({}, other, {
         style: this.mergeStyles(styles.root, style),
-        zDepth: zDepth }),
+        zDepth: zDepth
+      }),
       subheaderElement,
       children
     );

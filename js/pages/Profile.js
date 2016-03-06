@@ -50,8 +50,16 @@ export default class Profile extends Component {
       openMoreInfoPop: false,
       targetUndFoc: null,
       snackopen: false,
-      updateMsg: ''
+      updateMsg: '',
+      assetList: {}
     };
+  }
+
+  componentDidMount() {
+    this.ref = base.bindToState('Asset', {
+      context: this,
+      state: 'assetList'
+    });
   }
 
   getStyles() {
@@ -162,126 +170,120 @@ export default class Profile extends Component {
     let generalSkills = [];
     let generalKnowledge = [];
 
-    //First fetch the general Asset list (to extract Cross-information)
-    base.fetch('Asset', {
-      context: this,
-      then(data) {
-        //Loop through all Foci
-        for (let i=0; i < 3; i++) {
-          if (focusList[i]) {
-            let focusSkills = [];
-            let focusKnowledge = [];
-            //Loop through user Assets
-            for (let keyU in this.props.userInfo.Asset) {
-              //Loop through general Asset
-              for (let keyC in data) {
-                if (keyC === keyU) {
-                  let focusMatch = false;
-                  //Check if it's within this loop's Focus
-                  for (let keyF in data[keyC].crossFocus) {
-                    if (keyF === focusList[i]) { focusMatch = true; }
-                  }
-                  //If yes, (1) push into takenSkills, (2) remove from generalList (if exists), (3) categorize into Skill/Knowledge
-                  if (focusMatch) {
-                    takenSkills.push(keyU);
-                    for (var b=0; b < generalList.length; b++) {
-                      if (keyU === generalList[b].name) { generalList.splice(b,1); }
-                    }
-                    if (data[keyC].type === 'Skill') {
-                      focusSkills.push(
-                        <Paper
-                          className="skillBlock"
-                          zDepth={2}
-                          onTouchTap={this.handleSkillsPopup.bind(null, keyU)}>
-                          {keyU}
-                        </Paper>
-                      );
-                    } else if (data[keyC].type === 'Knowledge') {
-                      focusKnowledge.push(
-                        <Paper
-                          className="skillBlock"
-                          zDepth={2}
-                          onTouchTap={this.handleSkillsPopup.bind(null, keyU)}>
-                          {keyU}
-                        </Paper>
-                      );
-                    }
-                  } else {
-                    let duplicateSwitch = false;
-                    for (var c=0; c < takenSkills.length; c++) {
-                      if (keyU === takenSkills[c]) { duplicateSwitch = true; }
-                    }
-                    for (let g=0; g < generalList.length; g++) {
-                      if (keyU === generalList[g].name) { duplicateSwitch = true; }
-                    }
-                    if (!duplicateSwitch) {
-                      generalList.push({ name: keyU, type: data[keyC].type });
-                    }
-                  }
+    //Loop through all Foci
+    for (let i=0; i < 3; i++) {
+      if (focusList[i]) {
+        let focusSkills = [];
+        let focusKnowledge = [];
+        //Loop through user Assets
+        for (let keyU in this.props.userInfo.Asset) {
+          //Loop through general Asset
+          for (let keyC in this.state.assetList) {
+            if (keyC === keyU) {
+              let focusMatch = false;
+              //Check if it's within this loop's Focus
+              for (let keyF in this.state.assetList[keyC].crossFocus) {
+                if (keyF === focusList[i]) { focusMatch = true; }
+              }
+              //If yes, (1) push into takenSkills, (2) remove from generalList (if exists), (3) categorize into Skill/Knowledge
+              if (focusMatch) {
+                takenSkills.push(keyU);
+                for (var b=0; b < generalList.length; b++) {
+                  if (keyU === generalList[b].name) { generalList.splice(b,1); }
+                }
+                if (this.state.assetList[keyC].type === 'Skill') {
+                  focusSkills.push(
+                    <Paper
+                      className="skillBlock"
+                      zDepth={2}
+                      onTouchTap={this.handleSkillsPopup.bind(null, keyU)}>
+                      {keyU}
+                    </Paper>
+                  );
+                } else if (this.state.assetList[keyC].type === 'Knowledge') {
+                  focusKnowledge.push(
+                    <Paper
+                      className="skillBlock"
+                      zDepth={2}
+                      onTouchTap={this.handleSkillsPopup.bind(null, keyU)}>
+                      {keyU}
+                    </Paper>
+                  );
+                }
+              } else {
+                let duplicateSwitch = false;
+                for (var c=0; c < takenSkills.length; c++) {
+                  if (keyU === takenSkills[c]) { duplicateSwitch = true; }
+                }
+                for (let g=0; g < generalList.length; g++) {
+                  if (keyU === generalList[g].name) { duplicateSwitch = true; }
+                }
+                if (!duplicateSwitch) {
+                  generalList.push({ name: keyU, type: this.state.assetList[keyC].type });
                 }
               }
             }
-
-            //Message for when no skills/knowledge for a particular Focus
-            if (focusSkills.length === 0) {
-              focusSkills.push(
-                <h3 id='emptySkillsMsg'>You have no skills in this focus. Time to start building!</h3>
-              );
-            }
-
-            if (focusKnowledge.length === 0) {
-              focusKnowledge.push(
-                <h3 id='emptySkillsMsg'>You have no knowledge in this focus. Time to start building!</h3>
-              );
-            }
-
-            //Push categorized assets under the current Focus (at the end of loop)
-            tabsContent.push(
-              <Tab label={focusList[i]}>
-                <div className="tabcontent">
-                  <h3>Skills</h3>
-                  <Divider />
-                  {focusSkills}
-                  <Divider />
-                  <h3>Knowledge</h3>
-                  <Divider />
-                  {focusKnowledge}
-                  <div id='undeclareButton'>
-                    <FlatButton label="Undeclare" primary={true} onTouchTap={this.handleUndTargetFoc.bind(null, focusList[i])} />
-                  </div>
-                </div>
-              </Tab>
-            );
-            //Once all Focus have been scanned, render the general Assets (categorized)
-          } else {
-            generalSkills = generalList.map(function(skill) {
-              if (skill.type === 'Skill') {
-                return (
-                  <Paper
-                    className="skillBlock"
-                    zDepth={2}
-                    onTouchTap={this.handleSkillsPopup.bind(null, skill.name)}>
-                    {skill.name}
-                  </Paper>
-                );
-              }
-            }, this);
-            generalKnowledge = generalList.map(function(skill) {
-              if (skill.type === 'Knowledge') {
-                return (
-                  <Paper
-                    className="skillBlock"
-                    zDepth={2}
-                    onTouchTap={this.handleSkillsPopup.bind(null, skill.name)}>
-                    {skill.name}
-                  </Paper>
-                );
-              }
-            }, this);
           }
         }
+
+        //Message for when no skills/knowledge for a particular Focus
+        if (focusSkills.length === 0) {
+          focusSkills.push(
+            <h3 id='emptySkillsMsg'>You have no skills in this focus. Time to start building!</h3>
+          );
+        }
+
+        if (focusKnowledge.length === 0) {
+          focusKnowledge.push(
+            <h3 id='emptySkillsMsg'>You have no knowledge in this focus. Time to start building!</h3>
+          );
+        }
+
+        //Push categorized assets under the current Focus (at the end of loop)
+        tabsContent.push(
+          <Tab label={focusList[i]}>
+            <div className="tabcontent">
+              <h3>Skills</h3>
+              <Divider />
+              {focusSkills}
+              <Divider />
+              <h3>Knowledge</h3>
+              <Divider />
+              {focusKnowledge}
+              <div id='undeclareButton'>
+                <FlatButton label="Undeclare" primary={true} onTouchTap={this.handleUndTargetFoc.bind(null, focusList[i])} />
+              </div>
+            </div>
+          </Tab>
+        );
+        //Once all Focus have been scanned, render the general Assets (categorized)
+      } else {
+        generalSkills = generalList.map(function(skill) {
+          if (skill.type === 'Skill') {
+            return (
+              <Paper
+                className="skillBlock"
+                zDepth={2}
+                onTouchTap={this.handleSkillsPopup.bind(null, skill.name)}>
+                {skill.name}
+              </Paper>
+            );
+          }
+        }, this);
+        generalKnowledge = generalList.map(function(skill) {
+          if (skill.type === 'Knowledge') {
+            return (
+              <Paper
+                className="skillBlock"
+                zDepth={2}
+                onTouchTap={this.handleSkillsPopup.bind(null, skill.name)}>
+                {skill.name}
+              </Paper>
+            );
+          }
+        }, this);
       }
-    });
+    }
 
     //Message if general assets are empty
     if (generalSkills.length === 0) {
@@ -339,16 +341,19 @@ export default class Profile extends Component {
           open={this.state.openSkillsPopup}
           onRequestClose={this._handleRequestClose}>
           <SkillPopup
-            description= {this.state.selectedDescription} />
+            description= {this.state.selectedDescription}
+            userInfo= {this.props.userInfo} />
         </Dialog>
         <Dialog
           contentStyle={planDialogStyle}
           autoDetectWindowHeight={true}
           autoScrollBodyContent={true}
+          repositionOnUpdate={true}
           open={this.state.openPlanPopup}
           onRequestClose={this._handleRequestClose}>
           <CareerPlan
             selectedpath={this.state.selectedPath}
+            userInfo={this.props.userInfo}
             openStatus={this._handlePlanDialogClose}
             unTiePref={this._handlePlanRemove} />
         </Dialog>
@@ -498,17 +503,16 @@ export default class Profile extends Component {
   }
 
   _handlePlanRemove() {
+    this.setState({
+      updateMsg: 'Plan was undeclared!',
+      snackopen: true,
+      openPlanPopup: false,
+      selectedPath: null
+    });
+
     let planPrefEP = 'users/' + authData.uid + '/Path/' + this.state.selectedPath + '/userTied';
     base.post(planPrefEP, {
-      data: false,
-      then() {
-        this.setState({
-          updateMsg: 'Plan was undeclared!',
-          snackopen: true,
-          openPlanPopup: false,
-          selectedPath: null
-        });
-      }
+      data: false
     });
   }
 
@@ -578,6 +582,10 @@ export default class Profile extends Component {
 
   handleSnackClose() {
     this.setState({ snackopen: false });
+  }
+
+  componentWillUnmount() {
+    base.removeBinding(this.ref);
   }
 }
 

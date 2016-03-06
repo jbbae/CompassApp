@@ -14,8 +14,6 @@ var _transitions2 = _interopRequireDefault(_transitions);
 
 var _styles = require('../utils/styles');
 
-var _styles2 = _interopRequireDefault(_styles);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var propTypes = {
@@ -55,7 +53,7 @@ var propTypes = {
   muiTheme: _react2.default.PropTypes.object.isRequired,
 
   /**
-   * Override the inline-styles of the underline.
+   * Override the inline-styles of the root element.
    */
   style: _react2.default.PropTypes.object
 };
@@ -113,18 +111,18 @@ var TextFieldUnderline = function TextFieldUnderline(props) {
     }
   };
 
-  var underline = _styles2.default.merge(styles.root, style);
-  var focusedUnderline = _styles2.default.merge(underline, styles.focus, focusStyle);
+  var underline = (0, _styles.mergeStyles)(styles.root, style);
+  var focusedUnderline = (0, _styles.mergeStyles)(underline, styles.focus, focusStyle);
 
-  if (disabled) underline = _styles2.default.merge(underline, styles.disabled, disabledStyle);
-  if (focus) focusedUnderline = _styles2.default.merge(focusedUnderline, { transform: 'scaleX(1)' });
-  if (error) focusedUnderline = _styles2.default.merge(focusedUnderline, styles.error);
+  if (disabled) underline = (0, _styles.mergeStyles)(underline, styles.disabled, disabledStyle);
+  if (focus) focusedUnderline = (0, _styles.mergeStyles)(focusedUnderline, { transform: 'scaleX(1)' });
+  if (error) focusedUnderline = (0, _styles.mergeStyles)(focusedUnderline, styles.error);
 
   return _react2.default.createElement(
     'div',
     null,
-    _react2.default.createElement('hr', { style: _styles2.default.prepareStyles(muiTheme, underline) }),
-    _react2.default.createElement('hr', { style: _styles2.default.prepareStyles(muiTheme, focusedUnderline) })
+    _react2.default.createElement('hr', { style: (0, _styles.prepareStyles)(muiTheme, underline) }),
+    _react2.default.createElement('hr', { style: (0, _styles.prepareStyles)(muiTheme, focusedUnderline) })
   );
 };
 

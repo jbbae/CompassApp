@@ -38,13 +38,9 @@ var _listItem = require('../lists/list-item');
 
 var _listItem2 = _interopRequireDefault(_listItem);
 
-var _lightRawTheme = require('../styles/raw-themes/light-raw-theme');
+var _getMuiTheme = require('../styles/getMuiTheme');
 
-var _lightRawTheme2 = _interopRequireDefault(_lightRawTheme);
-
-var _themeManager = require('../styles/theme-manager');
-
-var _themeManager2 = _interopRequireDefault(_themeManager);
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 
 var _menu = require('./menu');
 
@@ -157,7 +153,7 @@ var MenuItem = _react2.default.createClass({
   },
   getInitialState: function getInitialState() {
     return {
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : _themeManager2.default.getMuiTheme(_lightRawTheme2.default),
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)(),
       open: false
     };
   },
@@ -321,7 +317,8 @@ var MenuItem = _react2.default.createClass({
           anchorEl: this.state.anchorEl,
           open: this.state.open,
           useLayerForClickAway: false,
-          onRequestClose: this._onRequestClose },
+          onRequestClose: this._onRequestClose
+        },
         _react2.default.createElement(
           _menu2.default,
           { desktop: desktop, disabled: disabled, style: nestedMenuStyle },
@@ -340,7 +337,8 @@ var MenuItem = _react2.default.createClass({
         leftIcon: leftIconElement,
         ref: 'listItem',
         rightIcon: rightIconElement,
-        style: mergedRootStyles }),
+        style: mergedRootStyles
+      }),
       children,
       secondaryTextElement,
       childMenuPopover

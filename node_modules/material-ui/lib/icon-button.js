@@ -42,13 +42,9 @@ var _children = require('./utils/children');
 
 var _children2 = _interopRequireDefault(_children);
 
-var _lightRawTheme = require('./styles/raw-themes/light-raw-theme');
+var _getMuiTheme = require('./styles/getMuiTheme');
 
-var _lightRawTheme2 = _interopRequireDefault(_lightRawTheme);
-
-var _themeManager = require('./styles/theme-manager');
-
-var _themeManager2 = _interopRequireDefault(_themeManager);
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -176,7 +172,7 @@ var IconButton = _react2.default.createClass({
   getInitialState: function getInitialState() {
     return {
       tooltipShown: false,
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : _themeManager2.default.getMuiTheme(_lightRawTheme2.default)
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)()
     };
   },
   getChildContext: function getChildContext() {
@@ -290,7 +286,8 @@ var IconButton = _react2.default.createClass({
       touch: touch,
       style: this.mergeStyles(styles.tooltip, this.props.tooltipStyles),
       verticalPosition: tooltipPosition[0],
-      horizontalPosition: tooltipPosition[1] }) : null;
+      horizontalPosition: tooltipPosition[1]
+    }) : null;
 
     if (iconClassName) {
       var iconHoverColor = iconStyle.iconHoverColor;
@@ -302,7 +299,8 @@ var IconButton = _react2.default.createClass({
         {
           className: iconClassName,
           hoverColor: disabled ? null : iconHoverColor,
-          style: this.mergeStyles(styles.icon, disabled ? styles.disabled : {}, iconStyleFontIcon) },
+          style: this.mergeStyles(styles.icon, disabled ? styles.disabled : {}, iconStyleFontIcon)
+        },
         this.props.children
       );
     }
@@ -320,7 +318,8 @@ var IconButton = _react2.default.createClass({
         onFocus: this._handleFocus,
         onMouseLeave: this._handleMouseLeave,
         onMouseEnter: this._handleMouseEnter,
-        onKeyboardFocus: this._handleKeyboardFocus }),
+        onKeyboardFocus: this._handleKeyboardFocus
+      }),
       tooltipElement,
       fonticon,
       _children2.default.extend(this.props.children, {

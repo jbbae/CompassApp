@@ -27,7 +27,7 @@ var AvFiberManualRecord = _react2.default.createClass({
     return _react2.default.createElement(
       _svgIcon2.default,
       this.props,
-      _react2.default.createElement('circle', { fill: '#010101', cx: '12', cy: '12', r: '8' })
+      _react2.default.createElement('circle', { cx: '12', cy: '12', r: '8' })
     );
   }
 });

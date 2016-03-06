@@ -14,13 +14,9 @@ var _stylePropable = require('../mixins/style-propable');
 
 var _stylePropable2 = _interopRequireDefault(_stylePropable);
 
-var _lightRawTheme = require('../styles/raw-themes/light-raw-theme');
+var _getMuiTheme = require('../styles/getMuiTheme');
 
-var _lightRawTheme2 = _interopRequireDefault(_lightRawTheme);
-
-var _themeManager = require('../styles/theme-manager');
-
-var _themeManager2 = _interopRequireDefault(_themeManager);
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -36,11 +32,36 @@ var TableRowColumn = _react2.default.createClass({
      * The css class name of the root element.
      */
     className: _react2.default.PropTypes.string,
+
+    /**
+     * Number to identify the header row. This property
+     * is automatically populated when used with TableHeader.
+     */
     columnNumber: _react2.default.PropTypes.number,
+
+    /**
+     * If true, this column responds to hover events.
+     */
     hoverable: _react2.default.PropTypes.bool,
+
+    /**
+     * Key for this element.
+     */
     key: _react2.default.PropTypes.string,
+
+    /**
+     * Callback function for click event.
+     */
     onClick: _react2.default.PropTypes.func,
+
+    /**
+     * Callback function for hover event.
+     */
     onHover: _react2.default.PropTypes.func,
+
+    /**
+     * Callback function for hover exit event.
+     */
     onHoverExit: _react2.default.PropTypes.func,
 
     /**
@@ -67,7 +88,7 @@ var TableRowColumn = _react2.default.createClass({
   },
   getInitialState: function getInitialState() {
     return {
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : _themeManager2.default.getMuiTheme(_lightRawTheme2.default),
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)(),
       hovered: false
     };
   },

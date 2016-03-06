@@ -44,13 +44,9 @@ var _menu = require('./menu/menu');
 
 var _menu2 = _interopRequireDefault(_menu);
 
-var _lightRawTheme = require('./styles/raw-themes/light-raw-theme');
+var _getMuiTheme = require('./styles/getMuiTheme');
 
-var _lightRawTheme2 = _interopRequireDefault(_lightRawTheme);
-
-var _themeManager = require('./styles/theme-manager');
-
-var _themeManager2 = _interopRequireDefault(_themeManager);
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 
 var _warning = require('warning');
 
@@ -217,7 +213,7 @@ var LeftNav = _react2.default.createClass({
     return {
       open: this.props.open !== null ? this.props.open : this.props.docked,
       swiping: null,
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : _themeManager2.default.getMuiTheme(_lightRawTheme2.default)
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)()
     };
   },
   getChildContext: function getChildContext() {
@@ -423,7 +419,7 @@ var LeftNav = _react2.default.createClass({
     var leftNav = _reactDom2.default.findDOMNode(this.refs.clickAwayableElement);
     var transformCSS = 'translate3d(' + this._getTranslateMultiplier() * translateX + 'px, 0, 0)';
     this.refs.overlay.setOpacity(1 - translateX / this._getMaxTranslateX());
-    _autoPrefix2.default.set(leftNav.style, 'transform', transformCSS);
+    _autoPrefix2.default.set(leftNav.style, 'transform', transformCSS, this.state.muiTheme);
   },
   _getTranslateX: function _getTranslateX(currentX) {
     return Math.min(Math.max(this.state.swiping === 'closing' ? this._getTranslateMultiplier() * (currentX - this._swipeStartX) : this._getMaxTranslateX() - this._getTranslateMultiplier() * (this._swipeStartX - currentX), 0), this._getMaxTranslateX());
@@ -513,7 +509,8 @@ var LeftNav = _react2.default.createClass({
         className: overlayClassName,
         style: this.mergeStyles(styles.overlay, overlayStyle),
         transitionEnabled: !this.state.swiping,
-        onTouchTap: this._onOverlayTouchTap });
+        onTouchTap: this._onOverlayTouchTap
+      });
     }
     var children = undefined;
     if (menuItems === undefined) {
@@ -531,7 +528,8 @@ var LeftNav = _react2.default.createClass({
         menuItemClassNameSubheader: menuItemClassNameSubheader,
         menuItemClassNameLink: menuItemClassNameLink,
         selectedIndex: selectedIndex,
-        onItemTap: this._onMenuItemClick });
+        onItemTap: this._onMenuItemClick
+      });
     }
 
     return _react2.default.createElement(
@@ -546,7 +544,8 @@ var LeftNav = _react2.default.createClass({
           rounded: false,
           transitionEnabled: !this.state.swiping,
           className: className,
-          style: this.mergeStyles(styles.root, openRight && styles.rootWhenOpenRight, style) },
+          style: this.mergeStyles(styles.root, openRight && styles.rootWhenOpenRight, style)
+        },
         header,
         children
       )

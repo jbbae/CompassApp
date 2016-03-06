@@ -42,13 +42,9 @@ var _touchRipple = require('./ripples/touch-ripple');
 
 var _touchRipple2 = _interopRequireDefault(_touchRipple);
 
-var _lightRawTheme = require('./styles/raw-themes/light-raw-theme');
+var _getMuiTheme = require('./styles/getMuiTheme');
 
-var _lightRawTheme2 = _interopRequireDefault(_lightRawTheme);
-
-var _themeManager = require('./styles/theme-manager');
-
-var _themeManager2 = _interopRequireDefault(_themeManager);
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -137,7 +133,7 @@ var EnhancedButton = _react2.default.createClass({
   getInitialState: function getInitialState() {
     return {
       isKeyboardFocused: !this.props.disabled && this.props.keyboardFocused && !this.props.disableKeyboardFocus,
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : _themeManager2.default.getMuiTheme(_lightRawTheme2.default)
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)()
     };
   },
   getChildContext: function getChildContext() {
@@ -199,6 +195,7 @@ var EnhancedButton = _react2.default.createClass({
 
     var focusRipple = isKeyboardFocused && !disabled && !disableFocusRipple && !disableKeyboardFocus ? _react2.default.createElement(_focusRipple2.default, {
       color: focusRippleColor,
+      muiTheme: this.state.muiTheme,
       opacity: focusRippleOpacity,
       show: isKeyboardFocused
     }) : undefined;
@@ -209,7 +206,9 @@ var EnhancedButton = _react2.default.createClass({
       {
         centerRipple: centerRipple,
         color: touchRippleColor,
-        opacity: touchRippleOpacity },
+        muiTheme: this.state.muiTheme,
+        opacity: touchRippleOpacity
+      },
       children
     ) : undefined;
 
@@ -228,8 +227,10 @@ var EnhancedButton = _react2.default.createClass({
     this.props.onKeyDown(e);
   },
   _handleKeyUp: function _handleKeyUp(e) {
-    if (!this.props.disabled && e.keyCode === _keyCode2.default.SPACE && this.state.isKeyboardFocused) {
-      this._handleTouchTap(e);
+    if (!this.props.disabled && !this.props.disableKeyboardFocus) {
+      if (e.keyCode === _keyCode2.default.SPACE && this.state.isKeyboardFocused) {
+        this._handleTouchTap(e);
+      }
     }
     this.props.onKeyUp(e);
   },
@@ -287,7 +288,7 @@ var EnhancedButton = _react2.default.createClass({
 
     var other = _objectWithoutProperties(_props2, ['centerRipple', 'children', 'containerElement', 'disabled', 'disableFocusRipple', 'disableKeyboardFocus', 'disableTouchRipple', 'focusRippleColor', 'focusRippleOpacity', 'linkButton', 'touchRippleColor', 'touchRippleOpacity', 'onBlur', 'onFocus', 'onKeyUp', 'onKeyDown', 'onTouchTap', 'style', 'tabIndex', 'type']);
 
-    var mergedStyles = this.prepareStyles({
+    var mergedStyles = this.mergeStyles({
       border: 10,
       background: 'none',
       boxSizing: 'border-box',
@@ -298,20 +299,29 @@ var EnhancedButton = _react2.default.createClass({
       appearance: linkButton ? null : 'button',
       cursor: disabled ? 'default' : 'pointer',
       textDecoration: 'none',
-      outline: 'none'
+      outline: 'none',
+      /*
+        This is needed so that ripples do not bleed
+        past border radius.
+        See: http://stackoverflow.com/questions/17298739/
+          css-overflow-hidden-not-working-in-chrome-when-parent-has-border-radius-and-chil
+       */
+      transform: disableTouchRipple && disableFocusRipple ? null : 'translate3d(0, 0, 0)',
+      verticalAlign: other.hasOwnProperty('href') ? 'middle' : null
     }, style);
 
     if (disabled && linkButton) {
       return _react2.default.createElement(
         'span',
         _extends({}, other, {
-          style: mergedStyles }),
+          style: mergedStyles
+        }),
         children
       );
     }
 
     var buttonProps = _extends({}, other, {
-      style: mergedStyles,
+      style: this.prepareStyles(mergedStyles),
       disabled: disabled,
       onBlur: this._handleBlur,
       onFocus: this._handleFocus,

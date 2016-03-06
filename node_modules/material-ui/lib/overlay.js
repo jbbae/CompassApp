@@ -58,7 +58,6 @@ var Overlay = _react2.default.createClass({
     };
   },
   componentDidMount: function componentDidMount() {
-    this._originalBodyOverflow = document.getElementsByTagName('body')[0].style.overflow;
     if (this.props.show) {
       this._applyAutoLockScrolling(this.props);
     }
@@ -69,7 +68,9 @@ var Overlay = _react2.default.createClass({
     }
   },
   componentWillUnmount: function componentWillUnmount() {
-    this._allowScrolling();
+    if (this.props.show === true) {
+      this._allowScrolling();
+    }
   },
 
   _originalBodyOverflow: '',
@@ -114,6 +115,8 @@ var Overlay = _react2.default.createClass({
   },
   _preventScrolling: function _preventScrolling() {
     var body = document.getElementsByTagName('body')[0];
+    this._originalBodyOverflow = body.style.overflow;
+
     body.style.overflow = 'hidden';
   },
   _allowScrolling: function _allowScrolling() {
@@ -127,9 +130,9 @@ var Overlay = _react2.default.createClass({
 
     var other = _objectWithoutProperties(_props, ['show', 'style']);
 
-    var styles = this.prepareStyles(this.getStyles().root, style, show && this.getStyles().rootWhenShown);
+    var styles = this.mergeStyles(this.getStyles().root, style, show && this.getStyles().rootWhenShown);
 
-    return _react2.default.createElement('div', _extends({}, other, { style: styles }));
+    return _react2.default.createElement('div', _extends({}, other, { style: this.prepareStyles(styles) }));
   }
 });
 

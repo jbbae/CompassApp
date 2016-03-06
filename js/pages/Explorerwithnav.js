@@ -24,7 +24,6 @@ export default class ExplorerWithNav extends Component {
     this.handleNeutralCheck = this.handleNeutralCheck.bind(this);
     this.handleDislikeCheck = this.handleDislikeCheck.bind(this);
     this.handleDescPageExit = this.handleDescPageExit.bind(this);
-    this.handleFetchItems = this.handleFetchItems.bind(this);
     this.state = {
       selecteditem: '',
       selectedObj: {},
@@ -34,8 +33,25 @@ export default class ExplorerWithNav extends Component {
       neutralShow: true,
       dislikeShow: true,
       showDescPage: false,
-      currentList: null
+      industryList: {},
+      pathList: {}
     };
+  }
+
+  componentDidMount() {
+    base.fetch('Industry', {
+      context: this,
+      then(data) {
+        this.setState({industryList: data});
+      }
+    });
+
+    base.fetch('Path', {
+      context: this,
+      then(data) {
+        this.setState({pathList: data});
+      }
+    });
   }
 
   getStyles() {
@@ -64,12 +80,89 @@ export default class ExplorerWithNav extends Component {
     return styles;
   }
 
+  listFilterAnalysis(filtertarget, targetIndustries) {
+    let userPrefSwitch = true;
+
+    if ( !this.state.likeShow || !this.state.neutralShow || !this.state.dislikeShow ) {
+      if ( this.state.likeShow && this.state.neutralShow && !this.state.dislikeShow ) {
+        for (var key in this.props.userInfo[this.state.exploreType]) {
+          if (!this.props.userInfo[this.state.exploreType][key].likeStatus && filtertarget === key) {
+            userPrefSwitch = false;
+            break;
+          }
+        }
+
+      } else if ( this.state.likeShow && !this.state.neutralShow && this.state.dislikeShow ) {
+        userPrefSwitch = false;
+        for (var key in this.props.userInfo[this.state.exploreType]) {
+          if (filtertarget === key) {
+            userPrefSwitch = true;
+            break;
+          }
+        }
+
+      } else if ( !this.state.likeShow && this.state.neutralShow && this.state.dislikeShow ) {
+        for (var key in this.props.userInfo[this.state.exploreType]) {
+          if (this.props.userInfo[this.state.exploreType][key].likeStatus && filtertarget === key) {
+            userPrefSwitch = false;
+            break;
+          }
+        }
+
+      } else if ( this.state.likeShow && !this.state.neutralShow && !this.state.dislikeShow ) {
+        userPrefSwitch = false;
+        for (var key in this.props.userInfo[this.state.exploreType]) {
+          if (this.props.userInfo[this.state.exploreType][key].likeStatus && filtertarget === key) {
+            userPrefSwitch = true;
+            break;
+          }
+        }
+
+      } else if ( !this.state.likeShow && this.state.neutralShow && !this.state.dislikeShow ) {
+        for (var key in this.props.userInfo[this.state.exploreType]) {
+          if (filtertarget === key) {
+            userPrefSwitch = false;
+            break;
+          }
+        }
+
+      } else if ( !this.state.likeShow && !this.state.neutralShow && this.state.dislikeShow ) {
+        userPrefSwitch = false;
+        for (var key in this.props.userInfo[this.state.exploreType]) {
+          if (!this.props.userInfo[this.state.exploreType][key].likeStatus && filtertarget === key) {
+            userPrefSwitch = true;
+            break;
+          }
+        }
+      }
+    }
+
+    if (this.state.exploreType === 'Path') {
+      let crossSwitch = false;
+
+      for (var key1 in targetIndustries) {
+        for (var key2 in this.props.userInfo.Industry) {
+          if ( key1 === key2 && this.props.userInfo.Industry[key2].likeStatus ) {
+            crossSwitch = true;
+            break;
+          }
+        }
+        if (crossSwitch) { break; }
+      }
+      if (!crossSwitch) {
+        userPrefSwitch = false;
+      }
+    }
+
+    return userPrefSwitch;
+  }
+
   render() {
     let styles = this.getStyles();
 
     //Part I - Check if exploreType = Careers is an option (disable button?)
     let careerAllow = false;
-    if (this.props.useInfo) {
+    if (this.props.userInfo) {
       if (this.props.userInfo.Industry && this.props.userInfo.Focus) {
         let industryCheck = false;
         let focusCheck = false;
@@ -89,7 +182,7 @@ export default class ExplorerWithNav extends Component {
           }
         }
 
-        if (industryCheck && focusCheck || this.state.exploreType === 'Path') { careerAllow = true; }
+        if ((industryCheck && focusCheck) || this.state.exploreType === 'Path') { careerAllow = true; }
       }
     }
 
@@ -99,13 +192,17 @@ export default class ExplorerWithNav extends Component {
     let lookup = this.state.exploreType;
     let pathSignal = false;
 
-    if (this.state.currentList) {
+    let currentList = null;
+    if (this.state.exploreType === 'Industry') { currentList = this.state.industryList; }
+    else if (this.state.exploreType === 'Path' || this.state.exploreType === 'Focus' ) { currentList = this.state.pathList; }
+
+    if (currentList) {
       //Start Level 1 unbundle
-      for (var key1 in this.state.currentList) {
+      for (var key1 in currentList) {
         let lvl2items=[];
 
         //Start Level 2 unbundle
-        for (var key2 in this.state.currentList[key1].level2) {
+        for (var key2 in currentList[key1].level2) {
           let lvl2Switch = null;
           let filterResult2;
           let listObject2;
@@ -113,32 +210,23 @@ export default class ExplorerWithNav extends Component {
           let lvl3items=[];
 
           if (lookup === 'Focus') {
-            listObject2 = this.state.currentList[key1].level2[key2];
+            listObject2 = currentList[key1].level2[key2];
           }
 
           //Use Level 3 to determine render for Level 2 (if Path/Industry)
           if (lookup === 'Path' || lookup === 'Industry') {
             let totalPref3 = 0;
             //Start Level 3 unbundle
-            for (var key3 in this.state.currentList[key1].level2[key2].level3) {
+            for (var key3 in currentList[key1].level2[key2].level3) {
               //Apply filter
-              let filterResult3 = (
-                <ExplorerListFilter
-                  exploreType={lookup}
-                  filtertarget={key3}
-                  targetIndustries={this.state.currentList[key1].level2[key2].level3[key3].Industries}
-                  likeShow={this.state.likeShow}
-                  neutralShow={this.state.neutralShow}
-                  dislikeShow={this.state.dislikeShow}
-                   />
-               );
+              let filterResult3 = this.listFilterAnalysis(key3, currentList[key1].level2[key2].level3[key3].crossIndustry);
 
               //Unbundle if passes filter
               if (filterResult3) {
                 pathSignal = true;
 
                 let lvl3Switch = null;
-                let listObject3 = this.state.currentList[key1].level2[key2].level3[key3];
+                let listObject3 = currentList[key1].level2[key2].level3[key3];
                 let lvl3Icon;
 
                 if (authData) {
@@ -180,35 +268,28 @@ export default class ExplorerWithNav extends Component {
               if (totalPref3 === lvl3items.length) { lvl2Switch = true }
               else if ((-1*totalPref3) === lvl3items.length) { lvl2Switch = false }
 
-            } else { filterResult2 = false; }
+            }
 
             //Skip Level 3 and determine render for Level 2 with Focus preferences
           } else if (lookup === 'Focus') {
-            filterResult2 = (
-              <ExplorerListFilter
-                exploreType={lookup}
-                filtertarget={key2}
-                likeShow={this.state.likeShow}
-                neutralShow={this.state.neutralShow}
-                dislikeShow={this.state.dislikeShow} />
-             );
+            filterResult2 = this.listFilterAnalysis(key2);
 
-             if (authData) {
-               if (filterResult2) {
-                 for (var keyU in this.props.userInfo[lookup]) {
-                   if (!this.props.userInfo[lookup].hasOwnProperty(keyU)) { continue; }
-                   if (key2 === keyU) {
-                     if (this.props.userInfo[lookup][keyU].likeStatus === true) {
-                       lvl2Switch = true;
-                       break;
-                     } else {
-                       lvl2Switch = false;
-                       break;
-                     }
-                   }
-                 }
-               }
-             }
+            if (authData) {
+              if (filterResult2) {
+                for (var keyU in this.props.userInfo[lookup]) {
+                  if (!this.props.userInfo[lookup].hasOwnProperty(keyU)) { continue; }
+                  if (key2 === keyU) {
+                    if (this.props.userInfo[lookup][keyU].likeStatus === true) {
+                     lvl2Switch = true;
+                     break;
+                    } else {
+                     lvl2Switch = false;
+                     break;
+                    }
+                  }
+                }
+              }
+            }
           }
 
           if (filterResult2) {
@@ -231,13 +312,15 @@ export default class ExplorerWithNav extends Component {
         }
         //End Level 2 unbundle
 
-        listitems.push(
-          <ListItem
-            primaryText={key1}
-            disabled={true}
-            style={this.state.selecteditem === key1 ? {color: Colors.pink500} : null}
-            nestedItems={lvl2items} />
-        );
+        if (lvl2items.length) {
+          listitems.push(
+            <ListItem
+              primaryText={key1}
+              disabled={true}
+              style={this.state.selecteditem === key1 ? {color: Colors.pink500} : null}
+              nestedItems={lvl2items} />
+          );
+        }
       }
       //End Level 1 unbundle
       //Loading screen if list is loading
@@ -331,7 +414,7 @@ export default class ExplorerWithNav extends Component {
           </List>
           <Divider />
           <div id='explorerScrollablePart'>
-            <List subheader={'Explore '&this.state.exploreType&'s'}>
+            <List subheader={this.state.exploreType ? 'Currently Exploring: ' + this.state.exploreType : '' }>
               {listitems}
             </List>
           </div>
@@ -356,7 +439,6 @@ export default class ExplorerWithNav extends Component {
       exploreType: value,
       showDescPage: false
     });
-    this.handleFetchItems();
   }
 
   handleCareerExp() {
@@ -364,37 +446,6 @@ export default class ExplorerWithNav extends Component {
       exploreType: 'Path',
       showDescPage: false
     });
-    this.handleFetchItems();
-  }
-
-  handleFetchItems() {
-    let ListEndPt;
-    if (this.state.exploreType === 'Industry') {
-      ListEndPt = 'Industry';
-      base.fetch(ListEndPt, {
-        context: this,
-        then(data) {
-          this.setState({currentList: data});
-          setTimeout(function(){
-            this.setState({querySwitch: 'selecting Paths'});
-          }.bind(this),300);
-        }
-      });
-    } else if (this.state.exploreType === 'Focus' || this.state.exploreType === 'Path') {
-      ListEndPt = 'Path';
-      base.fetch(ListEndPt, {
-        context: this,
-        then(data) {
-          this.setState({currentList: data});
-          setTimeout(function(){
-            this.setState({querySwitch: 'selecting Paths'});
-          }.bind(this),300);
-        }
-      });
-    }
-    setTimeout(function(){
-      this.setState({querySwitch: 'selecting Paths'});
-    }.bind(this),300);
   }
 
   handleLikeCheck() {

@@ -3,8 +3,7 @@ import StylePropable from '../mixins/style-propable';
 import Transition from '../styles/transitions';
 import DateTime from '../utils/date-time';
 import EnhancedButton from '../enhanced-button';
-import DefaultRawTheme from '../styles/raw-themes/light-raw-theme';
-import ThemeManager from '../styles/theme-manager';
+import getMuiTheme from '../styles/getMuiTheme';
 
 const DayButton = React.createClass({
 
@@ -39,7 +38,7 @@ const DayButton = React.createClass({
   getInitialState() {
     return {
       hover: false,
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : ThemeManager.getMuiTheme(DefaultRawTheme),
+      muiTheme: this.context.muiTheme || getMuiTheme(),
     };
   },
 
@@ -124,8 +123,7 @@ const DayButton = React.createClass({
       styles.label.color = this.getTheme().selectTextColor;
       styles.buttonState.opacity = 1;
       styles.buttonState.transform = 'scale(1)';
-    }
-    else if (this.props.disabled) {
+    } else if (this.props.disabled) {
       styles.root.opacity = '0.6';
     }
 
@@ -134,7 +132,8 @@ const DayButton = React.createClass({
     }
 
     return this.props.date ? (
-      <EnhancedButton {...other}
+      <EnhancedButton
+        {...other}
         style={styles.root}
         hoverStyle={styles.hover}
         disabled={this.props.disabled}
@@ -143,7 +142,8 @@ const DayButton = React.createClass({
         onMouseEnter={this._handleMouseEnter}
         onMouseLeave={this._handleMouseLeave}
         onTouchTap={this._handleTouchTap}
-        onKeyboardFocus={this._handleKeyboardFocus}>
+        onKeyboardFocus={this._handleKeyboardFocus}
+      >
         <div style={this.prepareStyles(styles.buttonState)} />
         <span style={this.prepareStyles(styles.label)}>{this.props.date.getDate()}</span>
       </EnhancedButton>

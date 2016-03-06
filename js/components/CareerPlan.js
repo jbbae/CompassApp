@@ -2,13 +2,16 @@ import React, {Component, PropTypes} from 'react';
 import Firebase from 'firebase';
 import Rebase from 're-base';
 
-var { Dialog, FlatButton, FloatingActionButton, FontIcon, Paper, RaisedButton, Styles, Tab, Tabs } = require('material-ui');
+var { Dialog, Divider, FlatButton, FloatingActionButton, FontIcon, Paper, RaisedButton, Styles, Tab, Tabs } = require('material-ui');
 
 import SkillPopup from './SkillPopup';
 import BuildingPage from './BuildingPage';
 import VerifyUndeclare from './VerifyUndeclare';
 
 var { Colors, Spacing, Typography } = Styles;
+
+var base = new Rebase.createClass('https://sageview.firebaseio.com');
+var authData = base.getAuth();
 
 export default class CareerPlan extends Component {
   constructor(props) {
@@ -30,21 +33,6 @@ export default class CareerPlan extends Component {
       openSkillsPopup: false,
       openIndustryPopup: false,
       openVerifyPopup: false
-    }
-  }
-
-  componentDidMount() {
-    if (authData) {
-      let uPathEndPoint = 'users/' + authData.uid + '/Path/' + this.props.selectedpath;
-      this.ref = base.syncState(uPathEndPoint, {
-        context: this,
-        state: 'userPath'
-      });
-      let uAssetEndPoint = 'users/' + authData.uid + '/Asset';
-      this.ref = base.syncState(uAssetEndPoint, {
-        context: this,
-        state: 'userAssets'
-      });
     }
   }
 
@@ -106,13 +94,7 @@ export default class CareerPlan extends Component {
         marginBottom: -6
       }
     };
-  //    if (this.isDeviceSize(StyleResizable.statics.Sizes.MEDIUM) ||
-  //        this.isDeviceSize(StyleResizable.statics.Sizes.LARGE)) {
-  //      styles.paperRoot = this.mergeAndPrefix(
-  //        styles.paperRoot,
-  //        styles.paperRootWhenMedium
-  //      );
-  //    }
+    
     return styles;
   }
 
@@ -124,7 +106,7 @@ export default class CareerPlan extends Component {
     base.fetch('Asset', {
       context: this,
       then(data) {
-        for (let key1 in this.state.userAssets) {
+        for (let key1 in this.props.userInfo.Asset) {
           for (let key2 in data) {
             if (key1 === key2) {
               for (let key3 in key2.crossPath) {
@@ -162,8 +144,12 @@ export default class CareerPlan extends Component {
         <FlatButton
           label="Undeclare"
           primary={true}
-          onTouchTap={this._handlePlanRemove.bind(null,planObj)} />
+          onTouchTap={this._handlePlanRemove.bind(null)} />
     ];
+
+    if (skillsContainer.length === 0) {
+      skillsContainer.push(<h3 id='emptySkillsMsg'>You have no skills in this Career Plan. Time to start building!</h3>);
+    }
 
     return (
         <div className="CareerPlan">
@@ -203,12 +189,18 @@ export default class CareerPlan extends Component {
           <Tabs>
             <Tab label="Skills" >
               <div className="tabcontent">
+                <h3>Skills</h3>
+                <Divider />
                 {skillsContainer}
+                <Divider />
+                <h3>Knowledge</h3>
+                <Divider />
+                <h3 id='emptySkillsMsg'>You have no general knowledge. Time to start building!</h3>
               </div>
             </Tab>
             <Tab label="How to Improve" >
               <div>
-                <BuildingPage />
+                <BuildingPage userInfo={this.props.userInfo} />
               </div>
             </Tab>
           </Tabs>
@@ -234,7 +226,7 @@ export default class CareerPlan extends Component {
   }
 
   _handleSkillRemove() {
-    let newUserAssets = this.state.userAssets;
+    let newUserAssets = this.props.userInfo.Asset;
     newUserAssets[this.state.selectedSkill] = null;
 
     this.setState({
@@ -249,13 +241,11 @@ export default class CareerPlan extends Component {
     });
   }
 
-  _handlePlanRemove(planObject) {
-    let newUserPath = React.addons.update(this.state.userPath, {userTied: {$set: false}});
+  _handlePlanRemove() {
+    this.props.unTiePref();
     this.setState({
-      userPath: newUserPath,
       openVerifyPopup: false
     });
-    this.props.unTiePref();
   }
 
   _handleRequestClose(buttonClicked) {
@@ -271,9 +261,9 @@ export default class CareerPlan extends Component {
 }
 
 CareerPlan.propTypes = {
-  history: PropTypes.object,
-  openStatus: PropTypes.func,
   selectedpath: PropTypes.string,
+  userInfo: PropTypes.object,
+  openStatus: PropTypes.func,
   unTiePref: PropTypes.func,
   selectedCross: PropTypes.array
 };

@@ -26,13 +26,9 @@ var _textField = require('../text-field');
 
 var _textField2 = _interopRequireDefault(_textField);
 
-var _themeManager = require('../styles/theme-manager');
+var _getMuiTheme = require('../styles/getMuiTheme');
 
-var _themeManager2 = _interopRequireDefault(_themeManager);
-
-var _lightRawTheme = require('../styles/raw-themes/light-raw-theme');
-
-var _lightRawTheme2 = _interopRequireDefault(_lightRawTheme);
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -48,20 +44,69 @@ var TimePicker = _react2.default.createClass({
   displayName: 'TimePicker',
 
   propTypes: {
+    /**
+     * If true, automatically accept and close the picker on set minutes.
+     */
     autoOk: _react2.default.PropTypes.bool,
+
+    /**
+     * This is the initial time value of the component.
+     */
     defaultTime: _react2.default.PropTypes.object,
+
+    /**
+     * Tells the component to display the picker in
+     * ampm (12hr) format or 24hr format.
+     */
     format: _react2.default.PropTypes.oneOf(['ampm', '24hr']),
+
+    /**
+     * Callback function that is fired when the time
+     * value changes. The time value is passed in a Date
+     * Object.Since there is no particular event associated
+     * with the change the first argument will always be null
+     * and the second argument will be the new Date instance.
+     */
     onChange: _react2.default.PropTypes.func,
+
+    /**
+     * Fired when the timepicker dialog is dismissed.
+     */
     onDismiss: _react2.default.PropTypes.func,
+
+    /**
+     * Callback function that is fired when the timepicker field gains focus.
+     */
     onFocus: _react2.default.PropTypes.func,
+
+    /**
+     * Fired when the timepicker dialog is shown.
+     */
     onShow: _react2.default.PropTypes.func,
+
+    /**
+     * Callback for touch tap event.
+     */
     onTouchTap: _react2.default.PropTypes.func,
+
+    /**
+     * It's technically more correct to refer to
+     * "12 noon" and "12 midnight" rather than
+     * "12 a.m." and "12 p.m." and it avoids real
+     * confusion between different locales. By default
+     * (for compatibility reasons) TimePicker uses
+     * (12 a.m./12 p.m.) To use (noon/midnight) set pedantic={true}.
+     */
     pedantic: _react2.default.PropTypes.bool,
 
     /**
      * Override the inline-styles of the root element.
      */
     style: _react2.default.PropTypes.object,
+
+    /**
+     * Override the inline-styles of TimePicker's TextField element.
+     */
     textFieldStyle: _react2.default.PropTypes.object
   },
 
@@ -84,7 +129,7 @@ var TimePicker = _react2.default.createClass({
     return {
       time: this.props.defaultTime || emptyTime,
       dialogTime: new Date(),
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : _themeManager2.default.getMuiTheme(_lightRawTheme2.default)
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)()
     };
   },
 
@@ -179,7 +224,8 @@ var TimePicker = _react2.default.createClass({
         ref: 'input',
         value: time === emptyTime ? null : this.formatTime(time),
         onFocus: this._handleInputFocus,
-        onTouchTap: this._handleInputTouchTap })),
+        onTouchTap: this._handleInputTouchTap
+      })),
       _react2.default.createElement(_timePickerDialog2.default, {
         ref: 'dialogWindow',
         initialTime: this.state.dialogTime,
@@ -187,7 +233,8 @@ var TimePicker = _react2.default.createClass({
         onShow: onShow,
         onDismiss: onDismiss,
         format: format,
-        autoOk: autoOk })
+        autoOk: autoOk
+      })
     );
   }
 });

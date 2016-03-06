@@ -19,44 +19,34 @@ export default class PlanDeclarePopup extends Component {
   render() {
     let renderPage;
 
-    if (this.props.exploreType === 'Paths') {
+    if (this.props.exploreType === 'Path') {
       //Declare required focus/industry containers & switches to indicate validity of declaring.
-      let requiredFocus;
+      let requiredFocus = this.props.selectedObj.crossFocus;
       let industryArray = [];
       let focusSwitch = false;
       let industrySwitch = false;
 
       //Scan through "crossList" to (1) unpack required focus & industries into arrays, and (2) check if user declared any of these, note via switches
-      base.fetch(authData.uid+'/Focus', {
-        context: this,
-        then(data) {
-          for (let key in data) {
-            if (key === this.props.selectedObj.Focus && data[key].userTied === true) { focusSwitch = true; }
-          }
-        }
-      });
+      for (let key in this.props.userInfo.Focus) {
+        if (key === this.props.selectedObj.crossFocus && this.props.userInfo.Focus[key].userTied === true) { focusSwitch = true; }
+      }
 
-      base.fetch(authData.uid+'/Industry', {
-        context: this,
-        then(data) {
-          for (let key in this.props.selectedObj.Industries) {
-            let industryDeclared = false;
-            for (let key2 in data) {
-              if (key === key2 && data[key2].userTied === true) {
-                industrySwitch = true;
-                industryDeclared = true;
-                break;
-              }
-            }
-            industryArray.push(
-              <div>
-                <span style={ industryDeclared ? {color: Colors.cyan500} : null}>{key}</span>
-                {industryDeclared ? <FontIcon style={{display: 'inline-block', margin: '2px'}} className="material-icons" color={Colors.cyan500}>done</FontIcon> : null}
-              </div>
-            );
+      for (let key in this.props.selectedObj.crossIndustry) {
+        let industryDeclared = false;
+        for (let key2 in this.props.userInfo.Industry) {
+          if (key === key2 && this.props.userInfo.Industry[key2].userTied === true) {
+            industrySwitch = true;
+            industryDeclared = true;
+            break;
           }
         }
-      });
+        industryArray.push(
+          <div>
+            <span style={ industryDeclared ? {color: Colors.cyan500} : null}>{key}</span>
+            {industryDeclared ? <FontIcon style={{display: 'inline-block', margin: '2px'}} className="material-icons" color={Colors.cyan500}>done</FontIcon> : null}
+          </div>
+        );
+      }
 
       if (focusSwitch && industrySwitch) {
         //Render declaring page content into variable
@@ -141,6 +131,7 @@ PlanDeclarePopup.propTypes = {
   selecteditem: PropTypes.string,
   selectedObj: PropTypes.object,
   exploreType: PropTypes.string,
+  userInfo: PropTypes.object,
   declarefunction: PropTypes.func,
   closePopup: PropTypes.func
 }

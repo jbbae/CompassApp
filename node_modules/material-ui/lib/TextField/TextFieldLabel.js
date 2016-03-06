@@ -14,8 +14,6 @@ var _transitions2 = _interopRequireDefault(_transitions);
 
 var _styles = require('../utils/styles');
 
-var _styles2 = _interopRequireDefault(_styles);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var propTypes = {
@@ -55,7 +53,7 @@ var propTypes = {
   onTouchTap: _react2.default.PropTypes.func,
 
   /**
-   * Override the inline-styles of the floating label.
+   * Override the inline-styles of the root element.
    */
   style: _react2.default.PropTypes.object
 };
@@ -94,7 +92,7 @@ var TextFieldLabel = function TextFieldLabel(props) {
     'label',
     {
       className: className,
-      style: _styles2.default.prepareStyles(muiTheme, styles.root, style),
+      style: (0, _styles.prepareStyles)(muiTheme, (0, _styles.mergeStyles)(styles.root, style)),
       htmlFor: htmlFor,
       onTouchTap: onTouchTap
     },

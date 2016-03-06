@@ -42,13 +42,9 @@ var _paper = require('./paper');
 
 var _paper2 = _interopRequireDefault(_paper);
 
-var _lightRawTheme = require('./styles/raw-themes/light-raw-theme');
+var _getMuiTheme = require('./styles/getMuiTheme');
 
-var _lightRawTheme2 = _interopRequireDefault(_lightRawTheme);
-
-var _themeManager = require('./styles/theme-manager');
-
-var _themeManager2 = _interopRequireDefault(_themeManager);
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -64,28 +60,124 @@ var RaisedButton = _react2.default.createClass({
   displayName: 'RaisedButton',
 
   propTypes: {
+    /**
+     * Override the background color. Always takes precedence unless the button is disabled.
+     */
     backgroundColor: _react2.default.PropTypes.string,
+
+    /**
+     * This is what will be displayed inside the button.
+     * If a label is specified, the text within the label prop will
+     * be displayed. Otherwise, the component will expect children
+     * which will then be displayed. (In our example,
+     * we are nesting an `<input type="file" />` and a `span`
+     * that acts as our label to be displayed.) This only
+     * applies to flat and raised buttons.
+     */
     children: _react2.default.PropTypes.node,
 
     /**
      * The css class name of the root element.
      */
     className: _react2.default.PropTypes.string,
+
+    /**
+     * Disables the button if set to true.
+     */
     disabled: _react2.default.PropTypes.bool,
+
+    /**
+     * Override the background color if the button is disabled.
+     */
     disabledBackgroundColor: _react2.default.PropTypes.string,
+
+    /**
+     * Color of the label if disabled is true.
+     */
     disabledLabelColor: _react2.default.PropTypes.string,
+
+    /**
+     * If true, then the button will take up the full
+     * width of its container.
+     */
     fullWidth: _react2.default.PropTypes.bool,
+
+    /**
+     * URL to link to when button clicked if `linkButton` is set to true.
+     */
+    href: _react2.default.PropTypes.string,
+
+    /**
+     * Use this property to display an icon.
+     */
+    icon: _react2.default.PropTypes.node,
+
+    /**
+     * The label for the button.
+     */
     label: validateLabel,
+
+    /**
+     * The color of the label for the button.
+     */
     labelColor: _react2.default.PropTypes.string,
+
+    /**
+     * Place label before or after the passed children.
+     */
     labelPosition: _react2.default.PropTypes.oneOf(['before', 'after']),
+
+    /**
+     * Override the inline-styles of the button's label element.
+     */
     labelStyle: _react2.default.PropTypes.object,
+
+    /**
+     * Enables use of `href` property to provide a URL to link to if set to true.
+     */
+    linkButton: _react2.default.PropTypes.bool,
+
+    /**
+     * Callback function for when the mouse is pressed down inside this element.
+     */
     onMouseDown: _react2.default.PropTypes.func,
+
+    /**
+     * Callback function for when the mouse enters this element.
+     */
     onMouseEnter: _react2.default.PropTypes.func,
+
+    /**
+     * Callback function for when the mouse leaves this element.
+     */
     onMouseLeave: _react2.default.PropTypes.func,
+
+    /**
+     * Callback function for when the mouse is realeased
+     * above this element.
+     */
     onMouseUp: _react2.default.PropTypes.func,
+
+    /**
+     * Callback function for when a touchTap event ends.
+     */
     onTouchEnd: _react2.default.PropTypes.func,
+
+    /**
+     * Callback function for when a touchTap event starts.
+     */
     onTouchStart: _react2.default.PropTypes.func,
+
+    /**
+     * If true, colors button according to
+     * primaryTextColor from the Theme.
+     */
     primary: _react2.default.PropTypes.bool,
+
+    /**
+     * If true, colors button according to secondaryTextColor from the theme.
+     * The primary prop has precendent if set to true.
+     */
     secondary: _react2.default.PropTypes.bool,
 
     /**
@@ -107,10 +199,14 @@ var RaisedButton = _react2.default.createClass({
 
   getDefaultProps: function getDefaultProps() {
     return {
-      labelPosition: 'before' };
+      disabled: false,
+      labelPosition: 'after',
+      fullWidth: false,
+      primary: false,
+      secondary: false
+    };
   },
 
-  // Should be after but we keep it like for now (prevent breaking changes)
   getInitialState: function getInitialState() {
     var zDepth = this.props.disabled ? 0 : 1;
     return {
@@ -118,7 +214,7 @@ var RaisedButton = _react2.default.createClass({
       touched: false,
       initialZDepth: zDepth,
       zDepth: zDepth,
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : _themeManager2.default.getMuiTheme(_lightRawTheme2.default)
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)()
     };
   },
   getChildContext: function getChildContext() {
@@ -152,8 +248,13 @@ var RaisedButton = _react2.default.createClass({
     return this.state.muiTheme.raisedButton;
   },
   getStyles: function getStyles() {
+    var _props = this.props;
+    var icon = _props.icon;
+    var labelPosition = _props.labelPosition;
+    var primary = _props.primary;
+    var secondary = _props.secondary;
 
-    var amount = this.props.primary || this.props.secondary ? 0.4 : 0.08;
+    var amount = primary || secondary ? 0.4 : 0.08;
     var styles = {
       root: {
         display: 'inline-block',
@@ -169,14 +270,7 @@ var RaisedButton = _react2.default.createClass({
         overflow: 'hidden',
         borderRadius: 2,
         transition: _transitions2.default.easeOut(),
-        backgroundColor: this._getBackgroundColor(),
-        /*
-          This is need so that ripples do not bleed
-          past border radius.
-          See: http://stackoverflow.com/questions/17298739/
-            css-overflow-hidden-not-working-in-chrome-when-parent-has-border-radius-and-chil
-         */
-        transform: 'translate3d(0, 0, 0)'
+        backgroundColor: this._getBackgroundColor()
       },
       label: {
         position: 'relative',
@@ -186,8 +280,9 @@ var RaisedButton = _react2.default.createClass({
         textTransform: this.getTheme().textTransform ? this.getTheme().textTransform : this.getThemeButton().textTransform ? this.getThemeButton().textTransform : 'uppercase',
         fontWeight: _typography2.default.fontWeightMedium,
         margin: 0,
-        padding: '0px ' + this.state.muiTheme.rawTheme.spacing.desktopGutterLess + 'px',
         userSelect: 'none',
+        paddingLeft: this.state.muiTheme.rawTheme.spacing.desktopGutterLess,
+        paddingRight: this.state.muiTheme.rawTheme.spacing.desktopGutterLess,
         lineHeight: this.props.style && this.props.style.height ? this.props.style.height : this.getThemeButton().height + 'px',
         color: this._getLabelColor()
       },
@@ -199,6 +294,15 @@ var RaisedButton = _react2.default.createClass({
         backgroundColor: _colorManipulator2.default.fade(this._getLabelColor(), amount)
       }
     };
+
+    if (icon) {
+      if (labelPosition === 'before') {
+        styles.label.paddingRight = 8;
+      } else {
+        styles.label.paddingLeft = 8;
+      }
+    }
+
     return styles;
   },
   _handleMouseDown: function _handleMouseDown(e) {
@@ -244,16 +348,17 @@ var RaisedButton = _react2.default.createClass({
     }
   },
   render: function render() {
-    var _props = this.props;
-    var children = _props.children;
-    var disabled = _props.disabled;
-    var label = _props.label;
-    var labelPosition = _props.labelPosition;
-    var labelStyle = _props.labelStyle;
-    var primary = _props.primary;
-    var secondary = _props.secondary;
+    var _props2 = this.props;
+    var children = _props2.children;
+    var disabled = _props2.disabled;
+    var icon = _props2.icon;
+    var label = _props2.label;
+    var labelPosition = _props2.labelPosition;
+    var labelStyle = _props2.labelStyle;
+    var primary = _props2.primary;
+    var secondary = _props2.secondary;
 
-    var other = _objectWithoutProperties(_props, ['children', 'disabled', 'label', 'labelPosition', 'labelStyle', 'primary', 'secondary']);
+    var other = _objectWithoutProperties(_props2, ['children', 'disabled', 'icon', 'label', 'labelPosition', 'labelStyle', 'primary', 'secondary']);
 
     var styles = this.getStyles();
 
@@ -279,15 +384,37 @@ var RaisedButton = _react2.default.createClass({
       onKeyboardFocus: this._handleKeyboardFocus
     };
 
+    var iconCloned = undefined;
+
+    if (icon) {
+      iconCloned = _react2.default.cloneElement(icon, {
+        color: styles.label.color,
+        style: {
+          verticalAlign: 'middle',
+          marginLeft: labelPosition === 'before' ? 0 : 12,
+          marginRight: labelPosition === 'before' ? 12 : 0
+        }
+      });
+    }
+
     // Place label before or after children.
-    var childrenFragment = labelPosition === 'before' ? { labelElement: labelElement, children: children } : { children: children, labelElement: labelElement };
+    var childrenFragment = labelPosition === 'before' ? {
+      labelElement: labelElement,
+      iconCloned: iconCloned,
+      children: children
+    } : {
+      children: children,
+      iconCloned: iconCloned,
+      labelElement: labelElement
+    };
     var enhancedButtonChildren = _children2.default.create(childrenFragment);
 
     return _react2.default.createElement(
       _paper2.default,
       {
         style: this.mergeStyles(styles.root, this.props.style),
-        zDepth: this.state.zDepth },
+        zDepth: this.state.zDepth
+      },
       _react2.default.createElement(
         _enhancedButton2.default,
         _extends({}, other, buttonEventHandlers, {
@@ -297,10 +424,14 @@ var RaisedButton = _react2.default.createClass({
           focusRippleColor: rippleColor,
           touchRippleColor: rippleColor,
           focusRippleOpacity: rippleOpacity,
-          touchRippleOpacity: rippleOpacity }),
+          touchRippleOpacity: rippleOpacity
+        }),
         _react2.default.createElement(
           'div',
-          { ref: 'overlay', style: this.prepareStyles(styles.overlay, this.state.hovered && !this.props.disabled && styles.overlayWhenHovered) },
+          {
+            ref: 'overlay',
+            style: this.prepareStyles(styles.overlay, this.state.hovered && !this.props.disabled && styles.overlayWhenHovered)
+          },
           enhancedButtonChildren
         )
       )

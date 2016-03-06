@@ -38,17 +38,9 @@ var _lodash = require('lodash.throttle');
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
-var _lightRawTheme = require('../styles/raw-themes/light-raw-theme');
+var _getMuiTheme = require('../styles/getMuiTheme');
 
-var _lightRawTheme2 = _interopRequireDefault(_lightRawTheme);
-
-var _themeManager = require('../styles/theme-manager');
-
-var _themeManager2 = _interopRequireDefault(_themeManager);
-
-var _extend = require('../utils/extend');
-
-var _extend2 = _interopRequireDefault(_extend);
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 
 var _popoverDefaultAnimation = require('./popover-default-animation');
 
@@ -62,27 +54,91 @@ var Popover = _react2.default.createClass({
   displayName: 'Popover',
 
   propTypes: {
+    /**
+     * This is the DOM element that will be used to set the position of the
+     * component.
+     */
     anchorEl: _react2.default.PropTypes.object,
+
+    /**
+     * This is the point on the anchor where the popover
+     * targetOrigin will stick to.
+     * Options:
+     * vertical: [top, middle, bottom]
+     * horizontal: [left, center, right]
+     */
     anchorOrigin: _propTypes2.default.origin,
+
+    /**
+     * If true, the popover will apply transitions when
+     * added it gets added to the DOM.
+     */
     animated: _react2.default.PropTypes.bool,
+
+    /**
+     * Override the default animation component used.
+     */
     animation: _react2.default.PropTypes.func,
+
+    /**
+     * If true, the popover will hide when the anchor scrolls off the screen
+     */
     autoCloseWhenOffScreen: _react2.default.PropTypes.bool,
+
+    /**
+     * If true, the popover (potentially) ignores targetOrigin
+     * and anchorOrigin to make itself fit on screen,
+     * which is useful for mobile devices.
+     */
     canAutoPosition: _react2.default.PropTypes.bool,
+
+    /**
+     * Use this property to render your component inside the `Popover`.
+     */
     children: _react2.default.PropTypes.node,
 
     /**
      * The css class name of the root element.
      */
     className: _react2.default.PropTypes.string,
+
+    /**
+     * This is a callback that fires when the popover
+     * thinks it should close. (e.g. clickAway or offScreen)
+     *
+     * @param {string} reason Determines what triggered this request.
+     */
     onRequestClose: _react2.default.PropTypes.func,
+
+    /**
+     * Controls the visibility of the popover.
+     */
     open: _react2.default.PropTypes.bool,
 
     /**
      * Override the inline-styles of the root element.
      */
     style: _react2.default.PropTypes.object,
+
+    /**
+     * This is the point on the popover which will stick to
+     * the anchors origin.
+     * Options:
+     * vertical: [top, middle, bottom]
+     * horizontal: [left, center, right]
+     */
     targetOrigin: _propTypes2.default.origin,
+
+    /**
+     * If true, the popover will render on top of an invisible
+     * layer, which will prevent clicks to the underlying
+     * elements, and trigger an onRequestClose(clickAway) event.
+     */
     useLayerForClickAway: _react2.default.PropTypes.bool,
+
+    /**
+     * This number represents the zDepth of the paper shadow.
+     */
     zDepth: _propTypes2.default.zDepth
   },
 
@@ -103,7 +159,6 @@ var Popover = _react2.default.createClass({
         vertical: 'bottom',
         horizontal: 'left'
       },
-      animation: _popoverDefaultAnimation2.default,
       animated: true,
       autoCloseWhenOffScreen: true,
       canAutoPosition: true,
@@ -127,7 +182,7 @@ var Popover = _react2.default.createClass({
     return {
       open: this.props.open,
       closing: false,
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : _themeManager2.default.getMuiTheme(_lightRawTheme2.default)
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)()
     };
   },
   getChildContext: function getChildContext() {
@@ -186,11 +241,13 @@ var Popover = _react2.default.createClass({
 
     var other = _objectWithoutProperties(_props, ['animated', 'animation', 'children', 'style']);
 
-    var Animation = animation;
+    var Animation = animation || _popoverDefaultAnimation2.default;
 
-    if (!animated) {
+    if (!Animation) {
       Animation = _paper2.default;
-      style = { position: 'fixed' };
+      style = {
+        position: 'fixed'
+      };
       if (!this.state.open) {
         return null;
       }
@@ -295,8 +352,8 @@ var Popover = _react2.default.createClass({
     return 'exclusive';
   },
   getPositions: function getPositions(anchor, target) {
-    var a = (0, _extend2.default)(anchor, {});
-    var t = (0, _extend2.default)(target, {});
+    var a = _extends({}, anchor);
+    var t = _extends({}, target);
 
     var positions = {
       x: ['left', 'right'].filter(function (p) {
@@ -362,7 +419,8 @@ var Popover = _react2.default.createClass({
       open: this.state.open,
       componentClickAway: this.componentClickAway,
       useLayerForClickAway: this.props.useLayerForClickAway,
-      render: this.renderLayer });
+      render: this.renderLayer
+    });
   }
 });
 

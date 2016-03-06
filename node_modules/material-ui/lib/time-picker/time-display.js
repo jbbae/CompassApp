@@ -16,13 +16,9 @@ var _stylePropable = require('../mixins/style-propable');
 
 var _stylePropable2 = _interopRequireDefault(_stylePropable);
 
-var _lightRawTheme = require('../styles/raw-themes/light-raw-theme');
+var _getMuiTheme = require('../styles/getMuiTheme');
 
-var _lightRawTheme2 = _interopRequireDefault(_lightRawTheme);
-
-var _themeManager = require('../styles/theme-manager');
-
-var _themeManager2 = _interopRequireDefault(_themeManager);
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -61,7 +57,7 @@ var TimeDisplay = _react2.default.createClass({
   getInitialState: function getInitialState() {
     return {
       transitionDirection: 'up',
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : _themeManager2.default.getMuiTheme(_lightRawTheme2.default)
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)()
     };
   },
   getChildContext: function getChildContext() {
@@ -173,19 +169,23 @@ var TimeDisplay = _react2.default.createClass({
     if (this.props.format === 'ampm') {
       buttons = [_react2.default.createElement(
         'div',
-        { key: 'pm',
+        {
+          key: 'pm',
           style: this.prepareStyles(styles.clickable, affix === 'pm' ? {} : styles.inactive),
           onTouchTap: function onTouchTap() {
             return _this.props.onSelectAffix('pm');
-          } },
+          }
+        },
         "PM"
       ), _react2.default.createElement(
         'div',
-        { key: 'am',
+        {
+          key: 'am',
           style: this.prepareStyles(styles.affixTop, styles.clickable, affix === 'am' ? {} : styles.inactive),
           onTouchTap: function onTouchTap() {
             return _this.props.onSelectAffix('am');
-          } },
+          }
+        },
         "AM"
       )];
     }
@@ -207,7 +207,8 @@ var TimeDisplay = _react2.default.createClass({
               'span',
               {
                 style: this.prepareStyles(styles.clickable, mode === 'hour' ? {} : styles.inactive),
-                onTouchTap: this.props.onSelectHour },
+                onTouchTap: this.props.onSelectHour
+              },
               hour
             ),
             _react2.default.createElement(
@@ -219,7 +220,8 @@ var TimeDisplay = _react2.default.createClass({
               'span',
               {
                 style: this.prepareStyles(styles.clickable, mode === 'minute' ? {} : styles.inactive),
-                onTouchTap: this.props.onSelectMin },
+                onTouchTap: this.props.onSelectMin
+              },
               min
             )
           ),

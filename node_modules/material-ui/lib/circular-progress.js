@@ -26,13 +26,9 @@ var _transitions = require('./styles/transitions');
 
 var _transitions2 = _interopRequireDefault(_transitions);
 
-var _lightRawTheme = require('./styles/raw-themes/light-raw-theme');
+var _getMuiTheme = require('./styles/getMuiTheme');
 
-var _lightRawTheme2 = _interopRequireDefault(_lightRawTheme);
-
-var _themeManager = require('./styles/theme-manager');
-
-var _themeManager2 = _interopRequireDefault(_themeManager);
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -106,7 +102,7 @@ var CircularProgress = _react2.default.createClass({
   },
   getInitialState: function getInitialState() {
     return {
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : _themeManager2.default.getMuiTheme(_lightRawTheme2.default)
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)()
     };
   },
   getChildContext: function getChildContext() {
@@ -177,13 +173,13 @@ var CircularProgress = _react2.default.createClass({
 
     if (this.props.mode !== 'indeterminate') return;
 
-    _autoPrefix2.default.set(wrapper.style, 'transform', 'rotate(0deg)');
-    _autoPrefix2.default.set(wrapper.style, 'transitionDuration', '0ms');
+    _autoPrefix2.default.set(wrapper.style, 'transform', 'rotate(0deg)', this.state.muiTheme);
+    _autoPrefix2.default.set(wrapper.style, 'transitionDuration', '0ms', this.state.muiTheme);
 
     setTimeout(function () {
-      _autoPrefix2.default.set(wrapper.style, 'transform', 'rotate(1800deg)');
-      _autoPrefix2.default.set(wrapper.style, 'transitionDuration', '10s');
-      _autoPrefix2.default.set(wrapper.style, 'transitionTimingFunction', 'linear');
+      _autoPrefix2.default.set(wrapper.style, 'transform', 'rotate(1800deg)', _this2.state.muiTheme);
+      _autoPrefix2.default.set(wrapper.style, 'transitionDuration', '10s', _this2.state.muiTheme);
+      _autoPrefix2.default.set(wrapper.style, 'transitionTimingFunction', 'linear', _this2.state.muiTheme);
     }, 50);
 
     this.rotateWrapperTimer = setTimeout(function () {
@@ -230,7 +226,7 @@ var CircularProgress = _react2.default.createClass({
       }
     };
 
-    _autoPrefix2.default.set(styles.wrapper, 'transitionTimingFunction', 'linear');
+    _autoPrefix2.default.set(styles.wrapper, 'transitionTimingFunction', 'linear', this.state.muiTheme);
 
     if (this.props.mode === 'determinate') {
       var relVal = this._getRelativeValue();
@@ -259,8 +255,11 @@ var CircularProgress = _react2.default.createClass({
         _react2.default.createElement(
           'svg',
           { style: this.prepareStyles(styles.svg) },
-          _react2.default.createElement('circle', { ref: 'path', style: this.prepareStyles(styles.path), cx: '25', cy: '25',
-            r: '20', fill: 'none', strokeWidth: '2.5', strokeMiterlimit: '10' })
+          _react2.default.createElement('circle', {
+            ref: 'path', style: this.prepareStyles(styles.path), cx: '25',
+            cy: '25', r: '20', fill: 'none',
+            strokeWidth: '2.5', strokeMiterlimit: '10'
+          })
         )
       )
     );

@@ -316,7 +316,7 @@ export default class ExplorerDescription extends Component {
 //          <Table
 //            height='100%'
 //            fixedHeader={true}>
-//            <TableHeader displaySelectAll={false}>
+//            <TableHeader>
 //              <TableRow>
 //                <TableHeaderColumn>Company Name</TableHeaderColumn>
 //                <TableHeaderColumn>Country</TableHeaderColumn>
@@ -342,8 +342,8 @@ export default class ExplorerDescription extends Component {
     //Tab 2 & 3 - Path
     else if (this.props.exploreType === 'Path') {
       labeltwo = 'How to Become';
-      let tabTwoPartA;
-      let tabTwoPartB;
+      let tabTwoPartA = [];
+      let tabTwoPartB = [];
 
       for (let key in howToBDesc) { tabTwoPartA.push(<p>{howToBDesc[key]}</p>); }
       for (let key in licensesDesc) { tabTwoPartB.push(<p>{licensesD[key]}</p>); }
@@ -362,8 +362,8 @@ export default class ExplorerDescription extends Component {
         </div>;
 
         //Tab 3 Start
-        let tabThreePartA;
-        let tabThreePartB;
+        let tabThreePartA = [];
+        let tabThreePartB = [];
 
         for (let key in jobOutDesc) { tabThreePartA.push(<p>{jobOutDesc[key]}</p>); }
         for (let key in jobProsp) { tabThreePartB.push(<p>{jobProsp[key]}</p>); }
@@ -436,6 +436,7 @@ export default class ExplorerDescription extends Component {
             <PlanDeclarePopup
               selecteditem= {this.props.selecteditem}
               exploreType= {this.props.exploreType}
+              userInfo= {this.props.userInfo}
               declarefunction= {this.handleDeclareFinal}
               selectedObj={this.props.selectedObj}
               closePopup= {this.declarePopupBack}/>
@@ -499,13 +500,7 @@ export default class ExplorerDescription extends Component {
 
     handleFavorite(e, index, value) {
       let self = this;
-      let listType;
-      if (this.props.exploreType === 'Focus' || this.props.exploreType === 'Path') {
-        listType = 'Path';
-      } else if (this.props.exploreType === 'Industry') {
-        listType = this.props.exploreType;
-      }
-      let newEndPoint = 'users/' + authData.uid + '/' + listType + '/' + this.props.selecteditem;
+      let newEndPoint = 'users/' + authData.uid + '/' + this.props.exploreType + '/' + this.props.selecteditem;
 
       if (authData) {
         if (value === null && userPref !== null) {

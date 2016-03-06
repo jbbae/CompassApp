@@ -26,13 +26,13 @@ var _focusRipple = require('./ripples/focus-ripple');
 
 var _focusRipple2 = _interopRequireDefault(_focusRipple);
 
-var _lightRawTheme = require('./styles/raw-themes/light-raw-theme');
+var _getMuiTheme = require('./styles/getMuiTheme');
 
-var _lightRawTheme2 = _interopRequireDefault(_lightRawTheme);
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 
-var _themeManager = require('./styles/theme-manager');
+var _autoPrefix = require('./styles/auto-prefix');
 
-var _themeManager2 = _interopRequireDefault(_themeManager);
+var _autoPrefix2 = _interopRequireDefault(_autoPrefix);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -78,80 +78,80 @@ var Slider = _react2.default.createClass({
   propTypes: {
     /**
      * The default value of the slider.
-     **/
+     */
     defaultValue: valueInRangePropType,
 
     /**
      * Describe the slider.
-     **/
+     */
     description: _react2.default.PropTypes.string,
 
     /**
      * Disables focus ripple if set to true.
-     **/
+     */
     disableFocusRipple: _react2.default.PropTypes.bool,
 
     /**
      * If true, the slider will not be interactable.
-     **/
+     */
     disabled: _react2.default.PropTypes.bool,
 
     /**
      * An error message for the slider.
-     **/
+     */
     error: _react2.default.PropTypes.string,
 
     /**
      * The maximum value the slider can slide to on
      * a scale from 0 to 1 inclusive. Cannot be equal to min.
-     **/
+     */
     max: minMaxPropType,
 
     /**
      * The minimum value the slider can slide to on a scale
      * from 0 to 1 inclusive. Cannot be equal to max.
-     **/
+     */
     min: minMaxPropType,
 
     /**
      * The name of the slider. Behaves like the name attribute
      * of an input element.
-     **/
+     */
     name: _react2.default.PropTypes.string,
 
     /**
      * Callback function that is fired when the focus has left the slider.
-     **/
+     */
     onBlur: _react2.default.PropTypes.func,
 
     /**
      * Callback function that is fired when the user changes the slider's value.
-     **/
+     */
     onChange: _react2.default.PropTypes.func,
 
     /**
      * Callback function that is fired when the slider has begun to move.
-     **/
+     */
     onDragStart: _react2.default.PropTypes.func,
 
     /**
-     * Callback function that is fried when teh slide has stopped moving.
-     **/
+     * Callback function that is fried when the slide has stopped moving.
+     */
     onDragStop: _react2.default.PropTypes.func,
 
     /**
      * Callback fired when the user has focused on the slider.
-     **/
+     */
     onFocus: _react2.default.PropTypes.func,
 
     /**
      * Whether or not the slider is required in a form.
-     **/
+     */
     required: _react2.default.PropTypes.bool,
 
     /**
      * The granularity the slider can step through values.
-     **/
+     */
     step: _react2.default.PropTypes.number,
 
     /**
@@ -161,7 +161,7 @@ var Slider = _react2.default.createClass({
 
     /**
      * The value of the slider.
-     **/
+     */
     value: valueInRangePropType
   },
 
@@ -202,7 +202,7 @@ var Slider = _react2.default.createClass({
       hovered: false,
       percent: percent,
       value: value,
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : _themeManager2.default.getMuiTheme(_lightRawTheme2.default)
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)()
     };
   },
   getChildContext: function getChildContext() {
@@ -308,13 +308,13 @@ var Slider = _react2.default.createClass({
         left: -this.getTheme().handleSize
       }
     };
-    styles.filled = this.mergeAndPrefix(styles.filledAndRemaining, {
+    styles.filled = this.mergeStyles(styles.filledAndRemaining, {
       left: 0,
       backgroundColor: this.props.disabled ? this.getTheme().trackColor : this.getTheme().selectionColor,
       marginRight: fillGutter,
       width: 'calc(' + this.state.percent * 100 + '%' + calcDisabledSpacing + ')'
     });
-    styles.remaining = this.mergeAndPrefix(styles.filledAndRemaining, {
+    styles.remaining = this.mergeStyles(styles.filledAndRemaining, {
       right: 0,
       backgroundColor: this.getTheme().trackColor,
       marginLeft: fillGutter,
@@ -322,6 +322,14 @@ var Slider = _react2.default.createClass({
     });
 
     return styles;
+  },
+
+  // Needed to prevent text selection when dragging the slider handler.
+  // In the future, we should consider use <input type="range"> to avoid
+  // similar issues.
+  _toggleSelection: function _toggleSelection(value) {
+    var body = document.getElementsByTagName('body')[0];
+    _autoPrefix2.default.set(body.style, 'userSelect', value, this.state.muiTheme);
   },
   _onHandleTouchStart: function _onHandleTouchStart(e) {
     if (document) {
@@ -336,6 +344,7 @@ var Slider = _react2.default.createClass({
     if (document) {
       document.addEventListener('mousemove', this._dragHandler, false);
       document.addEventListener('mouseup', this._dragEndHandler, false);
+      this._toggleSelection('none');
     }
     this._onDragStart(e);
   },
@@ -367,6 +376,7 @@ var Slider = _react2.default.createClass({
     if (document) {
       document.removeEventListener('mousemove', this._dragHandler, false);
       document.removeEventListener('mouseup', this._dragEndHandler, false);
+      this._toggleSelection('');
     }
 
     this._onDragStop(e);
@@ -488,11 +498,11 @@ var Slider = _react2.default.createClass({
     if (percent > 1) percent = 1;else if (percent < 0) percent = 0;
 
     var styles = this.getStyles();
-    var sliderStyles = this.prepareStyles(styles.root, this.props.style);
-    var handleStyles = percent === 0 ? this.prepareStyles(styles.handle, styles.handleWhenPercentZero, this.state.active && styles.handleWhenActive, this.state.focused && { outline: 'none' }, (this.state.hovered || this.state.focused) && !this.props.disabled && styles.handleWhenPercentZeroAndFocused, this.props.disabled && styles.handleWhenPercentZeroAndDisabled) : this.prepareStyles(styles.handle, this.state.active && styles.handleWhenActive, this.state.focused && { outline: 'none' }, this.props.disabled && styles.handleWhenDisabled, {
+    var sliderStyles = this.mergeStyles(styles.root, this.props.style);
+    var handleStyles = percent === 0 ? this.mergeStyles(styles.handle, styles.handleWhenPercentZero, this.state.active && styles.handleWhenActive, this.state.focused && { outline: 'none' }, (this.state.hovered || this.state.focused) && !this.props.disabled && styles.handleWhenPercentZeroAndFocused, this.props.disabled && styles.handleWhenPercentZeroAndDisabled) : this.mergeStyles(styles.handle, this.state.active && styles.handleWhenActive, this.state.focused && { outline: 'none' }, this.props.disabled && styles.handleWhenDisabled, {
       left: percent * 100 + '%'
     });
-    var rippleStyle = this.mergeAndPrefix(styles.ripple, percent === 0 && styles.rippleWhenPercentZero);
+    var rippleStyle = this.mergeStyles(styles.ripple, percent === 0 && styles.rippleWhenPercentZero);
     var remainingStyles = styles.remaining;
     if ((this.state.hovered || this.state.focused) && !this.props.disabled) {
       remainingStyles.backgroundColor = this.getTheme().trackColorSelected;
@@ -505,10 +515,12 @@ var Slider = _react2.default.createClass({
       focusRipple = _react2.default.createElement(_focusRipple2.default, {
         ref: 'focusRipple',
         key: 'focusRipple',
-        style: rippleStyle,
+        style: this.mergeStyles(rippleStyle),
         innerStyle: styles.rippleInner,
         show: rippleShowCondition,
-        color: rippleColor });
+        muiTheme: this.state.muiTheme,
+        color: rippleColor
+      });
     }
 
     var handleDragProps = {};
@@ -535,13 +547,15 @@ var Slider = _react2.default.createClass({
       ),
       _react2.default.createElement(
         'div',
-        { style: sliderStyles,
+        {
+          style: this.prepareStyles(sliderStyles),
           onFocus: this._onFocus,
           onBlur: this._onBlur,
           onMouseDown: this._onMouseDown,
           onMouseEnter: this._onMouseEnter,
           onMouseLeave: this._onMouseLeave,
-          onMouseUp: this._onMouseUp },
+          onMouseUp: this._onMouseUp
+        },
         _react2.default.createElement(
           'div',
           { ref: 'track', style: this.prepareStyles(styles.track) },
@@ -549,7 +563,7 @@ var Slider = _react2.default.createClass({
           _react2.default.createElement('div', { style: this.prepareStyles(remainingStyles) }),
           _react2.default.createElement(
             'div',
-            _extends({ style: handleStyles, tabIndex: 0 }, handleDragProps),
+            _extends({ style: this.prepareStyles(handleStyles), tabIndex: 0 }, handleDragProps),
             focusRipple
           )
         )
@@ -560,7 +574,8 @@ var Slider = _react2.default.createClass({
         required: this.props.required,
         min: this.props.min,
         max: this.props.max,
-        step: this.props.step })
+        step: this.props.step
+      })
     );
   }
 });

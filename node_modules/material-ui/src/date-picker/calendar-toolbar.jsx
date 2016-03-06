@@ -5,8 +5,7 @@ import ToolbarGroup from '../toolbar/toolbar-group';
 import NavigationChevronLeft from '../svg-icons/navigation/chevron-left';
 import NavigationChevronRight from '../svg-icons/navigation/chevron-right';
 import SlideInTransitionGroup from '../transition-groups/slide-in';
-import ThemeManager from '../styles/theme-manager';
-import DefaultRawTheme from '../styles/raw-themes/light-raw-theme';
+import getMuiTheme from '../styles/getMuiTheme';
 
 const styles = {
   root: {
@@ -55,7 +54,7 @@ const CalendarToolbar = React.createClass({
 
   getInitialState() {
     return {
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : ThemeManager.getMuiTheme(DefaultRawTheme),
+      muiTheme: this.context.muiTheme || getMuiTheme(),
       transitionDirection: 'up',
     };
   },
@@ -109,25 +108,26 @@ const CalendarToolbar = React.createClass({
       <Toolbar style={styles.root} noGutter={true}>
         <SlideInTransitionGroup
           style={styles.title}
-          direction={this.state.transitionDirection}>
+          direction={this.state.transitionDirection}
+        >
           <div key={dateTimeFormatted}>{dateTimeFormatted}</div>
         </SlideInTransitionGroup>
-
         <ToolbarGroup key={0} float="left">
           <IconButton
             style={styles.button}
             disabled={!this.props.prevMonth}
-            onTouchTap={this._prevMonthTouchTap}>
-              {nextButtonIcon}
+            onTouchTap={this._prevMonthTouchTap}
+          >
+            {nextButtonIcon}
           </IconButton>
         </ToolbarGroup>
-
         <ToolbarGroup key={1} float="right">
           <IconButton
             style={styles.button}
             disabled={!this.props.nextMonth}
-            onTouchTap={this._nextMonthTouchTap}>
-              {prevButtonIcon}
+            onTouchTap={this._nextMonthTouchTap}
+          >
+            {prevButtonIcon}
           </IconButton>
         </ToolbarGroup>
       </Toolbar>
