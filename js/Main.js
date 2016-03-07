@@ -123,7 +123,7 @@ export default class AppComponent extends Component {
               color={Colors.deepOrange300}
               backgroundColor={Colors.purple500}
               size={70}
-              src={this.state.userInfo.profilePic ? this.state.userInfo.profilePic.url() : null }>
+              src={this.state.userInfo.profilePic ? this.state.userInfo.profilePic : null }>
               { this.state.userInfo.profilePic ? null : this.state.userInfo.firstName.substring(0,1).concat(this.state.userInfo.lastName.substring(0,1)) }
             </Avatar>
           </div>

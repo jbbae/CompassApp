@@ -425,7 +425,8 @@ export default class ExplorerDescription extends Component {
             open={this.state.openSkillsPopup}
             onRequestClose={this._handleRequestClose}>
             <SkillPopup
-              description= {this.state.selectedSkill} />
+              selectedSkill= {this.state.selectedSkill}
+              userInfo= {this.props.userInfo} />
           </Dialog>
           <Dialog
             title="Declare Career Path"
@@ -505,6 +506,7 @@ export default class ExplorerDescription extends Component {
       if (authData) {
         if (value === null && userPref !== null) {
           base.post(newEndPoint, { data: null });
+          userPref = null;
 
         } else if (value !== null && userPref === null) {
           base.post(newEndPoint, {
@@ -522,7 +524,7 @@ export default class ExplorerDescription extends Component {
           });
 
         } else if (value != null && userPref != null) {
-          base.post(newEndPoint+'/likeStatus', { data: null });
+          base.post(newEndPoint+'/likeStatus', { data: value });
         }
       }
 
@@ -597,12 +599,14 @@ export default class ExplorerDescription extends Component {
 
     _handleSkillLike() {
       if (!this.state.assetLike) {
+        let self = this;
+
         let newAssets = this.props.userInfo.Asset;
         newAssets[this.state.selectedSkill] = 0;
         base.post('users/' + authData.uid + '/Asset', {
           data: newAssets,
           then() {
-            this.setState({
+            self.setState({
               assetLike: true,
               openSkillsPopup: false,
               updateMsg: 'Skill Added!',

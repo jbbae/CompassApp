@@ -28,7 +28,7 @@ export default class PersonalInfoPopup extends Component {
   render() {
     let {imagePreviewUrl} = this.state;
     let $imagePreview =
-      <Avatar color={Colors.deepOrange300} backgroundColor={Colors.purple500} size={180} src={this.props.userInfo.profilePic ? this.props.userInfo.profilePic.url() : null}>
+      <Avatar color={Colors.deepOrange300} backgroundColor={Colors.purple500} size={180} src={this.props.userInfo.profilePic ? this.props.userInfo.profilePic : null}>
         { this.props.userInfo.profilePic ? null : this.props.userInfo.firstName.substring(0,1).concat(this.props.userInfo.lastName.substring(0,1)) }
       </Avatar>;
     if (imagePreviewUrl) {

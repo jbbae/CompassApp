@@ -35,10 +35,10 @@ export default class Profile extends Component {
     this._handleProfileIndCancel = this._handleProfileIndCancel.bind(this);
     this._handleProfileIndUndeclare = this._handleProfileIndUndeclare.bind(this);
     this.indVerifyPopCancel = this.indVerifyPopCancel.bind(this);
+    this.handleTabChange = this.handleTabChange.bind(this);
 
     this.state = {
       selectedSkill: '',
-      selectedDescription: '',
       selectedAssObj: null,
       openSkillsPopup: false,
       openVerifyPopup: false,
@@ -51,7 +51,8 @@ export default class Profile extends Component {
       targetUndFoc: null,
       snackopen: false,
       updateMsg: '',
-      assetList: {}
+      assetList: {},
+      tabValue: 'General'
     };
   }
 
@@ -241,7 +242,7 @@ export default class Profile extends Component {
 
         //Push categorized assets under the current Focus (at the end of loop)
         tabsContent.push(
-          <Tab label={focusList[i]}>
+          <Tab label={focusList[i]} value={focusList[i]} >
             <div className="tabcontent">
               <h3>Skills</h3>
               <Divider />
@@ -341,7 +342,7 @@ export default class Profile extends Component {
           open={this.state.openSkillsPopup}
           onRequestClose={this._handleRequestClose}>
           <SkillPopup
-            description= {this.state.selectedDescription}
+            selectedSkill= {this.state.selectedSkill}
             userInfo= {this.props.userInfo} />
         </Dialog>
         <Dialog
@@ -401,7 +402,7 @@ export default class Profile extends Component {
                   color={Colors.deepOrange300}
                   backgroundColor={Colors.purple500}
                   size={150}
-                  src={this.props.userInfo.profilePic ? this.props.userInfo.profilePic.url() : null }>
+                  src={this.props.userInfo.profilePic ? this.props.userInfo.profilePic : null }>
                   { this.props.userInfo.profilePic ? null : this.props.userInfo.firstName.substring(0,1).concat(this.props.userInfo.lastName.substring(0,1)) }
                 </Avatar>
               </div>
@@ -421,8 +422,8 @@ export default class Profile extends Component {
             </div>
           </div>
         </div>
-        <Tabs>
-          <Tab label='General'>
+        <Tabs value={this.state.tabValue} onChange={this.handleTabChange}>
+          <Tab label='General' value='General'>
             <div className="tabcontent">
               <h3>Skills</h3>
               <Divider />
@@ -444,6 +445,10 @@ export default class Profile extends Component {
     );
   }
 
+  handleTabChange(tabVal) {
+    this.setState({ tabValue: tabVal });
+  }
+
   handleSkillsPopup(skillname) {
     this.setState({
       selectedSkill: skillname,
@@ -458,12 +463,15 @@ export default class Profile extends Component {
   }
 
   _handleSkillRemove() {
+    let self = this;
     let skillPrefEP = 'users/' + authData.uid + '/Asset/' + this.state.selectedSkill;
     base.post(skillPrefEP, {
       data: null,
       then() {
-        this.setState({
-          openSkillsPopup: false
+        self.setState({
+          openSkillsPopup: false,
+          updateMsg: 'Asset was removed!',
+          snackopen: true
         });
       }
     });
@@ -550,7 +558,8 @@ export default class Profile extends Component {
             updateMsg: 'Focus was undeclared!',
             snackopen: true,
             openVerifyPopup: false,
-            targetUndFoc: null
+            targetUndFoc: null,
+            tabValue: 'General'
           });
         }
       });
