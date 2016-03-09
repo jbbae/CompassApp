@@ -36,7 +36,7 @@ export default class SkillPopup extends Component {
       description.push(this.state.skillObj.description[key]);
     }
 
-    if(authData) {
+    if(this.props.userInfo) {
       for (let key in this.props.userInfo.Asset) {
         if (this.props.selectedSkill === key) {
           assLevel = this.props.userInfo.Asset[key];
@@ -57,7 +57,7 @@ export default class SkillPopup extends Component {
             {description}
           </Tab>
           <Tab label="How to Improve">
-            <BuildingPage userInfo={this.props.userInfo} />
+            <BuildingPage userInfo={this.props.userInfo ? this.props.userInfo : null} />
           </Tab>
         </Tabs>
       </div>

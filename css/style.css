@@ -83,13 +83,14 @@ body {
 }
 .careerPlan {
   display: inline-block;
-  margin: 15px;
-  margin-bottom: 30px;
-  padding: 24px;
+  margin: 8.5%;
+  margin-bottom: 17%;
+  padding: 13.3%;
   cursor: pointer;
 }
 .nameAndIcon {
-  width: 20%;
+  width: 19%;
+  margin-left: 3%;
   display: inline-block;
   text-align: center;
   margin-top: 0px;
@@ -120,7 +121,7 @@ body {
   width: auto;
 }
 .profileDetails {
-  width: 80%;
+  width: 78%;
   display: inline-block;
 }
 .detailsBlock {
@@ -170,7 +171,7 @@ body {
   margin: 5px;
 }
 .Header {
-  margin-bottom: 40px;
+  margin-bottom: 20px;
   text-align: center;
 }
 .backButton {
@@ -187,10 +188,16 @@ body {
   margin-bottom: 10px;
   justify-content: space-between;
 }
+.profHeaderDetails {
+  position: relative;
+  width: 100%;
+}
 .headerDetails {
   position: relative;
+  text-align: left;
   margin-left: 50px;
   padding: 20px;
+  width: 600px;
 }
 .descPTitle {
   font-size: 30px;
@@ -198,13 +205,13 @@ body {
   line-height: 32px;
   font-weight: normal;
   font-family: 'Roboto', sans-serif;
-  margin: 0px 0px 15px 15px;
+  margin: 0px 0px 15px 10px;
 }
 .descPSubtitle {
-  margin: 3px 0px 3px 25px;
+  margin: 3px 0px 3px 10px;
 }
 .bulletAligner {
-  margin-left: 5%
+  margin-left: 5%;
 }
 .popupH3 {
   font-size: 16px;
@@ -229,9 +236,20 @@ body {
   display: inline-block;
   margin: 6px;
 }
+#descriptionScrollable {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+#ExplorerDescription {
+  overflow-y: auto;
+  width: 100%;
+  padding-right: 17px;
+  max-height: 676px;
+}
 #explorerScrollablePart {
   overflow-y: auto;
-  max-height: 530px;
+  max-height: 534px;
 }
 #profilePic {
   display: none;

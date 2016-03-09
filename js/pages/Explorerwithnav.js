@@ -4,14 +4,13 @@ import React, { Component, PropTypes } from 'react';
 import Firebase from 'firebase';
 import Rebase from 're-base';
 
-import { Checkbox, CircularProgress, Divider, DropDownMenu, FontIcon, FloatingActionButton, IconButton, List, ListItem, MenuItem, Styles } from 'material-ui';
+import { Checkbox, CircularProgress, Divider, DropDownMenu, FontIcon, FloatingActionButton, IconButton, List, ListItem, MenuItem, Snackbar, Styles } from 'material-ui';
 let { Spacing, Colors } = Styles;
 
 import ExplorerListFilter from '../components/ExplorerListFilter';
 import ExplorerDescription from './ExplorerDescription.js';
 
 var base = new Rebase.createClass('https://sageview.firebaseio.com');
-var authData = base.getAuth();
 
 export default class ExplorerWithNav extends Component {
   //Note: querySwitch is only a placeholder to refresh queries
@@ -24,6 +23,8 @@ export default class ExplorerWithNav extends Component {
     this.handleNeutralCheck = this.handleNeutralCheck.bind(this);
     this.handleDislikeCheck = this.handleDislikeCheck.bind(this);
     this.handleDescPageExit = this.handleDescPageExit.bind(this);
+    this.handleSnackClose = this.handleSnackClose.bind(this);
+    this.handleNeedLogin = this.handleNeedLogin.bind(this);
     this.state = {
       selecteditem: '',
       selectedObj: {},
@@ -34,7 +35,9 @@ export default class ExplorerWithNav extends Component {
       dislikeShow: true,
       showDescPage: false,
       industryList: {},
-      pathList: {}
+      pathList: {},
+      snackopen: false,
+      updateMsg: ''
     };
   }
 
@@ -74,7 +77,8 @@ export default class ExplorerWithNav extends Component {
         maxWidth: (Spacing.desktopKeylineIncrement * 25 ) + 'px',
         marginLeft: subNavWidth,
         borderLeft: 'solid 1px ' + Colors.grey300,
-        minHeight: '800px'
+        minHeight: '700px',
+        maxHeight: '700px'
       }
     };
     return styles;
@@ -229,7 +233,7 @@ export default class ExplorerWithNav extends Component {
                 let listObject3 = currentList[key1].level2[key2].level3[key3];
                 let lvl3Icon;
 
-                if (authData) {
+                if (this.props.userInfo) {
                   for (var keyU in this.props.userInfo[lookup]) {
                     if (!this.props.userInfo[lookup].hasOwnProperty(keyU)) { continue; }
                     if (key3 === keyU) {
@@ -274,7 +278,7 @@ export default class ExplorerWithNav extends Component {
           } else if (lookup === 'Focus') {
             filterResult2 = this.listFilterAnalysis(key2);
 
-            if (authData) {
+            if (this.props.userInfo) {
               if (filterResult2) {
                 for (var keyU in this.props.userInfo[lookup]) {
                   if (!this.props.userInfo[lookup].hasOwnProperty(keyU)) { continue; }
@@ -340,12 +344,14 @@ export default class ExplorerWithNav extends Component {
     //Part III - Show the Description Page (while passing in props)
     if (this.state.showDescPage) {
       itemDescription =
-        <ExplorerDescription
-          userInfo={this.props.userInfo}
-          selecteditem={this.state.selecteditem}
-          exploreType={this.state.exploreType}
-          backFunction={this.handleDescPageExit}
-          selectedObj={this.state.selectedObj} />
+        <div id='descriptionScrollable'>
+          <ExplorerDescription
+            userInfo={this.props.userInfo}
+            selecteditem={this.state.selecteditem}
+            exploreType={this.state.exploreType}
+            backFunction={this.handleDescPageExit}
+            selectedObj={this.state.selectedObj} />
+        </div>;
     }
 
     // Part IV - ExploreType Career enable/disable
@@ -368,7 +374,7 @@ export default class ExplorerWithNav extends Component {
     return (
       <div style={styles.rootWhenMedium}>
         <div style={styles.contentWhenMedium}>
-        {itemDescription}
+          {itemDescription}
         </div>
         <div style={styles.secondaryNavWhenMedium}>
           <List subheader="Exploring...">
@@ -396,29 +402,38 @@ export default class ExplorerWithNav extends Component {
             <div className='checkboxWrap'>
               <Checkbox
                 label="Likes"
+                disabled={this.props.userInfo ? false : true}
                 defaultChecked={true}
-                onTouchTap={this.handleLikeCheck} />
+                onTouchTap={this.props.userInfo ? this.handleLikeCheck : this.handleNeedLogin} />
             </div>
             <div className='checkboxWrap'>
               <Checkbox
                 label="Neutrals"
+                disabled={this.props.userInfo ? false : true}
                 defaultChecked={true}
-                onTouchTap={this.handleNeutralCheck} />
+                onTouchTap={this.props.userInfo ? this.handleNeutralCheck: this.handleNeedLogin} />
             </div>
             <div className='checkboxWrap'>
               <Checkbox
                 label="Dislikes"
+                disabled={this.props.userInfo ? false : true}
                 defaultChecked={true}
-                onTouchTap={this.handleDislikeCheck} />
+                onTouchTap={this.props.userInfo ? this.handleDislikeCheck : this.handleNeedLogin} />
             </div>
           </List>
           <Divider />
           <div id='explorerScrollablePart'>
-            <List subheader={this.state.exploreType ? 'Currently Exploring: ' + this.state.exploreType : '' }>
+            <List subheader={this.state.exploreType ? 'Currently List: ' + this.state.exploreType : '' }>
               {listitems}
             </List>
           </div>
         </div>
+
+        <Snackbar
+          open={this.state.snackopen}
+          message={this.state.updateMsg}
+          autoHideDuration={1500}
+          onRequestClose={this.handleSnackClose} />
       </div>
     );
   }
@@ -477,6 +492,17 @@ export default class ExplorerWithNav extends Component {
       showDescPage: false,
       selecteditem: ''
     });
+  }
+
+  handleNeedLogin() {
+    this.setState({
+      updateMsg: 'You must be logged in to use this function!',
+      snackopen: true
+    })
+  }
+
+  handleSnackClose() {
+    this.setState({ snackopen: false });
   }
 }
 

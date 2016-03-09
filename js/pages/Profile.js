@@ -392,8 +392,8 @@ export default class Profile extends Component {
             vpUndeclareFunction={this._handleFinalRemove}
             openVerUndeclare={this.state.openIndVerifyPop} />
         </Dialog>
-        <div className="header">
-          <div className="headerDetails">
+        <div className="profHeaderDetails">
+          <div style={{padding: '20px'}}>
             <div className="nameAndIcon">
               <h2 style={styles.headline}>{this.props.userInfo.firstName} {this.props.userInfo.lastName}</h2>
               <div id='nameAndIcon2'>

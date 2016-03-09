@@ -89,25 +89,25 @@ export default class AppComponent extends Component {
 
 // Original version - using temporary (buggy) solution for now
 //    let title =
-//    this.props.history.isActive('/') ? 'Compass' :
+//    this.props.history.isActive('/') ? 'SagePath' :
 //    this.props.history.isActive('dashboard') ? 'Dashboard' :
 //    this.props.history.isActive('explorerwithnav') ? 'Explore' :
 //    this.props.history.isActive('profile') ? 'Profile' : '';
 
     //Title rendering (according to active Page)
     let title =
-    this.state.selectedPage === '/' ? 'Compass' :
-    this.state.selectedPage === 'howworks' ? 'How Compass Works' :
+    this.state.selectedPage === '/' ? 'SagePath' :
+    this.state.selectedPage === 'howworks' ? 'How SagePath Works' :
     this.state.selectedPage === 'explorerwithnav' ? 'Explore' :
-    this.state.selectedPage === 'profile' ? 'Profile' : 'Compass';
+    this.state.selectedPage === 'profile' ? 'Profile' : 'SagePath';
 
     //Render in User's Focus list
-    let focusList;
+    let focusList = [];
     if (this.state.userInfo) {
       if (this.state.userInfo.Focus) {
         for (let key in this.state.userInfo.Focus) {
-          if (this.state.userInfo.Focus.userTied === true) {
-            focusList.push(<p id="navProfileDetails">{focus}</p>);
+          if (this.state.userInfo.Focus[key].userTied === true) {
+            focusList.push(<p id="navProfileDetails">{key}</p>);
           }
         }
       }
@@ -190,11 +190,11 @@ export default class AppComponent extends Component {
           docked={false}
           open={this.state.navOpen}
           onRequestChange={navOpen => this.setState({navOpen})}>
-          <div style={styles.div} onTouchTap={this.onHeaderClick}>Compass</div>
+          <div style={styles.div} onTouchTap={this.onHeaderClick}>SagePath</div>
           {userSection}
           <Divider />
           <MenuItem value='/' primaryText='Landing' style={this.state.selectedPage === '/' ? {color: Colors.pink500} : null} onTouchTap={this.onLeftNavChange.bind(null, '/')} />
-          <MenuItem value='howworks' primaryText='How Compass Works' style={this.state.selectedPage === 'howworks' ? {color: Colors.pink500} : null} onTouchTap={this.onLeftNavChange.bind(null, 'howworks')} />
+          <MenuItem value='howworks' primaryText='How SagePath Works' style={this.state.selectedPage === 'howworks' ? {color: Colors.pink500} : null} onTouchTap={this.onLeftNavChange.bind(null, 'howworks')} />
           <MenuItem value='explorerwithnav' primaryText='Explore' style={this.state.selectedPage === 'explorerwithnav' ? {color: Colors.pink500} : null} onTouchTap={this.onLeftNavChange.bind(null, 'explorerwithnav')} />
         </LeftNav>
 
@@ -202,7 +202,7 @@ export default class AppComponent extends Component {
 
       <FullWidthSection style={styles.footer}>
         <p style={styles.p}>
-          &copy; Compass
+          &copy; SagePath
         </p>
         <br />
         <p style={styles.p}>

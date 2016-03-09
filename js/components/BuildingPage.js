@@ -18,7 +18,8 @@ export default class BuildingPage extends Component {
     this.state = {
       snackopen: false,
       activePopover: false,
-      anchorEl: null
+      anchorEl: null,
+      snackmsg: ''
     };
   }
 
@@ -28,10 +29,12 @@ export default class BuildingPage extends Component {
     base.fetch('emailList', {
       context: this,
       then(data) {
-        for (let key in data) {
-          if (this.props.userInfo.email === data[key]) {
-            listStatusCheck = true;
-            break;
+        if (this.props.userInfo) {
+          for (let key in data) {
+            if (this.props.userInfo.email === data[key]) {
+              listStatusCheck = true;
+              break;
+            }
           }
         }
       }
@@ -48,7 +51,7 @@ export default class BuildingPage extends Component {
           label={ listStatusCheck ? 'Already in List!' : 'Yes, let me know!'}
           secondary={true}
           disabled={ listStatusCheck ? true : false }
-          onTouchTap={ authData ? this.handleAddtoList.bind(null, this.props.userInfo.email) : this.handleAddButton.bind(this)} />
+          onTouchTap={ this.props.userInfo ? this.handleAddtoList.bind(null, this.props.userInfo.email) : this.handleAddButton.bind(this)} />
 
         <Popover
           open={this.state.activePopover}
@@ -67,7 +70,7 @@ export default class BuildingPage extends Component {
         </Popover>
         <Snackbar
           open={this.state.snackopen}
-          message='You have been added to the emailing list!'
+          message={this.state.snackmsg}
           autoHideDuration={1500}
           onRequestClose={this.handleSnackClose} />
       </div>
@@ -82,6 +85,8 @@ export default class BuildingPage extends Component {
   }
 
   handleAddtoList(emailEntry) {
+    let self = this;
+    let notDuplicate = true;
     let emailFinal;
     if (emailEntry === 'seeRef') {
       emailFinal = this.refs.emailListEntry.getValue();
@@ -89,12 +94,37 @@ export default class BuildingPage extends Component {
       emailFinal = emailEntry;
     }
 
-    base.post('emailList/' + authData.uid, {
-      data: emailFinal,
-      then() {
-        this.setState({ snackopen: true });
+    base.fetch('emailList', {
+      context: this,
+      then(data) {
+        for (let key in data) {
+          if (emailFinal === data[key]) {
+            notDuplicate = false;
+            break;
+          }
+        }
+        if (notDuplicate) {
+          base.push('emailList/', {
+            data: emailFinal,
+            then() {
+              self.setState({
+                snackmsg: 'You have been added to the emailing list!',
+                snackopen: true,
+                activePopover: false
+              });
+            }
+          });
+        } else {
+          self.setState({
+            snackmsg: 'You are already in the emailing list!',
+            snackopen: true,
+            activePopover: false
+          })
+        }
       }
     });
+
+
   }
 
   handleSnackClose() {

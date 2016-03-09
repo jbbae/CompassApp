@@ -133,7 +133,9 @@ export default class ExplorerDescription extends Component {
 
     //Part I - Input the userList object into a global variable + Count the # of Declared while at it.
     let declareCount = 0;
-    if (this.props.userInfo[this.props.exploreType][this.props.selecteditem]) { userPref = this.props.userInfo[this.props.exploreType][this.props.selecteditem]; }
+    if (this.props.userInfo) {
+      if (this.props.userInfo[this.props.exploreType][this.props.selecteditem]) { userPref = this.props.userInfo[this.props.exploreType][this.props.selecteditem]; }
+    }
     if (userPref) {
       let counterEndPt = 'users/' + authData.uid + '/' + this.props.exploreType;
       base.fetch(counterEndPt, {
@@ -152,7 +154,7 @@ export default class ExplorerDescription extends Component {
 
     if (this.props.selectedObj) {
       likeDropDown = (
-        <DropDownMenu value={userPref ? userPref.likeStatus : null} onChange={authData ? this.handleFavorite : this.handleNeedLogin}>
+        <DropDownMenu value={userPref ? userPref.likeStatus : null} onChange={this.props.userInfo ? this.handleFavorite : this.handleNeedLogin}>
           <MenuItem value={null} primaryText='Not Sure...' />
           <MenuItem value={true} primaryText='Like!' />
           <MenuItem value={false} primaryText='Nope!' />
@@ -284,7 +286,9 @@ export default class ExplorerDescription extends Component {
         <div className="tabcontent">
           {tabOneOverview.length > 0 ? tabOneOverview : null}
           {tabOneBullets.length > 0 ? <h3>Duties</h3> : null}
-          {tabOneBullets.length > 0 ? tabOneBullets : null}
+          <div className='bulletAligner'>
+            {tabOneBullets.length > 0 ? tabOneBullets : null}
+          </div>
           {tabOneWorkEnv.length > 0 ? <h3>Work Environment</h3> : null}
           {tabOneWorkEnv.length > 0 ? tabOneWorkEnv : null}
         </div>;
@@ -346,7 +350,7 @@ export default class ExplorerDescription extends Component {
       let tabTwoPartB = [];
 
       for (let key in howToBDesc) { tabTwoPartA.push(<p>{howToBDesc[key]}</p>); }
-      for (let key in licensesDesc) { tabTwoPartB.push(<p>{licensesD[key]}</p>); }
+      for (let key in licensesDesc) { tabTwoPartB.push(<p>{licensesDesc[key]}</p>); }
 
       //Tab 2 (Path) Compiler
       tabTwoContent =
@@ -357,7 +361,7 @@ export default class ExplorerDescription extends Component {
           {tabTwoPartB.length > 0 ? tabTwoPartB : null}
           <RequiredIFDisplay selecteditem={this.props.selecteditem} selectedindustries={this.props.selectedObj.crossIndustry} selectedfocus={this.props.selectedObj.crossFocus} />
           {assets.length > 0 ? <h3>Skills</h3> : null}
-          <Divider />
+          {assets.length > 0 ? <Divider /> : null}
           {assets}
         </div>;
 
@@ -412,11 +416,11 @@ export default class ExplorerDescription extends Component {
         <FlatButton
           label={this.state.assetLike ? "Added" : "Add"}
           primary={this.state.assetLike ? false : true}
-          onTouchTap={this._handleSkillLike} />
+          onTouchTap={this.props.userInfo ? this._handleSkillLike : this.handleNeedLogin} />
     ];
 
     return (
-        <div className="ExplorerDescription">
+        <div id="ExplorerDescription">
           <Dialog
             title={this.state.selectedSkill}
             actions={skillsPopupButton}
@@ -444,7 +448,7 @@ export default class ExplorerDescription extends Component {
           </Dialog>
           <div className="Header">
             <div className="HeaderButtons">
-              <div>
+              <div style={{margin: '7px'}}>
                 <FloatingActionButton onTouchTap={this.handleBack} mini={true}>
                   <FontIcon className="material-icons" color={Colors.pink50}>arrow_back</FontIcon>
                 </FloatingActionButton>
@@ -454,27 +458,13 @@ export default class ExplorerDescription extends Component {
                 <div>{declareButton}</div>
               </div>
             </div>
-            <div className="Headerdetails">
-              <table width="600px">
-                <tr>
-                  <td width="30%">
-                    <Avatar
-                      color={Colors.deepOrange300}
-                      backgroundColor={Colors.purple500}
-                      size={120}>
-                      AC
-                    </Avatar>
-                  </td>
-                  <td width="70%">
-                    <h2 className="descPTitle">{this.props.selecteditem}</h2>
-                    <p className='descPSubtitle'>Type: {this.props.exploreType}</p>
-                  </td>
-                </tr>
-              </table>
+            <div className="headerDetails">
+              <h2 className="descPTitle">{this.props.selecteditem}</h2>
+              <p className='descPSubtitle'>Type: {this.props.exploreType}</p>
             </div>
           </div>
-            <div className="body">
-          {tabComponents}
+          <div className="body">
+            {tabComponents}
           </div>
 
           <Snackbar
@@ -503,7 +493,7 @@ export default class ExplorerDescription extends Component {
       let self = this;
       let newEndPoint = 'users/' + authData.uid + '/' + this.props.exploreType + '/' + this.props.selecteditem;
 
-      if (authData) {
+      if (this.props.userInfo) {
         if (value === null && userPref !== null) {
           base.post(newEndPoint, { data: null });
           userPref = null;
@@ -580,8 +570,10 @@ export default class ExplorerDescription extends Component {
 
     handleSkillsPopup(skillname) {
       let liked = false;
-      for (let key in this.props.userInfo.Asset) {
-        if (skillname === key) { liked = true; }
+      if (this.props.userInfo) {
+        for (let key in this.props.userInfo.Asset) {
+          if (skillname === key) { liked = true; }
+        }
       }
 
       this.setState({
