@@ -331,12 +331,12 @@ export default class ExplorerWithNav extends Component {
     } else if (lookup === 'Path' && pathSignal) {
       listitems =
         <div>
-          <p>Unfortunately, we haven't been able to analyze this combination yet =(</p>
+          <p>Unfortunately, we haven't been able to analyze this combination yet...</p>
           <p>We'll notify you once these paths become available.</p>
           <p>Meahwile, please try another combination.</p>
         </div>
     } else {
-      listitems = <CircularProgress mode="indeterminate" value={60} size={1.5} />;
+      listitems = <div style={{height:'150px'}}><CircularProgress mode="indeterminate" value={60} size={1.5} /></div>;
     }
 
     let itemDescription;

@@ -2,7 +2,7 @@ import React, {Component, PropTypes } from 'react';
 import Firebase from 'firebase';
 import Rebase from 're-base';
 
-import { Avatar, Dialog, Divider, FlatButton, Paper, RaisedButton, Snackbar, Styles, Tab, Tabs } from 'material-ui';
+import { Avatar, CircularProgress, Dialog, Divider, FlatButton, Paper, RaisedButton, Snackbar, Styles, Tab, Tabs } from 'material-ui';
 let { Colors, Spacing, Typography } = Styles;
 
 import SkillPopup from '../components/SkillPopup';
@@ -332,117 +332,125 @@ export default class Profile extends Component {
 
     let planDialogStyle = { width: '86%', maxWidth: 'none' };
 
-    return (
-      <div className="Profile" style={styles.rootWhenMedium}>
-        <Dialog
-          title={this.state.selectedSkill}
-          actions={skillsPopupButton}
-          autoDetectWindowHeight={true}
-          autoScrollBodyContent={true}
-          open={this.state.openSkillsPopup}
-          onRequestClose={this._handleRequestClose}>
-          <SkillPopup
-            selectedSkill= {this.state.selectedSkill}
-            userInfo= {this.props.userInfo} />
-        </Dialog>
-        <Dialog
-          contentStyle={planDialogStyle}
-          autoDetectWindowHeight={true}
-          autoScrollBodyContent={true}
-          repositionOnUpdate={true}
-          open={this.state.openPlanPopup}
-          onRequestClose={this._handleRequestClose}>
-          <CareerPlan
-            selectedpath={this.state.selectedPath}
-            userInfo={this.props.userInfo}
-            openStatus={this._handlePlanDialogClose}
-            unTiePref={this._handlePlanRemove} />
-        </Dialog>
-        <Dialog
-          title='More about me...'
-          actions={moreInfoButtons}
-          autoDetectWindowHeight={true}
-          autoScrollBodyContent={true}
-          open={this.state.openMoreInfoPop}
-          onRequestClose={this._handleRequestClose}>
-          <PersonalInfoPopup
-            userInfo={this.props.userInfo}
-            closePopup={this._handleMoreInfoUpdater} />
-        </Dialog>
-        <Dialog
-          title='Undeclare Focus'
-          actions={verifyPopupButton}
-          autoDetectWindowHeight={true}
-          open={this.state.openVerifyPopup}
-          onRequestClose={this._handleRequestClose}>
-          <VerifyUndeclare
-            targetName={this.state.targetUndFoc}
-            targetType='Focus' />
-        </Dialog>
-        <Dialog
-          title={this.state.selectedInd}
-          actions={profileIndPopButton}
-          autoDetectWindowHeight={true}
-          autoScrollBodyContent={true}
-          open={this.state.openProfileIndPop}
-          onRequestClose={this._handleRequestClose}>
-          <ProfileIndustryPop
-            selectedindustry={this.state.selectedInd}
-            cancelfunction={this.indVerifyPopCancel}
-            vpUndeclareFunction={this._handleFinalRemove}
-            openVerUndeclare={this.state.openIndVerifyPop} />
-        </Dialog>
-        <div className="profHeaderDetails">
-          <div style={{padding: '20px'}}>
-            <div className="nameAndIcon">
-              <h2 style={styles.headline}>{this.props.userInfo.firstName} {this.props.userInfo.lastName}</h2>
-              <div id='nameAndIcon2'>
-                <Avatar
-                  id="profileAvatar"
-                  color={Colors.deepOrange300}
-                  backgroundColor={Colors.purple500}
-                  size={150}
-                  src={this.props.userInfo.profilePic ? this.props.userInfo.profilePic : null }>
-                  { this.props.userInfo.profilePic ? null : this.props.userInfo.firstName.substring(0,1).concat(this.props.userInfo.lastName.substring(0,1)) }
-                </Avatar>
+    if (this.props.userInfo) {
+      return (
+        <div className="Profile" style={styles.rootWhenMedium}>
+          <Dialog
+            title={this.state.selectedSkill}
+            actions={skillsPopupButton}
+            autoDetectWindowHeight={true}
+            autoScrollBodyContent={true}
+            open={this.state.openSkillsPopup}
+            onRequestClose={this._handleRequestClose}>
+            <SkillPopup
+              selectedSkill= {this.state.selectedSkill}
+              userInfo= {this.props.userInfo} />
+          </Dialog>
+          <Dialog
+            contentStyle={planDialogStyle}
+            autoDetectWindowHeight={true}
+            autoScrollBodyContent={true}
+            repositionOnUpdate={true}
+            open={this.state.openPlanPopup}
+            onRequestClose={this._handleRequestClose}>
+            <CareerPlan
+              selectedpath={this.state.selectedPath}
+              userInfo={this.props.userInfo}
+              openStatus={this._handlePlanDialogClose}
+              unTiePref={this._handlePlanRemove} />
+          </Dialog>
+          <Dialog
+            title='More about me...'
+            actions={moreInfoButtons}
+            autoDetectWindowHeight={true}
+            autoScrollBodyContent={true}
+            open={this.state.openMoreInfoPop}
+            onRequestClose={this._handleRequestClose}>
+            <PersonalInfoPopup
+              userInfo={this.props.userInfo}
+              closePopup={this._handleMoreInfoUpdater} />
+          </Dialog>
+          <Dialog
+            title='Undeclare Focus'
+            actions={verifyPopupButton}
+            autoDetectWindowHeight={true}
+            open={this.state.openVerifyPopup}
+            onRequestClose={this._handleRequestClose}>
+            <VerifyUndeclare
+              targetName={this.state.targetUndFoc}
+              targetType='Focus' />
+          </Dialog>
+          <Dialog
+            title={this.state.selectedInd}
+            actions={profileIndPopButton}
+            autoDetectWindowHeight={true}
+            autoScrollBodyContent={true}
+            open={this.state.openProfileIndPop}
+            onRequestClose={this._handleRequestClose}>
+            <ProfileIndustryPop
+              selectedindustry={this.state.selectedInd}
+              cancelfunction={this.indVerifyPopCancel}
+              vpUndeclareFunction={this._handleFinalRemove}
+              openVerUndeclare={this.state.openIndVerifyPop} />
+          </Dialog>
+          <div className="profHeaderDetails">
+            <div style={{padding: '20px'}}>
+              <div className="nameAndIcon">
+                <h2 style={styles.headline}>{this.props.userInfo.firstName} {this.props.userInfo.lastName}</h2>
+                <div id='nameAndIcon2'>
+                  <Avatar
+                    id="profileAvatar"
+                    color={Colors.deepOrange300}
+                    backgroundColor={Colors.purple500}
+                    size={150}
+                    src={this.props.userInfo.profilePic ? this.props.userInfo.profilePic : null }>
+                    { this.props.userInfo.profilePic ? null : this.props.userInfo.firstName.substring(0,1).concat(this.props.userInfo.lastName.substring(0,1)) }
+                  </Avatar>
+                </div>
+                <div id='nameAndIcon2'><RaisedButton label="More Info" onTouchTap={this.handleMoreInfoPop} /></div>
               </div>
-              <div id='nameAndIcon2'><RaisedButton label="More Info" onTouchTap={this.handleMoreInfoPop} /></div>
-            </div>
-            <div className="profileDetails">
-              <div className="detailsBlock">
-                <div id="detailsFiller"></div>
-                <p>{this.props.userInfo.occupation} at {this.props.userInfo.organization}</p>
-                <p>Industries: </p>
-                {industryList}
-              </div>
-              <div id="planBlock">
-                <p id="planHeading"><strong>My Career Plans</strong></p>
-                {planlist}
+              <div className="profileDetails">
+                <div className="detailsBlock">
+                  <div id="detailsFiller"></div>
+                  <p>{this.props.userInfo.occupation} at {this.props.userInfo.organization}</p>
+                  <p>Industries: </p>
+                  {industryList}
+                </div>
+                <div id="planBlock">
+                  <p id="planHeading"><strong>My Career Plans</strong></p>
+                  {planlist}
+                </div>
               </div>
             </div>
           </div>
+          <Tabs value={this.state.tabValue} onChange={this.handleTabChange}>
+            <Tab label='General' value='General'>
+              <div className="tabcontent">
+                <h3>Skills</h3>
+                <Divider />
+                {generalSkills}
+                <Divider />
+                <h3>Knowledge</h3>
+                <Divider />
+                {generalKnowledge}
+              </div>
+            </Tab>
+            {tabsContent}
+          </Tabs>
+          <Snackbar
+            open={this.state.snackopen}
+            message={this.state.updateMsg}
+            autoHideDuration={1500}
+            onRequestClose={this.handleSnackClose} />
         </div>
-        <Tabs value={this.state.tabValue} onChange={this.handleTabChange}>
-          <Tab label='General' value='General'>
-            <div className="tabcontent">
-              <h3>Skills</h3>
-              <Divider />
-              {generalSkills}
-              <Divider />
-              <h3>Knowledge</h3>
-              <Divider />
-              {generalKnowledge}
-            </div>
-          </Tab>
-          {tabsContent}
-        </Tabs>
-        <Snackbar
-          open={this.state.snackopen}
-          message={this.state.updateMsg}
-          autoHideDuration={1500}
-          onRequestClose={this.handleSnackClose} />
-      </div>
-    );
+      );
+    } else {
+      return (
+        <div className="Profile" style={styles.rootWhenMedium}>
+          <CircularProgress mode="indeterminate" value={60} size={1.5} />
+        </div>
+      );
+    }
   }
 
   handleTabChange(tabVal) {
