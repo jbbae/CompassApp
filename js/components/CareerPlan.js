@@ -51,12 +51,31 @@ export default class CareerPlan extends Component {
         height: 48
       },
       headline: {
+        fontSize: 28,
+        lineHeight: '32px',
+        paddingTop: 16,
+        marginBottom: 12,
+        letterSpacing: 0,
+        fontWeight: Typography.fontWeightNormal,
+        color: Typography.textDarkBlack
+      },
+      headline2: {
         fontSize: 24,
         lineHeight: '32px',
         paddingTop: 16,
         marginBottom: 12,
         letterSpacing: 0,
         fontWeight: Typography.fontWeightNormal,
+        color: Typography.textDarkBlack
+      },
+      content: {
+        margin: '0 auto',
+        fontWeight: Typography.fontWeightNormal,
+        fontSize: 16,
+        lineHeight: '28px',
+        paddingTop: 19,
+        marginBottom: 13,
+        letterSpacing: 0,
         color: Typography.textDarkBlack
       },
       iconButton: {
@@ -94,7 +113,7 @@ export default class CareerPlan extends Component {
         marginBottom: -6
       }
     };
-    
+
     return styles;
   }
 
@@ -148,7 +167,7 @@ export default class CareerPlan extends Component {
     ];
 
     if (skillsContainer.length === 0) {
-      skillsContainer.push(<h3 id='emptySkillsMsg'>You have no skills in this Career Plan. Time to start building!</h3>);
+      skillsContainer.push(<h3 style={styles.content} id='emptySkillsMsg'>You have no skills in this Career Plan. Time to start building!</h3>);
     }
 
     return (
@@ -179,7 +198,7 @@ export default class CareerPlan extends Component {
                 <FontIcon className="material-icons" color={Colors.pink50}>arrow_back</FontIcon>
               </FloatingActionButton>
             </div>
-            <h1 id="planTitle">{this.props.selectedpath}</h1>
+            <h1 style={styles.headline} id="planTitle">{this.props.selectedpath}</h1>
             <div className='backButton'>
               <FloatingActionButton mini={true} backgroundColor={Colors.red500} onTouchTap={this.handleUndeclare} >
                 <FontIcon className="material-icons" color={Colors.red50}>close</FontIcon>
@@ -189,13 +208,13 @@ export default class CareerPlan extends Component {
           <Tabs>
             <Tab label="Skills" >
               <div className="tabcontent">
-                <h3>Skills</h3>
+                <h3 style={styles.headline2}>Skills</h3>
                 <Divider />
                 {skillsContainer}
                 <Divider />
-                <h3>Knowledge</h3>
+                <h3 style={styles.headline2}>Knowledge</h3>
                 <Divider />
-                <h3 id='emptySkillsMsg'>You have no general knowledge. Time to start building!</h3>
+                <h3 style={styles.content} id='emptySkillsMsg'>You have no general knowledge. Time to start building!</h3>
               </div>
             </Tab>
             <Tab label="How to Improve" >

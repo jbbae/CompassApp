@@ -58,7 +58,7 @@ export default class ExplorerWithNav extends Component {
   }
 
   getStyles() {
-    let subNavWidth = Spacing.desktopKeylineIncrement * 5 + 'px';
+    let subNavWidth = Spacing.desktopKeylineIncrement * 5.5 + 'px';
     let styles = {
       rootWhenMedium: {
         paddingTop: Spacing.desktopKeylineIncrement + 'px',
@@ -378,7 +378,7 @@ export default class ExplorerWithNav extends Component {
         </div>
         <div style={styles.secondaryNavWhenMedium}>
           <List subheader="Exploring...">
-            <table width='310px'>
+            <table width='100%'>
               <td width='65%'>
                 <div id ='pathDropCont'>
                   <DropDownMenu id='pathDrop' autoWidth={false} value={this.state.exploreType} onChange={this.handleDropChange}>
@@ -423,7 +423,7 @@ export default class ExplorerWithNav extends Component {
           </List>
           <Divider />
           <div id='explorerScrollablePart'>
-            <List subheader={this.state.exploreType ? 'Currently List: ' + this.state.exploreType : '' }>
+            <List subheader={this.state.exploreType ? 'Current List: ' + this.state.exploreType : '' }>
               {listitems}
             </List>
           </div>

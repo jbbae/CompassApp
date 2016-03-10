@@ -72,13 +72,15 @@ export default class PlanDeclarePopup extends Component {
           <div className='planDecPopupDiv'>
             <h3 className='popupH3'>Required Focus/Industry missing</h3>
             <p className='popupP'>You need to first declare the required Focus and Industry to declare this path!</p>
-            <div style={{display: 'inline-block'}}><p>Required Focus: <span style={ focusSwitch ? {color: Colors.cyan500} : null}>{requiredFocus}</span></p></div>
+            <div style={{display: 'inline-block'}}><p><strong>Required Focus: </strong><span style={ focusSwitch ? {color: Colors.cyan500} : null}>{requiredFocus}</span></p></div>
             {focusSwitch ? <FontIcon style={{display: 'inline-block', margin: '2px'}} className="material-icons" color={Colors.cyan500}>done</FontIcon> : null}
-            <p>Required Industries:</p>
+            <p><strong>Required Industries:</strong></p>
             {industryArray}
             <div className='planDecbutton'>
               <RaisedButton
+                style={{margin:8}}
                 label="Got it!"
+                secondary={true}
                 onTouchTap={this.handleClose} />
             </div>
           </div>

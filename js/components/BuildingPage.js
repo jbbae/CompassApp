@@ -25,20 +25,7 @@ export default class BuildingPage extends Component {
 
   render() {
     let listStatusCheck = false;
-
-    base.fetch('emailList', {
-      context: this,
-      then(data) {
-        if (this.props.userInfo) {
-          for (let key in data) {
-            if (this.props.userInfo.email === data[key]) {
-              listStatusCheck = true;
-              break;
-            }
-          }
-        }
-      }
-    });
+    if (this.props.userInfo) { listStatusCheck = true; }
 
     return (
       <div style={{textAlign: 'center'}}>

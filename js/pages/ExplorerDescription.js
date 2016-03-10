@@ -1,5 +1,3 @@
-//require('../css/pages/ExplorerDescription.sass');
-
 import React, {Component, PropTypes} from 'react';
 import Firebase from 'firebase';
 import Rebase from 're-base';
@@ -83,8 +81,9 @@ export default class ExplorerDescription extends Component {
       },
       headline: {
         fontSize: 24,
-        lineHeight: '32px',
-        paddingTop: 16,
+        lineHeight: '15px',
+        paddingTop: 8,
+        marginTop: 18,
         marginBottom: 12,
         letterSpacing: 0,
         fontWeight: Typography.fontWeightNormal,
@@ -285,11 +284,11 @@ export default class ExplorerDescription extends Component {
       tabOneContent =
         <div className="tabcontent">
           {tabOneOverview.length > 0 ? tabOneOverview : null}
-          {tabOneBullets.length > 0 ? <h3>Duties</h3> : null}
+          {tabOneBullets.length > 0 ? <h3 style={styles.headline}>Duties</h3> : null}
           <div className='bulletAligner'>
             {tabOneBullets.length > 0 ? tabOneBullets : null}
           </div>
-          {tabOneWorkEnv.length > 0 ? <h3>Work Environment</h3> : null}
+          {tabOneWorkEnv.length > 0 ? <h3 style={styles.headline}>Work Environment</h3> : null}
           {tabOneWorkEnv.length > 0 ? tabOneWorkEnv : null}
         </div>;
     }
@@ -355,12 +354,12 @@ export default class ExplorerDescription extends Component {
       //Tab 2 (Path) Compiler
       tabTwoContent =
         <div className="tabcontent">
-          {tabTwoPartA.length > 0 ? <h3>How to Become</h3> : null}
+          {tabTwoPartA.length > 0 ? <h3 style={styles.headline}>How to Become</h3> : null}
           {tabTwoPartA.length > 0 ? tabTwoPartA : null}
-          {tabTwoPartB.length > 0 ? <h3>Licences & Certifications</h3> : null}
+          {tabTwoPartB.length > 0 ? <h3 style={styles.headline}>Licences & Certifications</h3> : null}
           {tabTwoPartB.length > 0 ? tabTwoPartB : null}
           <RequiredIFDisplay selecteditem={this.props.selecteditem} selectedindustries={this.props.selectedObj.crossIndustry} selectedfocus={this.props.selectedObj.crossFocus} />
-          {assets.length > 0 ? <h3>Skills</h3> : null}
+          {assets.length > 0 ? <h3 style={styles.headline}>Skills</h3> : null}
           {assets.length > 0 ? <Divider /> : null}
           {assets}
         </div>;
@@ -375,9 +374,9 @@ export default class ExplorerDescription extends Component {
         //Tab 3 Compiler
         tabThreeContent =
           <Tab label="Job Prospects">
-            <h3>Job Outlook</h3>
+            <h3 style={styles.headline}>Job Outlook</h3>
             {tabThreePartA.length > 0 ? tabThreePartA : null}
-            {tabThreePartB.length > 0 ? <h3>Job Prospects</h3> : null}
+            {tabThreePartB.length > 0 ? <h3 style={styles.headline}>Job Prospects</h3> : null}
             {tabThreePartB.length > 0 ? tabThreePartB : null}
             {tabThreePartA.length + tabThreePartB.length === 0 ? <EmptyContent /> : null}
           </Tab>

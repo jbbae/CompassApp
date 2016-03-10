@@ -87,10 +87,20 @@ export default class Profile extends Component {
       headline: {
         fontSize: 24,
         lineHeight: '32px',
-        paddingTop: 16,
+        paddingTop: 8,
         marginBottom: 12,
         letterSpacing: 0,
         fontWeight: Typography.fontWeightNormal,
+        color: Typography.textDarkBlack
+      },
+      content: {
+        margin: '0 auto',
+        fontWeight: Typography.fontWeightNormal,
+        fontSize: 16,
+        lineHeight: '28px',
+        paddingTop: 19,
+        marginBottom: 13,
+        letterSpacing: 0,
         color: Typography.textDarkBlack
       },
       iconButton: {
@@ -230,13 +240,13 @@ export default class Profile extends Component {
         //Message for when no skills/knowledge for a particular Focus
         if (focusSkills.length === 0) {
           focusSkills.push(
-            <h3 id='emptySkillsMsg'>You have no skills in this focus. Time to start building!</h3>
+            <p style={styles.content} id='emptySkillsMsg'>You have no skills in this focus. Time to start building!</p>
           );
         }
 
         if (focusKnowledge.length === 0) {
           focusKnowledge.push(
-            <h3 id='emptySkillsMsg'>You have no knowledge in this focus. Time to start building!</h3>
+            <p style={styles.content} id='emptySkillsMsg'>You have no knowledge in this focus. Time to start building!</p>
           );
         }
 
@@ -244,11 +254,11 @@ export default class Profile extends Component {
         tabsContent.push(
           <Tab label={focusList[i]} value={focusList[i]} >
             <div className="tabcontent">
-              <h3>Skills</h3>
+              <h2 style={styles.headline}>Skills</h2>
               <Divider />
               {focusSkills}
               <Divider />
-              <h3>Knowledge</h3>
+              <h2 style={styles.headline}>Knowledge</h2>
               <Divider />
               {focusKnowledge}
               <div id='undeclareButton'>
@@ -288,10 +298,10 @@ export default class Profile extends Component {
 
     //Message if general assets are empty
     if (generalSkills.length === 0) {
-      generalSkills.push( <h3 id='emptySkillsMsg'>You have no general skills. Time to start building!</h3> );
+      generalSkills.push( <p style={styles.content} id='emptySkillsMsg'>You have no general skills. Time to start building!</p> );
     }
     if (generalKnowledge.length === 0) {
-      generalKnowledge.push( <h3 id='emptySkillsMsg'>You have no general knowledge. Time to start building!</h3> );
+      generalKnowledge.push( <p style={styles.content} id='emptySkillsMsg'>You have no general knowledge. Time to start building!</p> );
     }
 
     let skillsPopupButton = [
@@ -400,8 +410,8 @@ export default class Profile extends Component {
                 <div id='nameAndIcon2'>
                   <Avatar
                     id="profileAvatar"
-                    color={Colors.deepOrange300}
-                    backgroundColor={Colors.purple500}
+                    color={Colors.indigo50}
+                    backgroundColor={Colors.indigo900}
                     size={150}
                     src={this.props.userInfo.profilePic ? this.props.userInfo.profilePic : null }>
                     { this.props.userInfo.profilePic ? null : this.props.userInfo.firstName.substring(0,1).concat(this.props.userInfo.lastName.substring(0,1)) }
@@ -412,8 +422,8 @@ export default class Profile extends Component {
               <div className="profileDetails">
                 <div className="detailsBlock">
                   <div id="detailsFiller"></div>
-                  <p>{this.props.userInfo.occupation} at {this.props.userInfo.organization}</p>
-                  <p>Industries: </p>
+                  <p style={{margin:'8px'}}>{this.props.userInfo.occupation} at {this.props.userInfo.organization}</p>
+                  <p style={{margin:'8px'}}>Industries: </p>
                   {industryList}
                 </div>
                 <div id="planBlock">
@@ -426,11 +436,11 @@ export default class Profile extends Component {
           <Tabs value={this.state.tabValue} onChange={this.handleTabChange}>
             <Tab label='General' value='General'>
               <div className="tabcontent">
-                <h3>Skills</h3>
+                <h2 style={styles.headline}>Skills</h2>
                 <Divider />
                 {generalSkills}
                 <Divider />
-                <h3>Knowledge</h3>
+                <h2 style={styles.headline}>Knowledge</h2>
                 <Divider />
                 {generalKnowledge}
               </div>
