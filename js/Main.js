@@ -92,10 +92,10 @@ export default class AppComponent extends Component {
 
 // Original version - using temporary (buggy) solution for now
 //    let title =
-//    this.props.history.isActive('/') ? 'SagePath' :
-//    this.props.history.isActive('dashboard') ? 'Dashboard' :
-//    this.props.history.isActive('explorerwithnav') ? 'Explore' :
-//    this.props.history.isActive('profile') ? 'Profile' : '';
+//    this.context.router.isActive('/') ? 'SagePath' :
+//    this.context.router.isActive('dashboard') ? 'Dashboard' :
+//    this.context.router.isActive('explorerwithnav') ? 'Explore' :
+//    this.context.router.isActive('profile') ? 'Profile' : '';
 
     //Title rendering (according to active Page)
     let title =
@@ -231,7 +231,7 @@ export default class AppComponent extends Component {
   }
 
   onLeftNavChange(route) {
-    this.props.history.pushState(null, route);
+    this.context.router.push(route);
     this.setState({
       selectedPage: route,
       navOpen: false
@@ -239,7 +239,7 @@ export default class AppComponent extends Component {
   }
 
   onHeaderClick() {
-    this.props.history.pushState(null, '/');
+    this.context.router.push('/');
     this.setState({
       selectedPage: '/',
       navOpen: false
@@ -247,7 +247,7 @@ export default class AppComponent extends Component {
   }
 
   onProfileClick() {
-    this.props.history.pushState(null, 'profile');
+    this.context.router.push('profile');
     this.setState({
       selectedPage: 'profile',
       navOpen: false
@@ -320,6 +320,10 @@ export default class AppComponent extends Component {
     this.setState({ snackopen: false });
   }
 }
+
+AppComponent.contextTypes = {
+  router: React.PropTypes.object.isRequired
+};
 
 AppComponent.propTypes = {
 };

@@ -19,6 +19,15 @@ body {
   cursor: pointer;
   margin: 5px auto 3px auto;
 }
+.profileLoading {
+  margin: 12% auto 18% auto;
+  width: 60px;
+}
+#explorerLoading {
+  margin: 50% auto 40% auto;
+  width: 50%;
+  text-align: center;
+}
 #navProfileName {
   font-size: 15px;
   margin: 3px;

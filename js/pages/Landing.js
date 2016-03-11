@@ -234,7 +234,7 @@ export default class LandingPage extends Component {
   }
 
   onDemoClick() {
-    this.props.history.pushState(null, 'explorerwithnav');
+    this.context.router.push('explorerwithnav');
   }
 
   onLoginClick() {
@@ -262,6 +262,10 @@ export default class LandingPage extends Component {
     });
   }
 }
+
+LandingPage.contextTypes = {
+  router: React.PropTypes.object.isRequired
+};
 
 LandingPage.propTypes = {
 };

@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Router, Route, IndexRoute, browserHistory } from 'react-router';
+import { Router, Route, IndexRoute, hashHistory } from 'react-router';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 
 //Needed for React Developer Tools
@@ -22,7 +22,7 @@ import ExplorerDescription from './pages/ExplorerDescription';
 
 // Render the main component into the dom
 ReactDOM.render((
-  <Router history={browserHistory} onUpdate={() => window.scrollTo(0, 0)}>
+  <Router history={hashHistory} onUpdate={() => window.scrollTo(0, 0)}>
     <Route path="/" component={App}>
       <IndexRoute component={Landing} />
       <Route path="howworks" component={HowWorks} />

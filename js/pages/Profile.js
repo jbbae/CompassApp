@@ -457,7 +457,10 @@ export default class Profile extends Component {
     } else {
       return (
         <div className="Profile" style={styles.rootWhenMedium}>
-          <CircularProgress mode="indeterminate" value={60} size={1.5} />
+          <div className="profileLoading">
+            <h2 style={styles.headline}>Loading...</h2>
+            <CircularProgress mode="indeterminate" value={60} size={1.5} />
+          </div>
         </div>
       );
     }

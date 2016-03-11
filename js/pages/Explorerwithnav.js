@@ -4,7 +4,7 @@ import React, { Component, PropTypes } from 'react';
 import Firebase from 'firebase';
 import Rebase from 're-base';
 
-import { Checkbox, CircularProgress, Divider, DropDownMenu, FontIcon, FloatingActionButton, IconButton, List, ListItem, MenuItem, Snackbar, Styles } from 'material-ui';
+import { Checkbox, Divider, DropDownMenu, FontIcon, FloatingActionButton, IconButton, List, ListItem, MenuItem, Snackbar, Styles } from 'material-ui';
 let { Spacing, Colors } = Styles;
 
 import ExplorerListFilter from '../components/ExplorerListFilter';
@@ -336,7 +336,7 @@ export default class ExplorerWithNav extends Component {
           <p>Meahwile, please try another combination.</p>
         </div>
     } else {
-      listitems = <div style={{height:'150px'}}><CircularProgress mode="indeterminate" value={60} size={1.5} /></div>;
+      listitems = <div id='explorerLoading'><p style={styles.content}>Select a list above...</p></div>;
     }
 
     let itemDescription;
