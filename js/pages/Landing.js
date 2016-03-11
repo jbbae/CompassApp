@@ -264,5 +264,4 @@ export default class LandingPage extends Component {
 }
 
 LandingPage.propTypes = {
-  history: PropTypes.object
 };

@@ -74,6 +74,5 @@ export default class AppLeftNav extends Component {
 }
 
 AppLeftNav.propTypes = {
-  history: PropTypes.object,
   open: PropTypes.bool
 };

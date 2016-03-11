@@ -67,5 +67,4 @@ export default class HowWorks extends Component {
 }
 
 HowWorks.propTypes = {
-  history: PropTypes.object
 };

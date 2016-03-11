@@ -322,5 +322,4 @@ export default class AppComponent extends Component {
 }
 
 AppComponent.propTypes = {
-  history: PropTypes.object
 };
