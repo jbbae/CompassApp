@@ -32,13 +32,9 @@ var _paper = require('./paper');
 
 var _paper2 = _interopRequireDefault(_paper);
 
-var _lightRawTheme = require('./styles/raw-themes/light-raw-theme');
+var _getMuiTheme = require('./styles/getMuiTheme');
 
-var _lightRawTheme2 = _interopRequireDefault(_lightRawTheme);
-
-var _themeManager = require('./styles/theme-manager');
-
-var _themeManager2 = _interopRequireDefault(_themeManager);
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -49,7 +45,7 @@ var RefreshIndicator = _react2.default.createClass({
   propTypes: {
     /**
      * Override the theme's color of the indicator while it's status is
-     * "ready" or it's percentage is less than 100.
+     * "ready" and it's percentage is less than 100.
      */
     color: _react2.default.PropTypes.string,
 
@@ -60,7 +56,7 @@ var RefreshIndicator = _react2.default.createClass({
 
     /**
      * Override the theme's color of the indicator while
-     * it's status is "loading" or it's percentage is 100.
+     * it's status is "loading" or when it's percentage is 100.
      */
     loadingColor: _react2.default.PropTypes.string,
 
@@ -89,7 +85,7 @@ var RefreshIndicator = _react2.default.createClass({
     style: _react2.default.PropTypes.object,
 
     /**
-     * The absolute right position of the indicator in pixels.
+     * The absolute top position of the indicator in pixels.
      */
     top: _react2.default.PropTypes.number.isRequired
   },
@@ -114,7 +110,7 @@ var RefreshIndicator = _react2.default.createClass({
   },
   getInitialState: function getInitialState() {
     return {
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : _themeManager2.default.getMuiTheme(_lightRawTheme2.default)
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)()
     };
   },
   getChildContext: function getChildContext() {
@@ -315,9 +311,10 @@ var RefreshIndicator = _react2.default.createClass({
     var perimeter = Math.PI * 2 * circle.radiu;
     var arcLen = perimeter * 0.64;
 
-    var strokeDasharray = undefined,
-        strokeDashoffset = undefined,
-        transitionDuration = undefined;
+    var strokeDasharray = undefined;
+    var strokeDashoffset = undefined;
+    var transitionDuration = undefined;
+
     if (currStep === 0) {
       strokeDasharray = '1, 200';
       strokeDashoffset = 0;
@@ -332,9 +329,9 @@ var RefreshIndicator = _react2.default.createClass({
       transitionDuration = '850ms';
     }
 
-    _autoPrefix2.default.set(path.style, 'strokeDasharray', strokeDasharray);
-    _autoPrefix2.default.set(path.style, 'strokeDashoffset', strokeDashoffset);
-    _autoPrefix2.default.set(path.style, 'transitionDuration', transitionDuration);
+    _autoPrefix2.default.set(path.style, 'strokeDasharray', strokeDasharray, this.state.muiTheme);
+    _autoPrefix2.default.set(path.style, 'strokeDashoffset', strokeDashoffset, this.state.muiTheme);
+    _autoPrefix2.default.set(path.style, 'transitionDuration', transitionDuration, this.state.muiTheme);
 
     this.scalePathTimer = setTimeout(function () {
       return _this._scalePath(path, currStep + 1);
@@ -345,22 +342,19 @@ var RefreshIndicator = _react2.default.createClass({
 
     if (this.props.status !== 'loading') return;
 
-    _autoPrefix2.default.set(wrapper.style, 'transform', null);
-    _autoPrefix2.default.set(wrapper.style, 'transform', 'rotate(0deg)');
-    _autoPrefix2.default.set(wrapper.style, 'transitionDuration', '0ms');
+    _autoPrefix2.default.set(wrapper.style, 'transform', null, this.state.muiTheme);
+    _autoPrefix2.default.set(wrapper.style, 'transform', 'rotate(0deg)', this.state.muiTheme);
+    _autoPrefix2.default.set(wrapper.style, 'transitionDuration', '0ms', this.state.muiTheme);
 
     this.rotateWrapperSecondTimer = setTimeout(function () {
-      _autoPrefix2.default.set(wrapper.style, 'transform', 'rotate(1800deg)');
-      _autoPrefix2.default.set(wrapper.style, 'transitionDuration', '10s');
-      _autoPrefix2.default.set(wrapper.style, 'transitionTimingFunction', 'linear');
+      _autoPrefix2.default.set(wrapper.style, 'transform', 'rotate(1800deg)', _this2.state.muiTheme);
+      _autoPrefix2.default.set(wrapper.style, 'transitionDuration', '10s', _this2.state.muiTheme);
+      _autoPrefix2.default.set(wrapper.style, 'transitionTimingFunction', 'linear', _this2.state.muiTheme);
     }, 50);
 
     this.rotateWrapperTimer = setTimeout(function () {
       return _this2._rotateWrapper(wrapper);
     }, 10050);
-  },
-  prefixed: function prefixed(key) {
-    return _autoPrefix2.default.single(key);
   },
   render: function render() {
     var rootStyle = this._getRootStyle();

@@ -12,32 +12,36 @@ var base = new Rebase.createClass('https://sageview.firebaseio.com/');
 var authData = base.getAuth();
 
 export default class SkillPopup extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      skillObj: {}
+    };
+  }
+
+  componentDidMount() {
+    this.ref = base.bindToState('Asset/' + this.props.selectedSkill, {
+      context: this,
+      state: 'skillObj'
+    });
+  }
+
   render() {
     let description = [];
     let assType;
     let assLevel;
 
-    base.fetch('Asset/'+this.props.selectedSkill, {
-      context: this,
-      then(data) {
-        assType = data.Type;
-        for (let key in data.Description) {
-          description.push(data.Description[key]);
+    assType = this.state.skillObj.type;
+    for (let key in this.state.skillObj.description) {
+      description.push(this.state.skillObj.description[key]);
+    }
+
+    if(this.props.userInfo) {
+      for (let key in this.props.userInfo.Asset) {
+        if (this.props.selectedSkill === key) {
+          assLevel = this.props.userInfo.Asset[key];
         }
       }
-    });
-
-    if(authData) {
-      base.fetch(authData.uid + '/Assets', {
-        context: this,
-        then(data) {
-          for (let key in data) {
-            if (this.props.selectedSkill === key) {
-              assLevel = data[key];
-            }
-          }
-        }
-      });
     }
 
     return (
@@ -53,14 +57,19 @@ export default class SkillPopup extends Component {
             {description}
           </Tab>
           <Tab label="How to Improve">
-            <BuildingPage />
+            <BuildingPage userInfo={this.props.userInfo ? this.props.userInfo : null} />
           </Tab>
         </Tabs>
       </div>
     );
   }
+
+  componentWillUnmount() {
+    base.removeBinding(this.ref);
+  }
 }
 
 SkillPopup.propTypes = {
-    selectedSkill: PropTypes.string
+  selectedSkill: PropTypes.string,
+  userInfo: PropTypes.object
 }

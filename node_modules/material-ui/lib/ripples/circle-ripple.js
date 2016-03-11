@@ -43,6 +43,12 @@ var CircleRipple = _react2.default.createClass({
 
   propTypes: {
     color: _react2.default.PropTypes.string,
+
+    /**
+     * The material-ui theme applied to this component.
+     */
+    muiTheme: _react2.default.PropTypes.object.isRequired,
+
     opacity: _react2.default.PropTypes.number,
 
     /**
@@ -83,15 +89,15 @@ var CircleRipple = _react2.default.createClass({
   _animate: function _animate() {
     var style = _reactDom2.default.findDOMNode(this).style;
     var transitionValue = _transitions2.default.easeOut('2s', 'opacity') + ',' + _transitions2.default.easeOut('1s', 'transform');
-    _autoPrefix2.default.set(style, 'transition', transitionValue);
-    _autoPrefix2.default.set(style, 'transform', 'scale(1)');
+    _autoPrefix2.default.set(style, 'transition', transitionValue, this.props.muiTheme);
+    _autoPrefix2.default.set(style, 'transform', 'scale(1)', this.props.muiTheme);
   },
   _initializeAnimation: function _initializeAnimation(callback) {
     var _this2 = this;
 
     var style = _reactDom2.default.findDOMNode(this).style;
     style.opacity = this.props.opacity;
-    _autoPrefix2.default.set(style, 'transform', 'scale(0)');
+    _autoPrefix2.default.set(style, 'transform', 'scale(0)', this.props.muiTheme);
     setTimeout(function () {
       if (_this2.isMounted()) callback();
     }, 0);
@@ -104,7 +110,7 @@ var CircleRipple = _react2.default.createClass({
 
     var other = _objectWithoutProperties(_props, ['color', 'opacity', 'style']);
 
-    var mergedStyles = this.mergeAndPrefix({
+    var mergedStyles = this.mergeStyles({
       position: 'absolute',
       top: 0,
       left: 0,
@@ -114,7 +120,7 @@ var CircleRipple = _react2.default.createClass({
       backgroundColor: color
     }, style);
 
-    return _react2.default.createElement('div', _extends({}, other, { style: mergedStyles }));
+    return _react2.default.createElement('div', _extends({}, other, { style: this.prepareStyles(mergedStyles) }));
   }
 });
 

@@ -12,17 +12,9 @@ var _stylePropable = require('./mixins/style-propable');
 
 var _stylePropable2 = _interopRequireDefault(_stylePropable);
 
-var _autoPrefix = require('./styles/auto-prefix');
+var _getMuiTheme = require('./styles/getMuiTheme');
 
-var _autoPrefix2 = _interopRequireDefault(_autoPrefix);
-
-var _lightRawTheme = require('./styles/raw-themes/light-raw-theme');
-
-var _lightRawTheme2 = _interopRequireDefault(_lightRawTheme);
-
-var _themeManager = require('./styles/theme-manager');
-
-var _themeManager2 = _interopRequireDefault(_themeManager);
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -99,7 +91,7 @@ var BeforeAfterWrapper = _react2.default.createClass({
   },
   getInitialState: function getInitialState() {
     return {
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : _themeManager2.default.getMuiTheme(_lightRawTheme2.default)
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)()
     };
   },
   getChildContext: function getChildContext() {
@@ -124,11 +116,16 @@ var BeforeAfterWrapper = _react2.default.createClass({
 
     var other = _objectWithoutProperties(_props, ['beforeStyle', 'afterStyle', 'beforeElementType', 'afterElementType', 'elementType']);
 
-    var beforeElement = undefined,
-        afterElement = undefined;
+    var beforeElement = undefined;
+    var afterElement = undefined;
 
-    beforeStyle = _autoPrefix2.default.all({ boxSizing: 'border-box' });
-    afterStyle = _autoPrefix2.default.all({ boxSizing: 'border-box' });
+    beforeStyle = {
+      boxSizing: 'border-box'
+    };
+
+    afterStyle = {
+      boxSizing: 'border-box'
+    };
 
     if (this.props.beforeStyle) beforeElement = _react2.default.createElement(this.props.beforeElementType, {
       style: this.prepareStyles(beforeStyle, this.props.beforeStyle),

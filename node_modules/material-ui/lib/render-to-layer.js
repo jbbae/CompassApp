@@ -16,13 +16,9 @@ var _dom = require('./utils/dom');
 
 var _dom2 = _interopRequireDefault(_dom);
 
-var _lightRawTheme = require('./styles/raw-themes/light-raw-theme');
+var _getMuiTheme = require('./styles/getMuiTheme');
 
-var _lightRawTheme2 = _interopRequireDefault(_lightRawTheme);
-
-var _themeManager = require('./styles/theme-manager');
-
-var _themeManager2 = _interopRequireDefault(_themeManager);
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -53,7 +49,7 @@ var RenderToLayer = _react2.default.createClass({
   },
   getInitialState: function getInitialState() {
     return {
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : _themeManager2.default.getMuiTheme(_lightRawTheme2.default)
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)()
     };
   },
   getChildContext: function getChildContext() {
@@ -77,9 +73,7 @@ var RenderToLayer = _react2.default.createClass({
     this._renderLayer();
   },
   componentWillUnmount: function componentWillUnmount() {
-    if (this._layer) {
-      this._unrenderLayer();
-    }
+    this._unrenderLayer();
   },
   onClickAway: function onClickAway(event) {
     if (event.defaultPrevented) {
@@ -104,6 +98,19 @@ var RenderToLayer = _react2.default.createClass({
   },
 
   _unrenderLayer: function _unrenderLayer() {
+    if (!this._layer) {
+      return;
+    }
+
+    if (this.props.useLayerForClickAway) {
+      this._layer.style.position = 'relative';
+      this._layer.removeEventListener('touchstart', this.onClickAway);
+      this._layer.removeEventListener('click', this.onClickAway);
+    } else {
+      window.removeEventListener('touchstart', this.onClickAway);
+      window.removeEventListener('click', this.onClickAway);
+    }
+
     _reactDom2.default.unmountComponentAtNode(this._layer);
     document.body.removeChild(this._layer);
     this._layer = null;
@@ -151,18 +158,7 @@ var RenderToLayer = _react2.default.createClass({
         this.layerElement = _reactDom2.default.unstable_renderSubtreeIntoContainer(this, layerElement, this._layer);
       }
     } else {
-      if (this._layer) {
-        if (this.props.useLayerForClickAway) {
-          this._layer.style.position = 'relative';
-          this._layer.removeEventListener('touchstart', this.onClickAway);
-          this._layer.removeEventListener('click', this.onClickAway);
-        } else {
-          window.removeEventListener('touchstart', this.onClickAway);
-          window.removeEventListener('click', this.onClickAway);
-        }
-
-        this._unrenderLayer();
-      }
+      this._unrenderLayer();
     }
   },
   render: function render() {

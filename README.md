@@ -1,18 +1,5 @@
-# AnyBudget: A Parse + React Demo
-
-This demo is a bit more complex than the Todo demo, and includes concepts like
-handling user login or adding ACLs to objects. It also demonstrates how multiple
-components automatically respond when data is modified, and how multiple
-components with the same queries will all wait on a single request.
-
-When building an application like this, we would ideally have a single query for
-fetching the expenses, and pass those objects to the different pieces of the app
-that needed them. This would prevent the need to load data whenever switching
-tabs. However, we wanted to demonstrate how components with the same query
-cooperate, so we intentionally subscribed multiple sibling components to the
-queries.
-
-# Running the demo
+# SagePath
+# Running the app
 
 First, you'll need to set up a new Parse app at [Parse.com](https://parse.com).
 This is where we'll store the remote data for your Todo list demo. Once you've

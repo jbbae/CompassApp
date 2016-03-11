@@ -14,13 +14,9 @@ var _stylePropable = require('../mixins/style-propable');
 
 var _stylePropable2 = _interopRequireDefault(_stylePropable);
 
-var _themeManager = require('../styles/theme-manager');
+var _getMuiTheme = require('../styles/getMuiTheme');
 
-var _themeManager2 = _interopRequireDefault(_themeManager);
-
-var _lightRawTheme = require('../styles/raw-themes/light-raw-theme');
-
-var _lightRawTheme2 = _interopRequireDefault(_lightRawTheme);
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -52,7 +48,7 @@ var CardText = _react2.default.createClass({
 
   getInitialState: function getInitialState() {
     return {
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : _themeManager2.default.getMuiTheme(_lightRawTheme2.default)
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)()
     };
   },
   getChildContext: function getChildContext() {
@@ -79,11 +75,11 @@ var CardText = _react2.default.createClass({
   },
   render: function render() {
     var styles = this.getStyles();
-    var rootStyle = this.prepareStyles(styles.root, this.props.style);
+    var rootStyle = this.mergeStyles(styles.root, this.props.style);
 
     return _react2.default.createElement(
       'div',
-      _extends({}, this.props, { style: rootStyle }),
+      _extends({}, this.props, { style: this.prepareStyles(rootStyle) }),
       this.props.children
     );
   }

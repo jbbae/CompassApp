@@ -52,15 +52,15 @@ var _clearfix = require('../clearfix');
 
 var _clearfix2 = _interopRequireDefault(_clearfix);
 
-var _themeManager = require('../styles/theme-manager');
+var _getMuiTheme = require('../styles/getMuiTheme');
 
-var _themeManager2 = _interopRequireDefault(_themeManager);
-
-var _lightRawTheme = require('../styles/raw-themes/light-raw-theme');
-
-var _lightRawTheme2 = _interopRequireDefault(_lightRawTheme);
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+var daysArray = [].concat(_toConsumableArray(Array(7)));
 
 var Calendar = _react2.default.createClass({
   displayName: 'Calendar',
@@ -68,6 +68,7 @@ var Calendar = _react2.default.createClass({
   propTypes: {
     DateTimeFormat: _react2.default.PropTypes.func.isRequired,
     disableYearSelection: _react2.default.PropTypes.bool,
+    firstDayOfWeek: _react2.default.PropTypes.number,
     initialDate: _react2.default.PropTypes.object,
     locale: _react2.default.PropTypes.string.isRequired,
     maxDate: _react2.default.PropTypes.object,
@@ -99,7 +100,7 @@ var Calendar = _react2.default.createClass({
   },
   getInitialState: function getInitialState() {
     return {
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : _themeManager2.default.getMuiTheme(_lightRawTheme2.default),
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)(),
       displayDate: _dateTime2.default.getFirstDayOfMonth(this.props.initialDate),
       displayMonthDay: true,
       selectedDate: this.props.initialDate,
@@ -141,7 +142,8 @@ var Calendar = _react2.default.createClass({
       onYearTouchTap: this._handleYearTouchTap,
       selectedDate: this.state.selectedDate,
       minDate: this.props.minDate,
-      maxDate: this.props.maxDate });
+      maxDate: this.props.maxDate
+    });
   },
   getSelectedDate: function getSelectedDate() {
     return this.state.selectedDate;
@@ -270,7 +272,7 @@ var Calendar = _react2.default.createClass({
   },
   render: function render() {
     var yearCount = _dateTime2.default.yearDiff(this.props.maxDate, this.props.minDate) + 1;
-    var weekCount = _dateTime2.default.getWeekArray(this.state.displayDate).length;
+    var weekCount = _dateTime2.default.getWeekArray(this.state.displayDate, this.props.firstDayOfWeek).length;
     var toolbarInteractions = this._getToolbarInteractions();
     var isLandscape = this.props.mode === 'landscape';
     var styles = {
@@ -316,6 +318,7 @@ var Calendar = _react2.default.createClass({
     var _props = this.props;
     var DateTimeFormat = _props.DateTimeFormat;
     var locale = _props.locale;
+    var firstDayOfWeek = _props.firstDayOfWeek;
 
     return _react2.default.createElement(
       _clearfix2.default,
@@ -330,7 +333,8 @@ var Calendar = _react2.default.createClass({
         handleYearClick: this._handleYearClick,
         monthDaySelected: this.state.displayMonthDay,
         mode: this.props.mode,
-        weekCount: weekCount }),
+        weekCount: weekCount
+      }),
       this.state.displayMonthDay && _react2.default.createElement(
         'div',
         { style: this.prepareStyles(styles.calendarContainer) },
@@ -340,52 +344,25 @@ var Calendar = _react2.default.createClass({
           displayDate: this.state.displayDate,
           onMonthChange: this._handleMonthChange,
           prevMonth: toolbarInteractions.prevMonth,
-          nextMonth: toolbarInteractions.nextMonth }),
+          nextMonth: toolbarInteractions.nextMonth
+        }),
         _react2.default.createElement(
           _clearfix2.default,
           {
             elementType: 'ul',
-            style: styles.weekTitle },
-          _react2.default.createElement(
-            'li',
-            { style: weekTitleDayStyle },
-            'S'
-          ),
-          _react2.default.createElement(
-            'li',
-            { style: weekTitleDayStyle },
-            'M'
-          ),
-          _react2.default.createElement(
-            'li',
-            { style: weekTitleDayStyle },
-            'T'
-          ),
-          _react2.default.createElement(
-            'li',
-            { style: weekTitleDayStyle },
-            'W'
-          ),
-          _react2.default.createElement(
-            'li',
-            { style: weekTitleDayStyle },
-            'T'
-          ),
-          _react2.default.createElement(
-            'li',
-            { style: weekTitleDayStyle },
-            'F'
-          ),
-          _react2.default.createElement(
-            'li',
-            { style: weekTitleDayStyle },
-            'S'
-          )
+            style: styles.weekTitle
+          },
+          daysArray.map(function (e, i) {
+            return _react2.default.createElement(
+              'li',
+              { key: i, style: weekTitleDayStyle },
+              _dateTime2.default.localizedWeekday(DateTimeFormat, locale, i, firstDayOfWeek)
+            );
+          })
         ),
         _react2.default.createElement(
           _slideIn2.default,
-          {
-            direction: this.state.transitionDirection },
+          { direction: this.state.transitionDirection },
           _react2.default.createElement(_calendarMonth2.default, {
             key: this.state.displayDate.toDateString(),
             ref: 'calendar',
@@ -394,7 +371,9 @@ var Calendar = _react2.default.createClass({
             selectedDate: this.state.selectedDate,
             minDate: this.props.minDate,
             maxDate: this.props.maxDate,
-            shouldDisableDate: this.props.shouldDisableDate })
+            shouldDisableDate: this.props.shouldDisableDate,
+            firstDayOfWeek: this.props.firstDayOfWeek
+          })
         )
       ),
       !this.state.displayMonthDay && _react2.default.createElement(

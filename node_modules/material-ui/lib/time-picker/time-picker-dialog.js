@@ -34,13 +34,9 @@ var _flatButton = require('../flat-button');
 
 var _flatButton2 = _interopRequireDefault(_flatButton);
 
-var _lightRawTheme = require('../styles/raw-themes/light-raw-theme');
+var _getMuiTheme = require('../styles/getMuiTheme');
 
-var _lightRawTheme2 = _interopRequireDefault(_lightRawTheme);
-
-var _themeManager = require('../styles/theme-manager');
-
-var _themeManager2 = _interopRequireDefault(_themeManager);
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -72,7 +68,7 @@ var TimePickerDialog = _react2.default.createClass({
   getInitialState: function getInitialState() {
     return {
       open: false,
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : _themeManager2.default.getMuiTheme(_lightRawTheme2.default)
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)()
     };
   },
   getChildContext: function getChildContext() {
@@ -148,11 +144,13 @@ var TimePickerDialog = _react2.default.createClass({
       key: 0,
       label: 'Cancel',
       secondary: true,
-      onTouchTap: this.dismiss }), _react2.default.createElement(_flatButton2.default, {
+      onTouchTap: this.dismiss
+    }), _react2.default.createElement(_flatButton2.default, {
       key: 1,
       label: 'OK',
       secondary: true,
-      onTouchTap: this._handleOKTouchTap })];
+      onTouchTap: this._handleOKTouchTap
+    })];
 
     var onClockChangeMinutes = autoOk === true ? this._handleOKTouchTap : undefined;
 
@@ -160,18 +158,20 @@ var TimePickerDialog = _react2.default.createClass({
       _dialog2.default,
       _extends({}, other, {
         ref: 'dialogWindow',
-        style: this.mergeAndPrefix(styles.root),
-        bodyStyle: this.mergeAndPrefix(styles.body),
+        style: this.mergeStyles(styles.root),
+        bodyStyle: styles.body,
         actions: actions,
         contentStyle: styles.dialogContent,
         repositionOnUpdate: false,
         open: this.state.open,
-        onRequestClose: this.dismiss }),
+        onRequestClose: this.dismiss
+      }),
       _react2.default.createElement(_clock2.default, {
         ref: 'clock',
         format: format,
         initialTime: initialTime,
-        onChangeMinutes: onClockChangeMinutes })
+        onChangeMinutes: onClockChangeMinutes
+      })
     );
   }
 });

@@ -28,15 +28,24 @@ var _dom = require('../utils/dom');
 
 var _dom2 = _interopRequireDefault(_dom);
 
-var _immutabilityHelper = require('../utils/immutability-helper');
-
-var _immutabilityHelper2 = _interopRequireDefault(_immutabilityHelper);
-
 var _circleRipple = require('./circle-ripple');
 
 var _circleRipple2 = _interopRequireDefault(_circleRipple);
 
+var _reactAddonsUpdate = require('react-addons-update');
+
+var _reactAddonsUpdate2 = _interopRequireDefault(_reactAddonsUpdate);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function push(array, obj) {
+  var newObj = Array.isArray(obj) ? obj : [obj];
+  return (0, _reactAddonsUpdate2.default)(array, { $push: newObj });
+}
+
+function shift(array) {
+  return (0, _reactAddonsUpdate2.default)(array, { $splice: [[0, 1]] });
+}
 
 var TouchRipple = _react2.default.createClass({
   displayName: 'TouchRipple',
@@ -45,6 +54,12 @@ var TouchRipple = _react2.default.createClass({
     centerRipple: _react2.default.PropTypes.bool,
     children: _react2.default.PropTypes.node,
     color: _react2.default.PropTypes.string,
+
+    /**
+     * The material-ui theme applied to this component.
+     */
+    muiTheme: _react2.default.PropTypes.object.isRequired,
+
     opacity: _react2.default.PropTypes.number,
 
     /**
@@ -80,12 +95,14 @@ var TouchRipple = _react2.default.createClass({
     var ripples = this.state.ripples;
 
     //Add a ripple to the ripples array
-    ripples = _immutabilityHelper2.default.push(ripples, _react2.default.createElement(_circleRipple2.default, {
+    ripples = push(ripples, _react2.default.createElement(_circleRipple2.default, {
       key: this.state.nextKey,
+      muiTheme: this.props.muiTheme,
       style: !this.props.centerRipple ? this._getRippleStyle(e) : {},
       color: this.props.color,
       opacity: this.props.opacity,
-      touchGenerated: isRippleTouchGenerated }));
+      touchGenerated: isRippleTouchGenerated
+    }));
 
     this._ignoreNextMouseDown = isRippleTouchGenerated;
     this.setState({
@@ -97,7 +114,7 @@ var TouchRipple = _react2.default.createClass({
   end: function end() {
     var currentRipples = this.state.ripples;
     this.setState({
-      ripples: _immutabilityHelper2.default.shift(currentRipples)
+      ripples: shift(currentRipples)
     });
   },
   _handleMouseDown: function _handleMouseDown(e) {
@@ -156,7 +173,7 @@ var TouchRipple = _react2.default.createClass({
 
     var rippleGroup = undefined;
     if (hasRipples) {
-      var mergedStyles = this.mergeAndPrefix({
+      var mergedStyles = this.mergeStyles({
         height: '100%',
         width: '100%',
         position: 'absolute',
@@ -167,7 +184,7 @@ var TouchRipple = _react2.default.createClass({
 
       rippleGroup = _react2.default.createElement(
         _reactAddonsTransitionGroup2.default,
-        { style: mergedStyles },
+        { style: this.prepareStyles(mergedStyles) },
         ripples
       );
     }
@@ -179,7 +196,8 @@ var TouchRipple = _react2.default.createClass({
         onMouseDown: this._handleMouseDown,
         onMouseLeave: this._handleMouseLeave,
         onTouchStart: this._handleTouchStart,
-        onTouchEnd: this._handleTouchEnd },
+        onTouchEnd: this._handleTouchEnd
+      },
       rippleGroup,
       children
     );

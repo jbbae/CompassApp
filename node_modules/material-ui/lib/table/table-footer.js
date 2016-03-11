@@ -18,13 +18,9 @@ var _stylePropable = require('../mixins/style-propable');
 
 var _stylePropable2 = _interopRequireDefault(_stylePropable);
 
-var _lightRawTheme = require('../styles/raw-themes/light-raw-theme');
+var _getMuiTheme = require('../styles/getMuiTheme');
 
-var _lightRawTheme2 = _interopRequireDefault(_lightRawTheme);
-
-var _themeManager = require('../styles/theme-manager');
-
-var _themeManager2 = _interopRequireDefault(_themeManager);
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -34,7 +30,18 @@ var TableFooter = _react2.default.createClass({
   displayName: 'TableFooter',
 
   propTypes: {
+    /**
+     * Controls whether or not header rows should be adjusted
+     * for a checkbox column. If the select all checkbox is true,
+     * this property will not influence the number of columns.
+     * This is mainly useful for "super header" rows so that
+     * the checkbox column does not create an offset that needs
+     * to be accounted for manually.
+     */
     adjustForCheckbox: _react2.default.PropTypes.bool,
+    /**
+     * Children passed to table footer.
+     */
     children: _react2.default.PropTypes.node,
 
     /**
@@ -67,7 +74,7 @@ var TableFooter = _react2.default.createClass({
   },
   getInitialState: function getInitialState() {
     return {
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : _themeManager2.default.getMuiTheme(_lightRawTheme2.default)
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)()
     };
   },
   getChildContext: function getChildContext() {
@@ -112,7 +119,7 @@ var TableFooter = _react2.default.createClass({
       displayBorder: false,
       key: 'f-' + rowNumber,
       rowNumber: rowNumber,
-      style: this.mergeAndPrefix(styles.cell, child.props.style)
+      style: this.mergeStyles(styles.cell, child.props.style)
     };
 
     var children = [this._getCheckboxPlaceholder(props)];

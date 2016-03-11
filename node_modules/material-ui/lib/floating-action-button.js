@@ -22,6 +22,10 @@ var _transitions = require('./styles/transitions');
 
 var _transitions2 = _interopRequireDefault(_transitions);
 
+var _colors = require('./styles/colors');
+
+var _colors2 = _interopRequireDefault(_colors);
+
 var _colorManipulator = require('./utils/color-manipulator');
 
 var _colorManipulator2 = _interopRequireDefault(_colorManipulator);
@@ -42,13 +46,9 @@ var _children = require('./utils/children');
 
 var _children2 = _interopRequireDefault(_children);
 
-var _lightRawTheme = require('./styles/raw-themes/light-raw-theme');
+var _getMuiTheme = require('./styles/getMuiTheme');
 
-var _lightRawTheme2 = _interopRequireDefault(_lightRawTheme);
-
-var _themeManager = require('./styles/theme-manager');
-
-var _themeManager2 = _interopRequireDefault(_themeManager);
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 
 var _warning = require('warning');
 
@@ -62,19 +62,90 @@ var FloatingActionButton = _react2.default.createClass({
   displayName: 'FloatingActionButton',
 
   propTypes: {
+    /**
+     * This value will override the default background color for the button.
+     * However it will not override the default disabled background color.
+     * This has to be set separately using the disabledColor attribute.
+     */
     backgroundColor: _react2.default.PropTypes.string,
+
+    /**
+     * This is what displayed inside the floating action button; for example, a SVG Icon.
+     */
     children: _react2.default.PropTypes.node,
+
+    /**
+     * Disables the button if set to true.
+     */
     disabled: _react2.default.PropTypes.bool,
+
+    /**
+     * This value will override the default background color for the button when it is disabled.
+     */
     disabledColor: _react2.default.PropTypes.string,
+
+    /**
+     * URL to link to when button clicked if `linkButton` is set to true.
+     */
+    href: _react2.default.PropTypes.string,
+
+    /**
+     * The icon within the FloatingActionButton is a FontIcon component.
+     * This property is the classname of the icon to be displayed inside the button.
+     * An alternative to adding an iconClassName would be to manually insert a
+     * FontIcon component or custom SvgIcon component or as a child of FloatingActionButton.
+     */
     iconClassName: _react2.default.PropTypes.string,
+
+    /**
+     * This is the equivalent to iconClassName except that it is used for
+     * overriding the inline-styles of the FontIcon component.
+     */
     iconStyle: _react2.default.PropTypes.object,
+
+    /**
+     * Enables use of `href` property to provide a URL to link to if set to true.
+     */
+    linkButton: _react2.default.PropTypes.bool,
+
+    /**
+     * If true, the button will be a small floating action button.
+     */
     mini: _react2.default.PropTypes.bool,
+
+    /**
+     * Called when mouse down event occurs on the button.
+     */
     onMouseDown: _react2.default.PropTypes.func,
+
+    /**
+     * Called when mouse enter event occurs on the button.
+     */
     onMouseEnter: _react2.default.PropTypes.func,
+
+    /**
+     * Called when mouse leave event occurs on the button.
+     */
     onMouseLeave: _react2.default.PropTypes.func,
+
+    /**
+     * Called when mouse up event occurs on the button.
+     */
     onMouseUp: _react2.default.PropTypes.func,
+
+    /**
+     * Called when touch end event occurs on the button.
+     */
     onTouchEnd: _react2.default.PropTypes.func,
+
+    /**
+     * Called when touch start event occurs on the button.
+     */
     onTouchStart: _react2.default.PropTypes.func,
+
+    /**
+     * If true, the button will use the secondary button colors.
+     */
     secondary: _react2.default.PropTypes.bool,
 
     /**
@@ -94,6 +165,14 @@ var FloatingActionButton = _react2.default.createClass({
 
   mixins: [_stylePropable2.default],
 
+  getDefaultProps: function getDefaultProps() {
+    return {
+      disabled: false,
+      disabledColor: _colors2.default.grey300,
+      mini: false,
+      secondary: false
+    };
+  },
   getInitialState: function getInitialState() {
     var zDepth = this.props.disabled ? 0 : 2;
 
@@ -102,7 +181,7 @@ var FloatingActionButton = _react2.default.createClass({
       initialZDepth: zDepth,
       touch: false,
       zDepth: zDepth,
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : _themeManager2.default.getMuiTheme(_lightRawTheme2.default)
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)()
     };
   },
   getChildContext: function getChildContext() {
@@ -153,14 +232,7 @@ var FloatingActionButton = _react2.default.createClass({
         backgroundColor: this._getBackgroundColor(),
         borderRadius: '50%',
         textAlign: 'center',
-        verticalAlign: 'bottom',
-        /*
-         This is need so that ripples do not bleed
-          past border radius.
-          See: http://stackoverflow.com/questions/17298739/
-            css-overflow-hidden-not-working-in-chrome-when-parent-has-border-radius-and-chil
-         */
-        transform: 'translate3d(0, 0, 0)'
+        verticalAlign: 'bottom'
       },
       containerWhenMini: {
         height: themeVariables.miniSize,
@@ -266,7 +338,8 @@ var FloatingActionButton = _react2.default.createClass({
       {
         style: this.mergeStyles(styles.root, this.props.style),
         zDepth: this.state.zDepth,
-        circle: true },
+        circle: true
+      },
       _react2.default.createElement(
         _enhancedButton2.default,
         _extends({}, other, buttonEventHandlers, {
@@ -274,12 +347,14 @@ var FloatingActionButton = _react2.default.createClass({
           disabled: disabled,
           style: this.mergeStyles(styles.container, this.props.mini && styles.containerWhenMini, iconStyle),
           focusRippleColor: styles.icon.color,
-          touchRippleColor: styles.icon.color }),
+          touchRippleColor: styles.icon.color
+        }),
         _react2.default.createElement(
           'div',
           {
             ref: 'overlay',
-            style: this.prepareStyles(styles.overlay, this.state.hovered && !this.props.disabled && styles.overlayWhenHovered) },
+            style: this.prepareStyles(styles.overlay, this.state.hovered && !this.props.disabled && styles.overlayWhenHovered)
+          },
           iconElement,
           children
         )

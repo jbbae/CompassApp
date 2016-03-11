@@ -18,13 +18,9 @@ var _stylePropable = require('../mixins/style-propable');
 
 var _stylePropable2 = _interopRequireDefault(_stylePropable);
 
-var _lightRawTheme = require('../styles/raw-themes/light-raw-theme');
+var _getMuiTheme = require('../styles/getMuiTheme');
 
-var _lightRawTheme2 = _interopRequireDefault(_lightRawTheme);
-
-var _themeManager = require('../styles/theme-manager');
-
-var _themeManager2 = _interopRequireDefault(_themeManager);
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -123,7 +119,7 @@ var GridTile = _react2.default.createClass({
   },
   getInitialState: function getInitialState() {
     return {
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : _themeManager2.default.getMuiTheme(_lightRawTheme2.default)
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)()
     };
   },
   getChildContext: function getChildContext() {
@@ -163,7 +159,7 @@ var GridTile = _react2.default.createClass({
       }, _defineProperty(_titleBar, this.props.titlePosition, 0), _defineProperty(_titleBar, 'height', this.props.subtitle ? 68 : 48), _defineProperty(_titleBar, 'background', this.props.titleBackground), _defineProperty(_titleBar, 'display', 'flex'), _defineProperty(_titleBar, 'alignItems', 'center'), _titleBar),
       titleWrap: {
         flexGrow: 1,
-        marginLeft: actionPos === 'right' ? gutterLess : 0,
+        marginLeft: actionPos !== 'left' ? gutterLess : 0,
         marginRight: actionPos === 'left' ? gutterLess : 0,
         color: themeVariables.textColor,
         overflow: 'hidden'
@@ -237,7 +233,7 @@ var GridTile = _react2.default.createClass({
 
     var styles = this.getStyles();
 
-    var mergedRootStyles = this.prepareStyles(styles.root, style);
+    var mergedRootStyles = this.mergeStyles(styles.root, style);
 
     var titleBar = null;
 
@@ -287,7 +283,7 @@ var GridTile = _react2.default.createClass({
     var RootTag = rootClass;
     return _react2.default.createElement(
       RootTag,
-      _extends({ style: mergedRootStyles }, other),
+      _extends({ style: this.prepareStyles(mergedRootStyles) }, other),
       newChildren,
       titleBar
     );

@@ -16,13 +16,9 @@ var _stylePropable = require('../mixins/style-propable');
 
 var _stylePropable2 = _interopRequireDefault(_stylePropable);
 
-var _lightRawTheme = require('../styles/raw-themes/light-raw-theme');
+var _getMuiTheme = require('../styles/getMuiTheme');
 
-var _lightRawTheme2 = _interopRequireDefault(_lightRawTheme);
-
-var _themeManager = require('../styles/theme-manager');
-
-var _themeManager2 = _interopRequireDefault(_themeManager);
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -32,32 +28,116 @@ var Table = _react2.default.createClass({
   displayName: 'Table',
 
   propTypes: {
+    /**
+     * Set to true to indicate that all rows should be selected.
+     */
     allRowsSelected: _react2.default.PropTypes.bool,
+
+    /**
+     * Override the inline-styles of the body's table element.
+     */
     bodyStyle: _react2.default.PropTypes.object,
+
+    /**
+     * Children passed to table.
+     */
     children: _react2.default.PropTypes.node,
 
     /**
      * The css class name of the root element.
      */
     className: _react2.default.PropTypes.string,
+
+    /**
+     * If true, the footer will appear fixed below the table.
+     * The default value is true.
+     */
     fixedFooter: _react2.default.PropTypes.bool,
+
+    /**
+     * If true, the header will appear fixed above the table.
+     * The default value is true.
+     */
     fixedHeader: _react2.default.PropTypes.bool,
+
+    /**
+     * Override the inline-styles of the footer's table element.
+     */
     footerStyle: _react2.default.PropTypes.object,
+
+    /**
+     * Override the inline-styles of the header's table element.
+     */
     headerStyle: _react2.default.PropTypes.object,
+
+    /**
+     * The height of the table.
+     */
     height: _react2.default.PropTypes.string,
+
+    /**
+     * If true, multiple table rows can be selected.
+     * CTRL/CMD+Click and SHIFT+Click are valid actions.
+     * The default value is false.
+     */
     multiSelectable: _react2.default.PropTypes.bool,
+
+    /**
+     * Called when a row cell is clicked.
+     * rowNumber is the row number and columnId is
+     * the column number or the column key.
+     */
     onCellClick: _react2.default.PropTypes.func,
+
+    /**
+     * Called when a table cell is hovered.
+     * rowNumber is the row number of the hovered row
+     * and columnId is the column number or the column key of the cell.
+     */
     onCellHover: _react2.default.PropTypes.func,
+
+    /**
+     * Called when a table cell is no longer hovered.
+     * rowNumber is the row number of the row and columnId
+     * is the column number or the column key of the cell.
+     */
     onCellHoverExit: _react2.default.PropTypes.func,
+
+    /**
+     * Called when a table row is hovered.
+     * rowNumber is the row number of the hovered row.
+     */
     onRowHover: _react2.default.PropTypes.func,
+
+    /**
+     * Called when a table row is no longer hovered.
+     * rowNumber is the row number of the row that is no longer hovered.
+     */
     onRowHoverExit: _react2.default.PropTypes.func,
+
+    /**
+     * Called when a row is selected.
+     * selectedRows is an array of all row selections.
+     * IF all rows have been selected, the string "all"
+     * will be returned instead to indicate that all rows have been selected.
+     */
     onRowSelection: _react2.default.PropTypes.func,
+
+    /**
+     * If true, table rows can be selected.
+     * If multiple row selection is desired, enable multiSelectable.
+     * The default value is true.
+     */
     selectable: _react2.default.PropTypes.bool,
 
     /**
      * Override the inline-styles of the root element.
      */
     style: _react2.default.PropTypes.object,
+
+    /**
+     * Override the inline-styles of the table's wrapper element.
+     */
     wrapperStyle: _react2.default.PropTypes.object
   },
 
@@ -84,7 +164,7 @@ var Table = _react2.default.createClass({
   },
   getInitialState: function getInitialState() {
     return {
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : _themeManager2.default.getMuiTheme(_lightRawTheme2.default),
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)(),
       allRowsSelected: this.props.allRowsSelected
     };
   },
@@ -151,7 +231,7 @@ var Table = _react2.default.createClass({
       onRowHoverExit: this._onRowHoverExit,
       onRowSelection: this._onRowSelection,
       selectable: this.props.selectable,
-      style: this.mergeAndPrefix({ height: this.props.height }, base.props.style)
+      style: this.mergeStyles({ height: this.props.height }, base.props.style)
     });
   },
   _createTableFooter: function _createTableFooter(base) {
@@ -188,6 +268,8 @@ var Table = _react2.default.createClass({
     this.setState({ allRowsSelected: !this.state.allRowsSelected });
   },
   render: function render() {
+    var _this = this;
+
     var _props = this.props;
     var children = _props.children;
     var className = _props.className;
@@ -203,52 +285,32 @@ var Table = _react2.default.createClass({
 
     var styles = this.getStyles();
 
-    var tHead = undefined,
-        tFoot = undefined,
-        tBody = undefined;
-    var _iteratorNormalCompletion = true;
-    var _didIteratorError = false;
-    var _iteratorError = undefined;
+    var tHead = undefined;
+    var tFoot = undefined;
+    var tBody = undefined;
 
-    try {
-      for (var _iterator = children[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-        var child = _step.value;
+    _react2.default.Children.forEach(children, function (child) {
+      if (!_react2.default.isValidElement(child)) return;
 
-        if (!_react2.default.isValidElement(child)) continue;
-
-        var displayName = child.type.displayName;
-        if (displayName === 'TableBody') {
-          tBody = this._createTableBody(child);
-        } else if (displayName === 'TableHeader') {
-          tHead = this._createTableHeader(child);
-        } else if (displayName === 'TableFooter') {
-          tFoot = this._createTableFooter(child);
-        }
+      var displayName = child.type.displayName;
+      if (displayName === 'TableBody') {
+        tBody = _this._createTableBody(child);
+      } else if (displayName === 'TableHeader') {
+        tHead = _this._createTableHeader(child);
+      } else if (displayName === 'TableFooter') {
+        tFoot = _this._createTableFooter(child);
       }
+    });
 
-      // If we could not find a table-header and a table-body, do not attempt to display anything.
-    } catch (err) {
-      _didIteratorError = true;
-      _iteratorError = err;
-    } finally {
-      try {
-        if (!_iteratorNormalCompletion && _iterator.return) {
-          _iterator.return();
-        }
-      } finally {
-        if (_didIteratorError) {
-          throw _iteratorError;
-        }
-      }
-    }
-
+    // If we could not find a table-header and a table-body, do not attempt to display anything.
     if (!tBody && !tHead) return null;
 
-    var mergedTableStyle = this.prepareStyles(styles.root, style);
-    var headerTable = undefined,
-        footerTable = undefined;
-    var inlineHeader = undefined,
-        inlineFooter = undefined;
+    var mergedTableStyle = this.mergeStyles(styles.root, style);
+    var headerTable = undefined;
+    var footerTable = undefined;
+    var inlineHeader = undefined;
+    var inlineFooter = undefined;
+
     if (fixedHeader) {
       headerTable = _react2.default.createElement(
         'div',
@@ -262,6 +324,7 @@ var Table = _react2.default.createClass({
     } else {
       inlineHeader = tHead;
     }
+
     if (tFoot !== undefined) {
       if (fixedFooter) {
         footerTable = _react2.default.createElement(
@@ -269,7 +332,7 @@ var Table = _react2.default.createClass({
           { style: this.prepareStyles(footerStyle) },
           _react2.default.createElement(
             'table',
-            { className: className, style: mergedTableStyle },
+            { className: className, style: this.prepareStyles(mergedTableStyle) },
             tFoot
           )
         );

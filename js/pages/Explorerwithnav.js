@@ -4,14 +4,13 @@ import React, { Component, PropTypes } from 'react';
 import Firebase from 'firebase';
 import Rebase from 're-base';
 
-import { Checkbox, CircularProgress, Divider, DropDownMenu, FontIcon, FloatingActionButton, IconButton, List, ListItem, MenuItem, Styles } from 'material-ui';
+import { Checkbox, Divider, DropDownMenu, FontIcon, FloatingActionButton, IconButton, List, ListItem, MenuItem, Snackbar, Styles } from 'material-ui';
 let { Spacing, Colors } = Styles;
 
 import ExplorerListFilter from '../components/ExplorerListFilter';
-//import ExplorerDescription from './ExplorerDescription.js';
+import ExplorerDescription from './ExplorerDescription.js';
 
 var base = new Rebase.createClass('https://sageview.firebaseio.com');
-var authData = base.getAuth();
 
 export default class ExplorerWithNav extends Component {
   //Note: querySwitch is only a placeholder to refresh queries
@@ -24,7 +23,8 @@ export default class ExplorerWithNav extends Component {
     this.handleNeutralCheck = this.handleNeutralCheck.bind(this);
     this.handleDislikeCheck = this.handleDislikeCheck.bind(this);
     this.handleDescPageExit = this.handleDescPageExit.bind(this);
-    this.handleFetchItems = this.handleFetchItems.bind(this);
+    this.handleSnackClose = this.handleSnackClose.bind(this);
+    this.handleNeedLogin = this.handleNeedLogin.bind(this);
     this.state = {
       selecteditem: '',
       selectedObj: {},
@@ -34,25 +34,31 @@ export default class ExplorerWithNav extends Component {
       neutralShow: true,
       dislikeShow: true,
       showDescPage: false,
-      userInfo: null,
-      currentList: null
+      industryList: {},
+      pathList: {},
+      snackopen: false,
+      updateMsg: ''
     };
   }
 
   componentDidMount() {
-    if (authData) {
-      let userEndPoint = 'users/' + authData.uid;
-      this.ref = base.bindToState(userEndPoint, {
-        context: this,
-        state: 'userInfo'
-      });
-    } else {
-      this.setState({userInfo: null});
-    }
+    base.fetch('Industry', {
+      context: this,
+      then(data) {
+        this.setState({industryList: data});
+      }
+    });
+
+    base.fetch('Path', {
+      context: this,
+      then(data) {
+        this.setState({pathList: data});
+      }
+    });
   }
 
   getStyles() {
-    let subNavWidth = Spacing.desktopKeylineIncrement * 5 + 'px';
+    let subNavWidth = Spacing.desktopKeylineIncrement * 5.5 + 'px';
     let styles = {
       rootWhenMedium: {
         paddingTop: Spacing.desktopKeylineIncrement + 'px',
@@ -71,10 +77,88 @@ export default class ExplorerWithNav extends Component {
         maxWidth: (Spacing.desktopKeylineIncrement * 25 ) + 'px',
         marginLeft: subNavWidth,
         borderLeft: 'solid 1px ' + Colors.grey300,
-        minHeight: '800px'
+        minHeight: '700px',
+        maxHeight: '700px'
       }
     };
     return styles;
+  }
+
+  listFilterAnalysis(filtertarget, targetIndustries) {
+    let userPrefSwitch = true;
+
+    if ( !this.state.likeShow || !this.state.neutralShow || !this.state.dislikeShow ) {
+      if ( this.state.likeShow && this.state.neutralShow && !this.state.dislikeShow ) {
+        for (var key in this.props.userInfo[this.state.exploreType]) {
+          if (!this.props.userInfo[this.state.exploreType][key].likeStatus && filtertarget === key) {
+            userPrefSwitch = false;
+            break;
+          }
+        }
+
+      } else if ( this.state.likeShow && !this.state.neutralShow && this.state.dislikeShow ) {
+        userPrefSwitch = false;
+        for (var key in this.props.userInfo[this.state.exploreType]) {
+          if (filtertarget === key) {
+            userPrefSwitch = true;
+            break;
+          }
+        }
+
+      } else if ( !this.state.likeShow && this.state.neutralShow && this.state.dislikeShow ) {
+        for (var key in this.props.userInfo[this.state.exploreType]) {
+          if (this.props.userInfo[this.state.exploreType][key].likeStatus && filtertarget === key) {
+            userPrefSwitch = false;
+            break;
+          }
+        }
+
+      } else if ( this.state.likeShow && !this.state.neutralShow && !this.state.dislikeShow ) {
+        userPrefSwitch = false;
+        for (var key in this.props.userInfo[this.state.exploreType]) {
+          if (this.props.userInfo[this.state.exploreType][key].likeStatus && filtertarget === key) {
+            userPrefSwitch = true;
+            break;
+          }
+        }
+
+      } else if ( !this.state.likeShow && this.state.neutralShow && !this.state.dislikeShow ) {
+        for (var key in this.props.userInfo[this.state.exploreType]) {
+          if (filtertarget === key) {
+            userPrefSwitch = false;
+            break;
+          }
+        }
+
+      } else if ( !this.state.likeShow && !this.state.neutralShow && this.state.dislikeShow ) {
+        userPrefSwitch = false;
+        for (var key in this.props.userInfo[this.state.exploreType]) {
+          if (!this.props.userInfo[this.state.exploreType][key].likeStatus && filtertarget === key) {
+            userPrefSwitch = true;
+            break;
+          }
+        }
+      }
+    }
+
+    if (this.state.exploreType === 'Path') {
+      let crossSwitch = false;
+
+      for (var key1 in targetIndustries) {
+        for (var key2 in this.props.userInfo.Industry) {
+          if ( key1 === key2 && this.props.userInfo.Industry[key2].likeStatus ) {
+            crossSwitch = true;
+            break;
+          }
+        }
+        if (crossSwitch) { break; }
+      }
+      if (!crossSwitch) {
+        userPrefSwitch = false;
+      }
+    }
+
+    return userPrefSwitch;
   }
 
   render() {
@@ -82,27 +166,28 @@ export default class ExplorerWithNav extends Component {
 
     //Part I - Check if exploreType = Careers is an option (disable button?)
     let careerAllow = false;
-
-    if (this.state.userInfo.Industry && this.state.userInfo.Focus) {
-      let industryCheck = false;
-      let focusCheck = false;
-      for (var key in this.state.userInfo.Industry) {
-        if (!this.state.userInfo.Industry.hasOwnProperty(key)) { continue; }
-        if (this.state.userInfo.Industry[key].likeStatus === true) {
-          industryCheck = true;
-          break;
+    if (this.props.userInfo) {
+      if (this.props.userInfo.Industry && this.props.userInfo.Focus) {
+        let industryCheck = false;
+        let focusCheck = false;
+        for (var key in this.props.userInfo.Industry) {
+          if (!this.props.userInfo.Industry.hasOwnProperty(key)) { continue; }
+          if (this.props.userInfo.Industry[key].likeStatus === true) {
+            industryCheck = true;
+            break;
+          }
         }
-      }
 
-      for (var key in this.state.userInfo.Focus) {
-        if (!this.state.userInfo.Focus.hasOwnProperty(key)) { continue; }
-        if (this.state.userInfo.Focus[key].likeStatus === true) {
-          focusCheck = true;
-          break;
+        for (var key2 in this.props.userInfo.Focus) {
+          if (!this.props.userInfo.Focus.hasOwnProperty(key2)) { continue; }
+          if (this.props.userInfo.Focus[key2].likeStatus === true) {
+            focusCheck = true;
+            break;
+          }
         }
-      }
 
-      if (industryCheck && focusCheck || this.state.exploreType === 'Path') { careerAllow = true; }
+        if ((industryCheck && focusCheck) || this.state.exploreType === 'Path') { careerAllow = true; }
+      }
     }
 
     //Part II - Populate with ListItem Components
@@ -111,13 +196,17 @@ export default class ExplorerWithNav extends Component {
     let lookup = this.state.exploreType;
     let pathSignal = false;
 
-    if (this.state.currentList) {
+    let currentList = null;
+    if (this.state.exploreType === 'Industry') { currentList = this.state.industryList; }
+    else if (this.state.exploreType === 'Path' || this.state.exploreType === 'Focus' ) { currentList = this.state.pathList; }
+
+    if (currentList) {
       //Start Level 1 unbundle
-      for (var key1 in this.state.currentList) {
+      for (var key1 in currentList) {
         let lvl2items=[];
 
         //Start Level 2 unbundle
-        for (var key2 in this.state.currentList[key1].level2) {
+        for (var key2 in currentList[key1].level2) {
           let lvl2Switch = null;
           let filterResult2;
           let listObject2;
@@ -125,52 +214,45 @@ export default class ExplorerWithNav extends Component {
           let lvl3items=[];
 
           if (lookup === 'Focus') {
-            listObject2 = this.state.currentList[key1].level2[key2];
+            listObject2 = currentList[key1].level2[key2];
           }
 
           //Use Level 3 to determine render for Level 2 (if Path/Industry)
           if (lookup === 'Path' || lookup === 'Industry') {
-            let totalPref3 = 1;
+            let totalPref3 = 0;
             //Start Level 3 unbundle
-            for (var key3 in this.state.currentList[key1][key2].level3) {
+            for (var key3 in currentList[key1].level2[key2].level3) {
               //Apply filter
-              let filterResult3 = (
-                <ExplorerListFilter
-                  exploreType={lookup}
-                  filtertarget={key3}
-                  targetIndustries={this.state.currentList[key1].level2[key2].level3[key3].Industries}
-                  likeShow={this.state.likeShow}
-                  neutralShow={this.state.neutralShow}
-                  dislikeShow={this.state.dislikeShow}
-                   />
-               );
+              let filterResult3 = this.listFilterAnalysis(key3, currentList[key1].level2[key2].level3[key3].crossIndustry);
 
               //Unbundle if passes filter
               if (filterResult3) {
                 pathSignal = true;
 
                 let lvl3Switch = null;
-                let listObject3 = this.state.currentList[key1].level2[key2].level3[key3];
+                let listObject3 = currentList[key1].level2[key2].level3[key3];
                 let lvl3Icon;
 
-                for (var keyU in this.state.userInfo[lookup]) {
-                  if (!this.state.userInfo[lookup].hasOwnProperty(keyU)) { continue; }
-                  if (key3 === keyU) {
-                    if (this.state.userInfo[lookup][keyU].likeStatus === true) {
-                      lvl3Switch = true;
-                      lvl2Switch = lvl2Switch + 1;
-                      break;
-                    } else {
-                      lvl3Switch = false;
-                      lvl2Switch = lvl2Switch - 1;
-                      break;
+                if (this.props.userInfo) {
+                  for (var keyU in this.props.userInfo[lookup]) {
+                    if (!this.props.userInfo[lookup].hasOwnProperty(keyU)) { continue; }
+                    if (key3 === keyU) {
+                      if (this.props.userInfo[lookup][keyU].likeStatus === true) {
+                        lvl3Switch = true;
+                        totalPref3 = totalPref3 + 1;
+                        break;
+                      } else {
+                        lvl3Switch = false;
+                        totalPref3 = totalPref3 - 1;
+                        break;
+                      }
                     }
                   }
                 }
 
                 if (lvl3Switch) {
                   lvl3Icon=<FontIcon className="material-icons" color={Colors.blue500}>star</FontIcon>;
-                } else if (!lvl3Switch) {
+                } else if (lvl3Switch === false) {
                   lvl3Icon=<FontIcon className="material-icons" color={Colors.red500}>block</FontIcon>;
                 }
 
@@ -190,39 +272,34 @@ export default class ExplorerWithNav extends Component {
               if (totalPref3 === lvl3items.length) { lvl2Switch = true }
               else if ((-1*totalPref3) === lvl3items.length) { lvl2Switch = false }
 
-            } else { filterResult2 = false; }
+            }
 
             //Skip Level 3 and determine render for Level 2 with Focus preferences
           } else if (lookup === 'Focus') {
-            filterResult2 = (
-              <ExplorerListFilter
-                exploreType={lookup}
-                filtertarget={key2}
-                likeShow={this.state.likeShow}
-                neutralShow={this.state.neutralShow}
-                dislikeShow={this.state.dislikeShow} />
-             );
+            filterResult2 = this.listFilterAnalysis(key2);
 
-             if (filterResult2) {
-               for (var keyU in this.state.userInfo[lookup]) {
-                 if (!this.state.userInfo[lookup].hasOwnProperty(keyU)) { continue; }
-                 if (key2 === keyU) {
-                   if (this.state.userInfo[lookup][keyU].likeStatus === true) {
+            if (this.props.userInfo) {
+              if (filterResult2) {
+                for (var keyU in this.props.userInfo[lookup]) {
+                  if (!this.props.userInfo[lookup].hasOwnProperty(keyU)) { continue; }
+                  if (key2 === keyU) {
+                    if (this.props.userInfo[lookup][keyU].likeStatus === true) {
                      lvl2Switch = true;
                      break;
-                   } else {
+                    } else {
                      lvl2Switch = false;
                      break;
-                   }
-                 }
-               }
-             }
+                    }
+                  }
+                }
+              }
+            }
           }
 
           if (filterResult2) {
             if (lvl2Switch) {
               lvl2Icon=<FontIcon className="material-icons" color={Colors.blue500}>star</FontIcon>;
-            } else if (!lvl2Switch) {
+            } else if (lvl2Switch === false) {
               lvl2Icon=<FontIcon className="material-icons" color={Colors.red500}>block</FontIcon>;
             }
 
@@ -239,41 +316,46 @@ export default class ExplorerWithNav extends Component {
         }
         //End Level 2 unbundle
 
-        listitems.push(
-          <ListItem
-            primaryText={key1}
-            disabled={true}
-            style={this.state.selecteditem === key1 ? {color: Colors.pink500} : null}
-            nestedItems={lvl2items} />
-        );
+        if (lvl2items.length) {
+          listitems.push(
+            <ListItem
+              primaryText={key1}
+              disabled={true}
+              style={this.state.selecteditem === key1 ? {color: Colors.pink500} : null}
+              nestedItems={lvl2items} />
+          );
+        }
       }
       //End Level 1 unbundle
       //Loading screen if list is loading
     } else if (lookup === 'Path' && pathSignal) {
       listitems =
         <div>
-          <p>Unfortunately, we haven't been able to analyze this combination yet =(</p>
+          <p>Unfortunately, we haven't been able to analyze this combination yet...</p>
           <p>We'll notify you once these paths become available.</p>
           <p>Meahwile, please try another combination.</p>
         </div>
     } else {
-      listitems = <CircularProgress mode="indeterminate" value={60} size={1.5} />;
+      listitems = <div id='explorerLoading'><p style={styles.content}>Select a list above...</p></div>;
     }
 
     let itemDescription;
 
-    //Just pass the entire item object instead of its pieces! (See "Description" page for processor)
+    //Part III - Show the Description Page (while passing in props)
     if (this.state.showDescPage) {
       itemDescription =
-        <ExplorerDescription
-        selecteditem={this.state.selecteditem}
-        exploreType={this.state.exploreType}
-        backFunction={this.handleDescPageExit}
-        selectedObj={this.state.selectedObj} />
+        <div id='descriptionScrollable'>
+          <ExplorerDescription
+            userInfo={this.props.userInfo}
+            selecteditem={this.state.selecteditem}
+            exploreType={this.state.exploreType}
+            backFunction={this.handleDescPageExit}
+            selectedObj={this.state.selectedObj} />
+        </div>;
     }
 
+    // Part IV - ExploreType Career enable/disable
     let careerButton;
-
     if (careerAllow) {
       careerButton = (
         <FloatingActionButton disabled={careerAllow ? false : true } disabledColor={Colors.pink50} onTouchTap={this.handleCareerExp} mini={true}>
@@ -288,14 +370,15 @@ export default class ExplorerWithNav extends Component {
       );
     }
 
+    //Part V - Return components
     return (
       <div style={styles.rootWhenMedium}>
         <div style={styles.contentWhenMedium}>
-        {itemDescription}
+          {itemDescription}
         </div>
         <div style={styles.secondaryNavWhenMedium}>
           <List subheader="Exploring...">
-            <table width='310px'>
+            <table width='100%'>
               <td width='65%'>
                 <div id ='pathDropCont'>
                   <DropDownMenu id='pathDrop' autoWidth={false} value={this.state.exploreType} onChange={this.handleDropChange}>
@@ -316,35 +399,41 @@ export default class ExplorerWithNav extends Component {
                 </div>
               </td>
             </table>
-          </List>
-          <Divider />
-          <List subheader="Show me my...">
             <div className='checkboxWrap'>
               <Checkbox
                 label="Likes"
+                disabled={this.props.userInfo ? false : true}
                 defaultChecked={true}
-                onTouchTap={this.handleLikeCheck} />
+                onTouchTap={this.props.userInfo ? this.handleLikeCheck : this.handleNeedLogin} />
             </div>
             <div className='checkboxWrap'>
               <Checkbox
                 label="Neutrals"
+                disabled={this.props.userInfo ? false : true}
                 defaultChecked={true}
-                onTouchTap={this.handleNeutralCheck} />
+                onTouchTap={this.props.userInfo ? this.handleNeutralCheck: this.handleNeedLogin} />
             </div>
             <div className='checkboxWrap'>
               <Checkbox
                 label="Dislikes"
+                disabled={this.props.userInfo ? false : true}
                 defaultChecked={true}
-                onTouchTap={this.handleDislikeCheck} />
+                onTouchTap={this.props.userInfo ? this.handleDislikeCheck : this.handleNeedLogin} />
             </div>
           </List>
           <Divider />
           <div id='explorerScrollablePart'>
-            <List subheader={'Explore '&this.state.exploreType&'s'}>
+            <List subheader={this.state.exploreType ? 'Current List: ' + this.state.exploreType : '' }>
               {listitems}
             </List>
           </div>
         </div>
+
+        <Snackbar
+          open={this.state.snackopen}
+          message={this.state.updateMsg}
+          autoHideDuration={1500}
+          onRequestClose={this.handleSnackClose} />
       </div>
     );
   }
@@ -365,10 +454,6 @@ export default class ExplorerWithNav extends Component {
       exploreType: value,
       showDescPage: false
     });
-    this.handleFetchItems();
-    setTimeout(function(){
-      this.setState({querySwitch: 'selecting focus'});
-    }.bind(this),300);
   }
 
   handleCareerExp() {
@@ -376,25 +461,6 @@ export default class ExplorerWithNav extends Component {
       exploreType: 'Path',
       showDescPage: false
     });
-    this.handleFetchItems();
-    setTimeout(function(){
-      this.setState({querySwitch: 'selecting paths'});
-    }.bind(this),300);
-  }
-
-  handleFetchItems() {
-    let ListEndPt;
-    if (this.state.exploreType === 'Industry') {
-      ListEndPt = 'Industry';
-    } else if (this.state.exploreType === 'Focus' || this.state.exploreType === 'Path') {
-      ListEndPt = 'Path';
-    }
-    base.fetch(ListEndPt, {
-      context: this,
-      then(data) {
-        this.setState({currentList: data});
-      }
-    })
   }
 
   handleLikeCheck() {
@@ -427,4 +493,19 @@ export default class ExplorerWithNav extends Component {
       selecteditem: ''
     });
   }
+
+  handleNeedLogin() {
+    this.setState({
+      updateMsg: 'You must be logged in to use this function!',
+      snackopen: true
+    })
+  }
+
+  handleSnackClose() {
+    this.setState({ snackopen: false });
+  }
 }
+
+ExplorerWithNav.propTypes = {
+  userInfo: PropTypes.object
+};

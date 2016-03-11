@@ -18,10 +18,6 @@ var _reactAddonsUpdate = require('react-addons-update');
 
 var _reactAddonsUpdate2 = _interopRequireDefault(_reactAddonsUpdate);
 
-var _controllable = require('../mixins/controllable');
-
-var _controllable2 = _interopRequireDefault(_controllable);
-
 var _stylePropable = require('../mixins/style-propable');
 
 var _stylePropable2 = _interopRequireDefault(_stylePropable);
@@ -54,13 +50,9 @@ var _paper = require('../paper');
 
 var _paper2 = _interopRequireDefault(_paper);
 
-var _lightRawTheme = require('../styles/raw-themes/light-raw-theme');
+var _getMuiTheme = require('../styles/getMuiTheme');
 
-var _lightRawTheme2 = _interopRequireDefault(_lightRawTheme);
-
-var _themeManager = require('../styles/theme-manager');
-
-var _themeManager2 = _interopRequireDefault(_themeManager);
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -189,7 +181,7 @@ var Menu = _react2.default.createClass({
     muiTheme: _react2.default.PropTypes.object
   },
 
-  mixins: [_stylePropable2.default, _controllable2.default, _clickAwayable2.default],
+  mixins: [_stylePropable2.default, _clickAwayable2.default],
 
   getDefaultProps: function getDefaultProps() {
     return {
@@ -199,6 +191,7 @@ var Menu = _react2.default.createClass({
       initiallyKeyboardFocused: false,
       maxHeight: null,
       multiple: false,
+      onChange: function onChange() {},
       onEscKeyDown: function onEscKeyDown() {},
       onItemTouchTap: function onItemTouchTap() {},
       onKeyDown: function onKeyDown() {},
@@ -214,7 +207,7 @@ var Menu = _react2.default.createClass({
       focusIndex: selectedIndex >= 0 ? selectedIndex : 0,
       isKeyboardFocused: this.props.initiallyKeyboardFocused,
       keyWidth: this.props.desktop ? 64 : 56,
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : _themeManager2.default.getMuiTheme(_lightRawTheme2.default)
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)()
     };
   },
   getChildContext: function getChildContext() {
@@ -241,24 +234,17 @@ var Menu = _react2.default.createClass({
   componentDidUpdate: function componentDidUpdate() {
     if (this.props.autoWidth) this._setWidth();
   },
-  componentDidEnter: function componentDidEnter() {
-    this._animateOpen();
-  },
-  componentWillLeave: function componentWillLeave(callback) {
-    var _this = this;
-
-    var rootStyle = _reactDom2.default.findDOMNode(this).style;
-    rootStyle.transition = _transitions2.default.easeOut('250ms', ['opacity', 'transform']);
-    rootStyle.transform = 'translate3d(0,-8px,0)';
-    rootStyle.opacity = 0;
-    rootStyle = _autoPrefix2.default.all(rootStyle);
-    setTimeout(function () {
-      if (_this.isMounted()) callback();
-    }, 250);
-  },
   componentClickAway: function componentClickAway(e) {
     if (e.defaultPrevented) return;
     this._setFocusIndex(-1, false);
+  },
+
+  // Do not use outside of this component, it will be removed once valueLink is deprecated
+  getValueLink: function getValueLink(props) {
+    return props.valueLink || {
+      value: props.value,
+      requestChange: props.onChange
+    };
   },
   setKeyboardFocused: function setKeyboardFocused(keyboardFocused) {
     this.setState({
@@ -279,8 +265,8 @@ var Menu = _react2.default.createClass({
     var scrollContainerStyle = _reactDom2.default.findDOMNode(this.refs.scrollContainer).style;
     var menuContainers = _reactDom2.default.findDOMNode(this.refs.list).childNodes;
 
-    _autoPrefix2.default.set(rootStyle, 'transform', 'scaleX(1)');
-    _autoPrefix2.default.set(scrollContainerStyle, 'transform', 'scaleY(1)');
+    _autoPrefix2.default.set(rootStyle, 'transform', 'scaleX(1)', this.state.muiTheme);
+    _autoPrefix2.default.set(scrollContainerStyle, 'transform', 'scaleY(1)', this.state.muiTheme);
     scrollContainerStyle.opacity = 1;
 
     for (var i = 0; i < menuContainers.length; ++i) {
@@ -288,7 +274,7 @@ var Menu = _react2.default.createClass({
     }
   },
   _cloneMenuItem: function _cloneMenuItem(child, childIndex, styles) {
-    var _this2 = this;
+    var _this = this;
 
     var _props = this.props;
     var desktop = _props.desktop;
@@ -313,7 +299,7 @@ var Menu = _react2.default.createClass({
       desktop: desktop,
       focusState: focusState,
       onTouchTap: function onTouchTap(e) {
-        _this2._handleMenuItemTouchTap(e, child);
+        _this._handleMenuItemTouchTap(e, child);
         if (child.props.onTouchTap) child.props.onTouchTap(e);
       },
       ref: isFocused ? 'focusedMenuItem' : null,
@@ -363,7 +349,7 @@ var Menu = _react2.default.createClass({
     return menuItemCount;
   },
   _getSelectedIndex: function _getSelectedIndex(props, filteredChildren) {
-    var _this3 = this;
+    var _this2 = this;
 
     var selectedIndex = -1;
     var menuItemIndex = 0;
@@ -371,7 +357,7 @@ var Menu = _react2.default.createClass({
     filteredChildren.forEach(function (child) {
       var childIsADivider = child.type && child.type.displayName === 'Divider';
 
-      if (_this3._isChildSelected(child, props)) selectedIndex = menuItemIndex;
+      if (_this2._isChildSelected(child, props)) selectedIndex = menuItemIndex;
       if (!childIsADivider) menuItemIndex++;
     });
 
@@ -479,7 +465,7 @@ var Menu = _react2.default.createClass({
     listEl.style.width = newWidth + 'px';
   },
   render: function render() {
-    var _this4 = this;
+    var _this3 = this;
 
     var _props3 = this.props;
     var animated = _props3.animated;
@@ -552,7 +538,7 @@ var Menu = _react2.default.createClass({
       }
     };
 
-    var mergedRootStyles = this.prepareStyles(styles.root, style);
+    var mergedRootStyles = this.mergeStyles(styles.root, style);
     var mergedListStyles = this.mergeStyles(styles.list, listStyle);
 
     var filteredChildren = this._getFilteredChildren(children);
@@ -569,7 +555,7 @@ var Menu = _react2.default.createClass({
       var childrenContainerStyles = {};
 
       if (animated) {
-        var focusIndex = _this4.state.focusIndex;
+        var focusIndex = _this3.state.focusIndex;
         var transitionDelay = 0;
 
         //Only cascade the visible menu items
@@ -578,18 +564,18 @@ var Menu = _react2.default.createClass({
           transitionDelay = cumulativeDelay;
         }
 
-        childrenContainerStyles = _this4.prepareStyles(styles.menuItemContainer, {
+        childrenContainerStyles = _this3.mergeStyles(styles.menuItemContainer, {
           transitionDelay: transitionDelay + 'ms'
         });
       }
 
-      var clonedChild = childIsADivider ? _react2.default.cloneElement(child, { style: styles.divider }) : childIsDisabled ? _react2.default.cloneElement(child, { desktop: desktop }) : _this4._cloneMenuItem(child, menuItemIndex, styles);
+      var clonedChild = childIsADivider ? _react2.default.cloneElement(child, { style: styles.divider }) : childIsDisabled ? _react2.default.cloneElement(child, { desktop: desktop }) : _this3._cloneMenuItem(child, menuItemIndex, styles);
 
       if (!childIsADivider && !childIsDisabled) menuItemIndex++;
 
       return animated ? _react2.default.createElement(
         'div',
-        { style: childrenContainerStyles },
+        { style: _this3.prepareStyles(childrenContainerStyles) },
         clonedChild
       ) : clonedChild;
     });
@@ -598,18 +584,21 @@ var Menu = _react2.default.createClass({
       'div',
       {
         onKeyDown: this._handleKeyDown,
-        style: mergedRootStyles },
+        style: this.prepareStyles(mergedRootStyles)
+      },
       _react2.default.createElement(
         _paper2.default,
         {
           ref: 'scrollContainer',
           style: styles.paper,
-          zDepth: zDepth },
+          zDepth: zDepth
+        },
         _react2.default.createElement(
           _list2.default,
           _extends({}, other, {
             ref: 'list',
-            style: mergedListStyles }),
+            style: mergedListStyles
+          }),
           newChildren
         )
       )

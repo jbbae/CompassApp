@@ -30,13 +30,9 @@ var _checkBox = require('./svg-icons/toggle/check-box');
 
 var _checkBox2 = _interopRequireDefault(_checkBox);
 
-var _lightRawTheme = require('./styles/raw-themes/light-raw-theme');
+var _getMuiTheme = require('./styles/getMuiTheme');
 
-var _lightRawTheme2 = _interopRequireDefault(_lightRawTheme);
-
-var _themeManager = require('./styles/theme-manager');
-
-var _themeManager2 = _interopRequireDefault(_themeManager);
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -46,15 +42,61 @@ var Checkbox = _react2.default.createClass({
   displayName: 'Checkbox',
 
   propTypes: {
+    /**
+     * Checkbox is checked if true.
+     */
     checked: _react2.default.PropTypes.bool,
+
+    /**
+     * The SvgIcon to use for the checked state.
+     * This is useful to create icon toggles.
+     */
     checkedIcon: _react2.default.PropTypes.element,
+
+    /**
+     * The default state of our checkbox component.
+     */
     defaultChecked: _react2.default.PropTypes.bool,
+
+    /**
+     * Disabled if true.
+     */
     disabled: _react2.default.PropTypes.bool,
+
+    /**
+     * Overrides the inline-styles of the icon element.
+     */
     iconStyle: _react2.default.PropTypes.object,
+
+    /**
+     * Where the label will be placed next to the checkbox.
+     */
     labelPosition: _react2.default.PropTypes.oneOf(['left', 'right']),
+
+    /**
+     * Overrides the inline-styles of the Checkbox element label.
+     */
     labelStyle: _react2.default.PropTypes.object,
+
+    /**
+     * Callback function that is fired when the checkbox is checked.
+     */
     onCheck: _react2.default.PropTypes.func,
+
+    /**
+     * Override the inline-styles of the root element.
+     */
+    style: _react2.default.PropTypes.object,
+
+    /**
+     * The SvgIcon to use for the unchecked state.
+     * This is useful to create icon toggles.
+     */
     unCheckedIcon: _react2.default.PropTypes.element,
+
+    /**
+     * ValueLink for when using controlled checkbox.
+     */
     valueLink: _react2.default.PropTypes.object
   },
 
@@ -69,10 +111,17 @@ var Checkbox = _react2.default.createClass({
 
   mixins: [_stylePropable2.default],
 
+  getDefaultProps: function getDefaultProps() {
+    return {
+      defaultChecked: false,
+      labelPosition: 'right',
+      disabled: false
+    };
+  },
   getInitialState: function getInitialState() {
     return {
       switched: this.props.checked || this.props.defaultChecked || this.props.valueLink && this.props.valueLink.value || false,
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : _themeManager2.default.getMuiTheme(_lightRawTheme2.default)
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)()
     };
   },
   getChildContext: function getChildContext() {
@@ -196,7 +245,7 @@ var Checkbox = _react2.default.createClass({
       labelStyle: labelStyle,
       onParentShouldUpdate: this._handleStateChange,
       defaultSwitched: this.props.defaultChecked,
-      labelPosition: this.props.labelPosition ? this.props.labelPosition : 'right'
+      labelPosition: this.props.labelPosition
     };
 
     return _react2.default.createElement(_enhancedSwitch2.default, _extends({}, other, enhancedSwitchProps));

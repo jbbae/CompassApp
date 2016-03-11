@@ -1,15 +1,13 @@
 {
-  "name": "parsereact-todo",
+  "name": "sageview",
   "main": "js/app.js",
   "dependencies": {
     "firebase": "^2.4.1",
-    "history": "^1.16.0",
-    "material-ui": "^0.14.2",
-    "parse": "^1.6.0",
-    "parse-react": "^0.5.0",
-    "react": "^0.14.6",
-    "react-dom": "^0.14.6",
-    "react-router": "^1.0.3",
+    "material-ui": "^0.14.4",
+    "re-base": "^1.5.1",
+    "react": "^0.14.7",
+    "react-dom": "^0.14.7",
+    "react-router": "^2.0.1",
     "react-tap-event-plugin": "^0.2.1"
   },
   "devDependencies": {

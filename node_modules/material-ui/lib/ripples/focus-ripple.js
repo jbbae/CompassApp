@@ -46,6 +46,12 @@ var FocusRipple = _react2.default.createClass({
   propTypes: {
     color: _react2.default.PropTypes.string,
     innerStyle: _react2.default.PropTypes.object,
+
+    /**
+     * The material-ui theme applied to this component.
+     */
+    muiTheme: _react2.default.PropTypes.object.isRequired,
+
     opacity: _react2.default.PropTypes.number,
     show: _react2.default.PropTypes.bool,
 
@@ -81,7 +87,7 @@ var FocusRipple = _react2.default.createClass({
     var innerStyle = props.innerStyle;
     var opacity = props.opacity;
 
-    var innerStyles = this.mergeAndPrefix({
+    var innerStyles = this.mergeStyles({
       position: 'absolute',
       height: '100%',
       width: '100%',
@@ -91,7 +97,7 @@ var FocusRipple = _react2.default.createClass({
       transition: _transitions2.default.easeOut(pulsateDuration + 'ms', 'transform', null, _transitions2.default.easeInOutFunction)
     }, innerStyle);
 
-    return _react2.default.createElement('div', { ref: 'innerCircle', style: innerStyles });
+    return _react2.default.createElement('div', { ref: 'innerCircle', style: this.prepareStyles(innerStyles) });
   },
   _pulsate: function _pulsate() {
     if (!this.isMounted()) return;
@@ -107,7 +113,7 @@ var FocusRipple = _react2.default.createClass({
     currentScale = currentScale || startScale;
     nextScale = currentScale === startScale ? endScale : startScale;
 
-    _autoPrefix2.default.set(innerCircle.style, 'transform', nextScale);
+    _autoPrefix2.default.set(innerCircle.style, 'transform', nextScale, this.props.muiTheme);
     this._timeout = setTimeout(this._pulsate, pulsateDuration);
   },
   _setRippleSize: function _setRippleSize() {
@@ -143,7 +149,8 @@ var FocusRipple = _react2.default.createClass({
       _scaleIn2.default,
       {
         maxScale: 0.85,
-        style: mergedRootStyles },
+        style: mergedRootStyles
+      },
       ripple
     );
   }

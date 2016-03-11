@@ -42,13 +42,9 @@ var _flatButton = require('../flat-button');
 
 var _flatButton2 = _interopRequireDefault(_flatButton);
 
-var _lightRawTheme = require('../styles/raw-themes/light-raw-theme');
+var _getMuiTheme = require('../styles/getMuiTheme');
 
-var _lightRawTheme2 = _interopRequireDefault(_lightRawTheme);
-
-var _themeManager = require('../styles/theme-manager');
-
-var _themeManager2 = _interopRequireDefault(_themeManager);
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 
 var _dateTime = require('../utils/date-time');
 
@@ -66,6 +62,7 @@ var DatePickerDialog = _react2.default.createClass({
     autoOk: _react2.default.PropTypes.bool,
     container: _react2.default.PropTypes.oneOf(['dialog', 'inline']),
     disableYearSelection: _react2.default.PropTypes.bool,
+    firstDayOfWeek: _react2.default.PropTypes.number,
     initialDate: _react2.default.PropTypes.object,
     locale: _react2.default.PropTypes.string,
     maxDate: _react2.default.PropTypes.object,
@@ -120,7 +117,7 @@ var DatePickerDialog = _react2.default.createClass({
   getInitialState: function getInitialState() {
     return {
       open: false,
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : _themeManager2.default.getMuiTheme(_lightRawTheme2.default)
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)()
     };
   },
   getChildContext: function getChildContext() {
@@ -185,8 +182,9 @@ var DatePickerDialog = _react2.default.createClass({
     var onAccept = _props.onAccept;
     var style = _props.style;
     var container = _props.container;
+    var firstDayOfWeek = _props.firstDayOfWeek;
 
-    var other = _objectWithoutProperties(_props, ['DateTimeFormat', 'locale', 'wordings', 'initialDate', 'onAccept', 'style', 'container']);
+    var other = _objectWithoutProperties(_props, ['DateTimeFormat', 'locale', 'wordings', 'initialDate', 'onAccept', 'style', 'container', 'firstDayOfWeek']);
 
     var _constructor$getRelev = this.constructor.getRelevantContextKeys(this.state.muiTheme);
 
@@ -216,7 +214,8 @@ var DatePickerDialog = _react2.default.createClass({
       label: wordings.cancel,
       secondary: true,
       style: styles.actions,
-      onTouchTap: this._handleCancelTouchTap })];
+      onTouchTap: this._handleCancelTouchTap
+    })];
 
     if (!this.props.autoOk) {
       actions.push(_react2.default.createElement(_flatButton2.default, {
@@ -225,7 +224,8 @@ var DatePickerDialog = _react2.default.createClass({
         secondary: true,
         disabled: this.refs.calendar !== undefined && this.refs.calendar.isSelectedDateDisabled(),
         style: styles.actions,
-        onTouchTap: this._handleOKTouchTap }));
+        onTouchTap: this._handleOKTouchTap
+      }));
     }
 
     // will change later when Popover is available.
@@ -240,9 +240,11 @@ var DatePickerDialog = _react2.default.createClass({
         actions: actions,
         repositionOnUpdate: false,
         open: this.state.open,
-        onRequestClose: this.dismiss }),
+        onRequestClose: this.dismiss
+      }),
       _react2.default.createElement(_calendar2.default, {
         DateTimeFormat: DateTimeFormat,
+        firstDayOfWeek: firstDayOfWeek,
         locale: locale,
         ref: 'calendar',
         onDayTouchTap: this._onDayTouchTap,
@@ -252,7 +254,8 @@ var DatePickerDialog = _react2.default.createClass({
         maxDate: this.props.maxDate,
         shouldDisableDate: this.props.shouldDisableDate,
         disableYearSelection: this.props.disableYearSelection,
-        mode: this.props.mode })
+        mode: this.props.mode
+      })
     );
   }
 });

@@ -17,6 +17,10 @@ var _colorManipulator = require('../utils/color-manipulator');
 
 var _colorManipulator2 = _interopRequireDefault(_colorManipulator);
 
+var _autoPrefix = require('./auto-prefix');
+
+var _autoPrefix2 = _interopRequireDefault(_autoPrefix);
+
 var _lightBaseTheme = require('./baseThemes/lightBaseTheme');
 
 var _lightBaseTheme2 = _interopRequireDefault(_lightBaseTheme);
@@ -25,7 +29,15 @@ var _zIndex = require('./zIndex');
 
 var _zIndex2 = _interopRequireDefault(_zIndex);
 
+var _transformers = require('./transformers');
+
+var _lodash3 = require('lodash.flowright');
+
+var _lodash4 = _interopRequireDefault(_lodash3);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 /**
  * Get the MUI theme corresponding to a base theme.
@@ -39,8 +51,9 @@ function getMuiTheme(baseTheme, muiTheme) {
   var palette = _baseTheme.palette;
   var spacing = _baseTheme.spacing;
 
-  return (0, _lodash2.default)({
+  muiTheme = (0, _lodash2.default)({
     isRtl: false,
+    userAgent: undefined,
     zIndex: _zIndex2.default,
     baseTheme: baseTheme,
     rawTheme: baseTheme, // To provide backward compatibility.
@@ -133,7 +146,10 @@ function getMuiTheme(baseTheme, muiTheme) {
       textColor: palette.primary1Color
     },
     paper: {
-      backgroundColor: palette.canvasColor
+      backgroundColor: palette.canvasColor,
+      zDepthShadows: [[1, 6, 0.12, 1, 4, 0.12], [3, 10, 0.16, 3, 10, 0.23], [10, 30, 0.19, 6, 10, 0.23], [14, 45, 0.25, 10, 18, 0.22], [19, 60, 0.30, 15, 20, 0.22]].map(function (d) {
+        return '0 ' + d[0] + 'px ' + d[1] + 'px ' + _colorManipulator2.default.fade(palette.shadowColor, d[2]) + ',\n         0 ' + d[3] + 'px ' + d[4] + 'px ' + _colorManipulator2.default.fade(palette.shadowColor, d[5]);
+      })
     },
     radioButton: {
       borderColor: palette.textColor,
@@ -235,7 +251,7 @@ function getMuiTheme(baseTheme, muiTheme) {
     },
     tabs: {
       backgroundColor: palette.primary1Color,
-      textColor: _colorManipulator2.default.fade(palette.alternateTextColor, 0.6),
+      textColor: _colorManipulator2.default.fade(palette.alternateTextColor, 0.7),
       selectedTextColor: palette.alternateTextColor
     },
     textField: {
@@ -249,5 +265,15 @@ function getMuiTheme(baseTheme, muiTheme) {
       borderColor: palette.borderColor
     }
   }, muiTheme);
+
+  var transformers = [_transformers.autoprefixer, _transformers.rtl, _transformers.callOnce].map(function (t) {
+    return t(muiTheme);
+  }).filter(function (t) {
+    return t;
+  });
+  muiTheme.prefix = _autoPrefix2.default.getTransform(muiTheme.userAgent);
+  muiTheme.prepareStyles = _lodash4.default.apply(undefined, _toConsumableArray(transformers));
+
+  return muiTheme;
 }
 module.exports = exports['default'];

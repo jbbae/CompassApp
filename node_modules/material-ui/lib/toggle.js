@@ -26,13 +26,9 @@ var _enhancedSwitch = require('./enhanced-switch');
 
 var _enhancedSwitch2 = _interopRequireDefault(_enhancedSwitch);
 
-var _lightRawTheme = require('./styles/raw-themes/light-raw-theme');
+var _getMuiTheme = require('./styles/getMuiTheme');
 
-var _lightRawTheme2 = _interopRequireDefault(_lightRawTheme);
-
-var _themeManager = require('./styles/theme-manager');
-
-var _themeManager2 = _interopRequireDefault(_themeManager);
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -42,17 +38,69 @@ var Toggle = _react2.default.createClass({
   displayName: 'Toggle',
 
   propTypes: {
+    /**
+     * Determines whether the Toggle is initially turned on.
+     */
     defaultToggled: _react2.default.PropTypes.bool,
+
+    /**
+     * Will disable the toggle if true.
+     */
     disabled: _react2.default.PropTypes.bool,
+
+    /**
+     * Overrides the inline-styles of the Toggle element.
+     */
     elementStyle: _react2.default.PropTypes.object,
+
+    /**
+     * Overrides the inline-styles of the Icon element.
+     */
     iconStyle: _react2.default.PropTypes.object,
+
+    /**
+     * Where the label will be placed next to the toggle.
+     */
     labelPosition: _react2.default.PropTypes.oneOf(['left', 'right']),
+
+    /**
+     * Overrides the inline-styles of the Toggle element label.
+     */
     labelStyle: _react2.default.PropTypes.object,
+
+    /**
+     * Callback function that is fired when the toggle switch is toggled.
+     */
     onToggle: _react2.default.PropTypes.func,
+
+    /**
+     * Override style of ripple.
+     */
     rippleStyle: _react2.default.PropTypes.object,
+
+    /**
+     * Override the inline-styles of the root element.
+     */
+    style: _react2.default.PropTypes.object,
+
+    /**
+     * Override style for thumb.
+     */
     thumbStyle: _react2.default.PropTypes.object,
+
+    /**
+     * Toggled if set to true.
+     */
     toggled: _react2.default.PropTypes.bool,
+
+    /**
+     * Override style for track.
+     */
     trackStyle: _react2.default.PropTypes.object,
+
+    /**
+     * ValueLink prop for when using controlled toggle.
+     */
     valueLink: _react2.default.PropTypes.object
   },
 
@@ -67,10 +115,17 @@ var Toggle = _react2.default.createClass({
 
   mixins: [_stylePropable2.default],
 
+  getDefaultProps: function getDefaultProps() {
+    return {
+      defaultToggled: false,
+      disabled: false,
+      labelPosition: 'left'
+    };
+  },
   getInitialState: function getInitialState() {
     return {
       switched: this.props.toggled || this.props.defaultToggled || this.props.valueLink && this.props.valueLink.value || false,
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : _themeManager2.default.getMuiTheme(_lightRawTheme2.default)
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)()
     };
   },
   getChildContext: function getChildContext() {
@@ -200,7 +255,7 @@ var Toggle = _react2.default.createClass({
       onSwitch: this._handleToggle,
       onParentShouldUpdate: this._handleStateChange,
       defaultSwitched: this.props.defaultToggled,
-      labelPosition: this.props.labelPosition ? this.props.labelPosition : 'left'
+      labelPosition: this.props.labelPosition
     };
 
     if (this.props.hasOwnProperty('toggled')) enhancedSwitchProps.checked = this.props.toggled;

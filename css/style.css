@@ -19,6 +19,15 @@ body {
   cursor: pointer;
   margin: 5px auto 3px auto;
 }
+.profileLoading {
+  margin: 12% auto 18% auto;
+  width: 60px;
+}
+#explorerLoading {
+  margin: 50% auto 40% auto;
+  width: 50%;
+  text-align: center;
+}
 #navProfileName {
   font-size: 15px;
   margin: 3px;
@@ -58,7 +67,7 @@ body {
 }
 .requiredListBlock {
   display: inline-block;
-  width: 50%
+  width: 33%;
 }
 #undeclareButton {
   margin-left: auto;
@@ -83,13 +92,14 @@ body {
 }
 .careerPlan {
   display: inline-block;
-  margin: 15px;
-  margin-bottom: 30px;
-  padding: 24px;
+  margin: 10px;
+  margin-bottom: 20px;
+  padding: 20px;
   cursor: pointer;
 }
 .nameAndIcon {
-  width: 20%;
+  width: 19%;
+  margin-left: 3%;
   display: inline-block;
   text-align: center;
   margin-top: 0px;
@@ -106,10 +116,11 @@ body {
   display: inline-block;
   width: 60%;
   text-align: center;
-  margin-top: 60px;
+  margin-top: 80px;
+  vertical-align: top;
 }
 #planHeading {
-  margin-bottom: 0px;
+  margin-bottom: 8px;
 }
 #planWrapper {
   display: inline-block;
@@ -120,7 +131,7 @@ body {
   width: auto;
 }
 .profileDetails {
-  width: 80%;
+  width: 78%;
   display: inline-block;
 }
 .detailsBlock {
@@ -167,10 +178,11 @@ body {
 }
 .checkboxWrap {
   display: inline-block;
-  margin: 5px;
+  margin: 0 5px 0 5px;
+  padding: 0 5px 0 5px;
 }
 .Header {
-  margin-bottom: 40px;
+  margin-bottom: 20px;
   text-align: center;
 }
 .backButton {
@@ -187,10 +199,16 @@ body {
   margin-bottom: 10px;
   justify-content: space-between;
 }
+.profHeaderDetails {
+  position: relative;
+  width: 100%;
+}
 .headerDetails {
   position: relative;
+  text-align: left;
   margin-left: 50px;
   padding: 20px;
+  width: 600px;
 }
 .descPTitle {
   font-size: 30px;
@@ -198,16 +216,16 @@ body {
   line-height: 32px;
   font-weight: normal;
   font-family: 'Roboto', sans-serif;
-  margin: 0px 0px 15px 15px;
+  margin: 0px 0px 15px 10px;
 }
 .descPSubtitle {
-  margin: 3px 0px 3px 25px;
+  margin: 3px 0px 3px 10px;
 }
 .bulletAligner {
-  margin-left: 5%
+  margin-left: 5%;
 }
 .popupH3 {
-  font-size: 16px;
+  font-size: 22px;
   color: #000000;
   line-height: 32px;
   font-weight: normal;
@@ -215,7 +233,7 @@ body {
   margin: 0px 0px 15px 15px;
 }
 .popupP {
-  font-size: 13px;
+  font-size: 16px;
   color: #000000;
   line-height: 32px;
   font-weight: normal;
@@ -229,9 +247,20 @@ body {
   display: inline-block;
   margin: 6px;
 }
+#descriptionScrollable {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+#ExplorerDescription {
+  overflow-y: auto;
+  width: 100%;
+  padding-right: 17px;
+  max-height: 676px;
+}
 #explorerScrollablePart {
   overflow-y: auto;
-  max-height: 530px;
+  max-height: 534px;
 }
 #profilePic {
   display: none;

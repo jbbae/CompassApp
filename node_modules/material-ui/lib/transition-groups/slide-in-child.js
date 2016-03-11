@@ -26,13 +26,9 @@ var _transitions = require('../styles/transitions');
 
 var _transitions2 = _interopRequireDefault(_transitions);
 
-var _lightRawTheme = require('../styles/raw-themes/light-raw-theme');
+var _getMuiTheme = require('../styles/getMuiTheme');
 
-var _lightRawTheme2 = _interopRequireDefault(_lightRawTheme);
-
-var _themeManager = require('../styles/theme-manager');
-
-var _themeManager2 = _interopRequireDefault(_themeManager);
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -74,7 +70,7 @@ var SlideInChild = _react2.default.createClass({
 
   getInitialState: function getInitialState() {
     return {
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : _themeManager2.default.getMuiTheme(_lightRawTheme2.default)
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)()
     };
   },
   getChildContext: function getChildContext() {
@@ -97,7 +93,7 @@ var SlideInChild = _react2.default.createClass({
     var y = this.props.direction === 'up' ? '100%' : this.props.direction === 'down' ? '-100%' : '0';
 
     style.opacity = '0';
-    _autoPrefix2.default.set(style, 'transform', 'translate3d(' + x + ',' + y + ',0)');
+    _autoPrefix2.default.set(style, 'transform', 'translate3d(' + x + ',' + y + ',0)', this.state.muiTheme);
 
     setTimeout(function () {
       if (_this.isMounted()) callback();
@@ -106,7 +102,7 @@ var SlideInChild = _react2.default.createClass({
   componentDidEnter: function componentDidEnter() {
     var style = _reactDom2.default.findDOMNode(this).style;
     style.opacity = '1';
-    _autoPrefix2.default.set(style, 'transform', 'translate3d(0,0,0)');
+    _autoPrefix2.default.set(style, 'transform', 'translate3d(0,0,0)', this.state.muiTheme);
   },
   componentWillLeave: function componentWillLeave(callback) {
     var _this2 = this;
@@ -117,7 +113,7 @@ var SlideInChild = _react2.default.createClass({
     var y = direction === 'up' ? '-100%' : direction === 'down' ? '100%' : '0';
 
     style.opacity = '0';
-    _autoPrefix2.default.set(style, 'transform', 'translate3d(' + x + ',' + y + ',0)');
+    _autoPrefix2.default.set(style, 'transform', 'translate3d(' + x + ',' + y + ',0)', this.state.muiTheme);
 
     setTimeout(function () {
       if (_this2.isMounted()) callback();
@@ -132,7 +128,7 @@ var SlideInChild = _react2.default.createClass({
 
     var other = _objectWithoutProperties(_props, ['children', 'enterDelay', 'getLeaveDirection', 'style']);
 
-    var mergedRootStyles = this.prepareStyles({
+    var mergedRootStyles = this.mergeStyles({
       position: 'absolute',
       height: '100%',
       width: '100%',
@@ -143,7 +139,7 @@ var SlideInChild = _react2.default.createClass({
 
     return _react2.default.createElement(
       'div',
-      _extends({}, other, { style: mergedRootStyles }),
+      _extends({}, other, { style: this.prepareStyles(mergedRootStyles) }),
       children
     );
   }

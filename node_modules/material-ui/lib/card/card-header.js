@@ -22,13 +22,9 @@ var _stylePropable = require('../mixins/style-propable');
 
 var _stylePropable2 = _interopRequireDefault(_stylePropable);
 
-var _themeManager = require('../styles/theme-manager');
+var _getMuiTheme = require('../styles/getMuiTheme');
 
-var _themeManager2 = _interopRequireDefault(_themeManager);
-
-var _lightRawTheme = require('../styles/raw-themes/light-raw-theme');
-
-var _lightRawTheme2 = _interopRequireDefault(_lightRawTheme);
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -75,7 +71,7 @@ var CardHeader = _react2.default.createClass({
   },
   getInitialState: function getInitialState() {
     return {
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : _themeManager2.default.getMuiTheme(_lightRawTheme2.default)
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)()
     };
   },
   getChildContext: function getChildContext() {
@@ -120,10 +116,10 @@ var CardHeader = _react2.default.createClass({
   },
   render: function render() {
     var styles = this.getStyles();
-    var rootStyle = this.prepareStyles(styles.root, this.props.style);
-    var textStyle = this.prepareStyles(styles.text, this.props.textStyle);
-    var titleStyle = this.prepareStyles(styles.title, this.props.titleStyle);
-    var subtitleStyle = this.prepareStyles(styles.subtitle, this.props.subtitleStyle);
+    var rootStyle = this.mergeStyles(styles.root, this.props.style);
+    var textStyle = this.mergeStyles(styles.text, this.props.textStyle);
+    var titleStyle = this.mergeStyles(styles.title, this.props.titleStyle);
+    var subtitleStyle = this.mergeStyles(styles.subtitle, this.props.subtitleStyle);
 
     var avatar = this.props.avatar;
     if (_react2.default.isValidElement(this.props.avatar)) {
@@ -135,19 +131,19 @@ var CardHeader = _react2.default.createClass({
 
     return _react2.default.createElement(
       'div',
-      _extends({}, this.props, { style: rootStyle }),
+      _extends({}, this.props, { style: this.prepareStyles(rootStyle) }),
       avatar,
       _react2.default.createElement(
         'div',
-        { style: textStyle },
+        { style: this.prepareStyles(textStyle) },
         _react2.default.createElement(
           'span',
-          { style: titleStyle },
+          { style: this.prepareStyles(titleStyle) },
           this.props.title
         ),
         _react2.default.createElement(
           'span',
-          { style: subtitleStyle },
+          { style: this.prepareStyles(subtitleStyle) },
           this.props.subtitle
         )
       ),

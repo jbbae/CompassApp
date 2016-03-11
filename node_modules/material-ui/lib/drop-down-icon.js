@@ -30,13 +30,13 @@ var _menu = require('./menu/menu');
 
 var _menu2 = _interopRequireDefault(_menu);
 
-var _lightRawTheme = require('./styles/raw-themes/light-raw-theme');
+var _getMuiTheme = require('./styles/getMuiTheme');
 
-var _lightRawTheme2 = _interopRequireDefault(_lightRawTheme);
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 
-var _themeManager = require('./styles/theme-manager');
+var _warning = require('warning');
 
-var _themeManager2 = _interopRequireDefault(_themeManager);
+var _warning2 = _interopRequireDefault(_warning);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -77,21 +77,17 @@ var DropDownIcon = _react2.default.createClass({
     };
   },
   getInitialState: function getInitialState() {
+    process.env.NODE_ENV !== "production" ? (0, _warning2.default)(false, 'DropDownIcon has been deprecated and will be removed in an upcoming verion.' + ' Please use IconMenu instead.') : undefined;
+
     return {
       open: false,
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : _themeManager2.default.getMuiTheme(_lightRawTheme2.default)
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)()
     };
   },
   getChildContext: function getChildContext() {
     return {
       muiTheme: this.state.muiTheme
     };
-  },
-  componentDidMount: function componentDidMount() {
-    // This component can be deprecated once ./menu/menu has been deprecated.
-    // if (process.env.NODE_ENV !== 'production') {
-    //   console.warn('DropDownIcon has been deprecated. Use IconMenu instead.');
-    // }
   },
 
   //to update theme inside state whenever a new theme is passed down

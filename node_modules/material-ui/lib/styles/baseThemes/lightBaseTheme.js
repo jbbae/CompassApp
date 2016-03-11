@@ -40,7 +40,8 @@ exports.default = {
     borderColor: _colors2.default.grey300,
     disabledColor: _colorManipulator2.default.fade(_colors2.default.darkBlack, 0.3),
     pickerHeaderColor: _colors2.default.cyan500,
-    clockCircleColor: _colorManipulator2.default.fade(_colors2.default.darkBlack, 0.07)
+    clockCircleColor: _colorManipulator2.default.fade(_colors2.default.darkBlack, 0.07),
+    shadowColor: _colors2.default.fullBlack
   }
 };
 module.exports = exports['default'];

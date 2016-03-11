@@ -27,7 +27,7 @@ var AvWebAsset = _react2.default.createClass({
     return _react2.default.createElement(
       _svgIcon2.default,
       this.props,
-      _react2.default.createElement('path', { fill: '#010101', d: 'M19 4H5c-1.11 0-2 .9-2 2v12c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.89-2-2-2zm0 14H5V8h14v10z' })
+      _react2.default.createElement('path', { d: 'M19 4H5c-1.11 0-2 .9-2 2v12c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.89-2-2-2zm0 14H5V8h14v10z' })
     );
   }
 });

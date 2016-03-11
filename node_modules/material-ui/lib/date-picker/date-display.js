@@ -22,13 +22,9 @@ var _slideIn = require('../transition-groups/slide-in');
 
 var _slideIn2 = _interopRequireDefault(_slideIn);
 
-var _lightRawTheme = require('../styles/raw-themes/light-raw-theme');
+var _getMuiTheme = require('../styles/getMuiTheme');
 
-var _lightRawTheme2 = _interopRequireDefault(_lightRawTheme);
-
-var _themeManager = require('../styles/theme-manager');
-
-var _themeManager2 = _interopRequireDefault(_themeManager);
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -76,7 +72,7 @@ var DateDisplay = _react2.default.createClass({
     return {
       selectedYear: !this.props.monthDaySelected,
       transitionDirection: 'up',
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : _themeManager2.default.getMuiTheme(_lightRawTheme2.default)
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)()
     };
   },
   getChildContext: function getChildContext() {
@@ -196,7 +192,8 @@ var DateDisplay = _react2.default.createClass({
         _slideIn2.default,
         {
           style: styles.year.root,
-          direction: this.state.transitionDirection },
+          direction: this.state.transitionDirection
+        },
         _react2.default.createElement(
           'div',
           { key: year, style: styles.year.title, onTouchTap: this._handleYearClick },
@@ -207,13 +204,15 @@ var DateDisplay = _react2.default.createClass({
         _slideIn2.default,
         {
           style: styles.monthDay.root,
-          direction: this.state.transitionDirection },
+          direction: this.state.transitionDirection
+        },
         _react2.default.createElement(
           'div',
           {
             key: dateTimeFormatted,
             style: styles.monthDay.title,
-            onTouchTap: this._handleMonthDayClick },
+            onTouchTap: this._handleMonthDayClick
+          },
           dateTimeFormatted
         )
       )

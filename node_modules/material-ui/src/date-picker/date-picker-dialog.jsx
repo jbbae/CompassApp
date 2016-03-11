@@ -7,8 +7,7 @@ import Calendar from './calendar';
 import Dialog from '../dialog';
 import DatePickerInline from './date-picker-inline';
 import FlatButton from '../flat-button';
-import DefaultRawTheme from '../styles/raw-themes/light-raw-theme';
-import ThemeManager from '../styles/theme-manager';
+import getMuiTheme from '../styles/getMuiTheme';
 import DateTime from '../utils/date-time';
 
 const DatePickerDialog = React.createClass({
@@ -18,6 +17,7 @@ const DatePickerDialog = React.createClass({
     autoOk: React.PropTypes.bool,
     container: React.PropTypes.oneOf(['dialog', 'inline']),
     disableYearSelection: React.PropTypes.bool,
+    firstDayOfWeek: React.PropTypes.number,
     initialDate: React.PropTypes.object,
     locale: React.PropTypes.string,
     maxDate: React.PropTypes.object,
@@ -79,7 +79,7 @@ const DatePickerDialog = React.createClass({
   getInitialState() {
     return {
       open: false,
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : ThemeManager.getMuiTheme(DefaultRawTheme),
+      muiTheme: this.context.muiTheme || getMuiTheme(),
     };
   },
 
@@ -151,6 +151,7 @@ const DatePickerDialog = React.createClass({
       onAccept,
       style,
       container,
+      firstDayOfWeek,
       ...other,
     } = this.props;
 
@@ -183,7 +184,8 @@ const DatePickerDialog = React.createClass({
         label={wordings.cancel}
         secondary={true}
         style={styles.actions}
-        onTouchTap={this._handleCancelTouchTap} />,
+        onTouchTap={this._handleCancelTouchTap}
+      />,
     ];
 
     if (!this.props.autoOk) {
@@ -194,7 +196,8 @@ const DatePickerDialog = React.createClass({
           secondary={true}
           disabled={this.refs.calendar !== undefined && this.refs.calendar.isSelectedDateDisabled()}
           style={styles.actions}
-          onTouchTap={this._handleOKTouchTap} />
+          onTouchTap={this._handleOKTouchTap}
+        />
       );
     }
 
@@ -210,9 +213,11 @@ const DatePickerDialog = React.createClass({
         actions={actions}
         repositionOnUpdate={false}
         open={this.state.open}
-        onRequestClose={this.dismiss}>
+        onRequestClose={this.dismiss}
+      >
         <Calendar
           DateTimeFormat={DateTimeFormat}
+          firstDayOfWeek={firstDayOfWeek}
           locale={locale}
           ref="calendar"
           onDayTouchTap={this._onDayTouchTap}
@@ -222,7 +227,8 @@ const DatePickerDialog = React.createClass({
           maxDate={this.props.maxDate}
           shouldDisableDate={this.props.shouldDisableDate}
           disableYearSelection={this.props.disableYearSelection}
-          mode={this.props.mode} />
+          mode={this.props.mode}
+        />
       </Container>
     );
   },

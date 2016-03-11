@@ -4,8 +4,8 @@ import Transitions from './styles/transitions';
 import ClickAwayable from './mixins/click-awayable';
 import FontIcon from './font-icon';
 import Menu from './menu/menu';
-import DefaultRawTheme from './styles/raw-themes/light-raw-theme';
-import ThemeManager from './styles/theme-manager';
+import getMuiTheme from './styles/getMuiTheme';
+import warning from 'warning';
 
 const DropDownIcon = React.createClass({
 
@@ -42,9 +42,12 @@ const DropDownIcon = React.createClass({
   },
 
   getInitialState() {
+    warning(false, 'DropDownIcon has been deprecated and will be removed in an upcoming verion.' +
+      ' Please use IconMenu instead.');
+
     return {
       open: false,
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : ThemeManager.getMuiTheme(DefaultRawTheme),
+      muiTheme: this.context.muiTheme || getMuiTheme(),
     };
   },
 
@@ -52,13 +55,6 @@ const DropDownIcon = React.createClass({
     return {
       muiTheme: this.state.muiTheme,
     };
-  },
-
-  componentDidMount() {
-    // This component can be deprecated once ./menu/menu has been deprecated.
-    // if (process.env.NODE_ENV !== 'production') {
-    //   console.warn('DropDownIcon has been deprecated. Use IconMenu instead.');
-    // }
   },
 
   //to update theme inside state whenever a new theme is passed down

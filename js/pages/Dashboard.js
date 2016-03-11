@@ -77,18 +77,6 @@ export default class Dashboard extends Component {
         marginBottom: -6
       }
     };
-  //    if (this.isDeviceSize(StyleResizable.statics.Sizes.MEDIUM) ||
-  //        this.isDeviceSize(StyleResizable.statics.Sizes.LARGE)) {
-  //      styles.paperRoot = this.mergeAndPrefix(
-  //        styles.paperRoot,
-  //        styles.paperRootWhenMedium
-  //      );
-  //    }
-
-//  if (this.isDeviceSize(StyleResizable.statics.Sizes.MEDIUM) ||
-//      this.isDeviceSize(StyleResizable.statics.Sizes.LARGE)) {
-//    styles.root = this.mergeStyles(styles.root, styles.rootWhenMedium);
-//  }
 
     return styles;
   }

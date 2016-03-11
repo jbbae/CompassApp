@@ -58,13 +58,9 @@ var _nestedList = require('./nested-list');
 
 var _nestedList2 = _interopRequireDefault(_nestedList);
 
-var _lightRawTheme = require('../styles/raw-themes/light-raw-theme');
+var _getMuiTheme = require('../styles/getMuiTheme');
 
-var _lightRawTheme2 = _interopRequireDefault(_lightRawTheme);
-
-var _themeManager = require('../styles/theme-manager');
-
-var _themeManager2 = _interopRequireDefault(_themeManager);
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -142,6 +138,11 @@ var ListItem = _react2.default.createClass({
      * This property is automatically managed so modify at your own risk.
      */
     nestedLevel: _react2.default.PropTypes.number,
+
+    /**
+     * Override the inline-styles of the nestedItems NestedList.
+     */
+    nestedListStyle: _react2.default.PropTypes.object,
 
     /**
      * Called when the ListItem has keyboard focus.
@@ -264,7 +265,7 @@ var ListItem = _react2.default.createClass({
       rightIconButtonHovered: false,
       rightIconButtonKeyboardFocused: false,
       touch: false,
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : _themeManager2.default.getMuiTheme(_lightRawTheme2.default)
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)()
     };
   },
   getChildContext: function getChildContext() {
@@ -298,31 +299,43 @@ var ListItem = _react2.default.createClass({
       }
     }
   },
-  _createDisabledElement: function _createDisabledElement(styles, contentChildren) {
+  _createDisabledElement: function _createDisabledElement(styles, contentChildren, additionalProps) {
     var _props = this.props;
     var innerDivStyle = _props.innerDivStyle;
     var style = _props.style;
 
-    var mergedDivStyles = this.prepareStyles(styles.root, styles.innerDiv, innerDivStyle, style);
+    var mergedDivStyles = this.mergeStyles(styles.root, styles.innerDiv, innerDivStyle, style);
 
-    return _react2.default.createElement('div', { style: mergedDivStyles }, contentChildren);
+    return _react2.default.createElement(
+      'div',
+      _extends({}, additionalProps, {
+        style: this.prepareStyles(mergedDivStyles)
+      }),
+      contentChildren
+    );
   },
-  _createLabelElement: function _createLabelElement(styles, contentChildren) {
+  _createLabelElement: function _createLabelElement(styles, contentChildren, additionalProps) {
     var _props2 = this.props;
     var innerDivStyle = _props2.innerDivStyle;
     var style = _props2.style;
 
-    var mergedLabelStyles = this.prepareStyles(styles.root, styles.innerDiv, innerDivStyle, styles.label, style);
+    var mergedLabelStyles = this.mergeStyles(styles.root, styles.innerDiv, innerDivStyle, styles.label, style);
 
-    return _react2.default.createElement('label', { style: mergedLabelStyles }, contentChildren);
+    return _react2.default.createElement(
+      'label',
+      _extends({}, additionalProps, {
+        style: this.prepareStyles(mergedLabelStyles)
+      }),
+      contentChildren
+    );
   },
   _createTextElement: function _createTextElement(styles, data, key) {
     var isAnElement = _react2.default.isValidElement(data);
-    var mergedStyles = isAnElement ? this.prepareStyles(styles, data.props.style) : null;
+    var mergedStyles = isAnElement ? this.mergeStyles(styles, data.props.style) : null;
 
     return isAnElement ? _react2.default.cloneElement(data, {
       key: key,
-      style: mergedStyles
+      style: this.prepareStyles(mergedStyles)
     }) : _react2.default.createElement(
       'div',
       { key: key, style: this.prepareStyles(styles) },
@@ -409,6 +422,7 @@ var ListItem = _react2.default.createClass({
     var leftIcon = _props3.leftIcon;
     var nestedItems = _props3.nestedItems;
     var nestedLevel = _props3.nestedLevel;
+    var nestedListStyle = _props3.nestedListStyle;
     var onKeyboardFocus = _props3.onKeyboardFocus;
     var onMouseLeave = _props3.onMouseLeave;
     var onMouseEnter = _props3.onMouseEnter;
@@ -424,7 +438,7 @@ var ListItem = _react2.default.createClass({
     var secondaryTextLines = _props3.secondaryTextLines;
     var style = _props3.style;
 
-    var other = _objectWithoutProperties(_props3, ['autoGenerateNestedIndicator', 'children', 'disabled', 'disableKeyboardFocus', 'innerDivStyle', 'insetChildren', 'leftAvatar', 'leftCheckbox', 'leftIcon', 'nestedItems', 'nestedLevel', 'onKeyboardFocus', 'onMouseLeave', 'onMouseEnter', 'onTouchStart', 'onTouchTap', 'rightAvatar', 'rightIcon', 'rightIconButton', 'rightToggle', 'primaryText', 'primaryTogglesNestedList', 'secondaryText', 'secondaryTextLines', 'style']);
+    var other = _objectWithoutProperties(_props3, ['autoGenerateNestedIndicator', 'children', 'disabled', 'disableKeyboardFocus', 'innerDivStyle', 'insetChildren', 'leftAvatar', 'leftCheckbox', 'leftIcon', 'nestedItems', 'nestedLevel', 'nestedListStyle', 'onKeyboardFocus', 'onMouseLeave', 'onMouseEnter', 'onTouchStart', 'onTouchTap', 'rightAvatar', 'rightIcon', 'rightIconButton', 'rightToggle', 'primaryText', 'primaryTogglesNestedList', 'secondaryText', 'secondaryTextLines', 'style']);
 
     var textColor = this.state.muiTheme.rawTheme.palette.textColor;
     var hoverColor = _colorManipulator2.default.fade(textColor, 0.1);
@@ -607,14 +621,14 @@ var ListItem = _react2.default.createClass({
 
     var nestedList = nestedItems.length ? _react2.default.createElement(
       _nestedList2.default,
-      { nestedLevel: nestedLevel + 1, open: this.state.open },
+      { nestedLevel: nestedLevel + 1, open: this.state.open, style: nestedListStyle },
       nestedItems
     ) : undefined;
 
     return _react2.default.createElement(
       'div',
       null,
-      hasCheckbox ? this._createLabelElement(styles, contentChildren) : disabled ? this._createDisabledElement(styles, contentChildren) : _react2.default.createElement(
+      hasCheckbox ? this._createLabelElement(styles, contentChildren, other) : disabled ? this._createDisabledElement(styles, contentChildren, other) : _react2.default.createElement(
         _enhancedButton2.default,
         _extends({}, other, {
           disabled: disabled,
@@ -626,7 +640,8 @@ var ListItem = _react2.default.createClass({
           onTouchStart: this._handleTouchStart,
           onTouchTap: primaryTogglesNestedList ? this._handleNestedListToggle : onTouchTap,
           ref: 'enhancedButton',
-          style: this.mergeStyles(styles.root, style) }),
+          style: this.mergeStyles(styles.root, style)
+        }),
         _react2.default.createElement(
           'div',
           { style: this.prepareStyles(styles.innerDiv, innerDivStyle) },

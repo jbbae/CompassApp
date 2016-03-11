@@ -1,14 +1,12 @@
-//require('normalize.css');
-//require('styles/App.css');
-
 import React, { Component, PropTypes } from 'react';
 import Firebase from 'firebase';
 import Rebase from 're-base';
 
-import { AppBar, AppCanvas, Avatar, Divider, Dialog, IconButton, LeftNav, MenuItem, RaisedButton, Styles, TextField } from 'material-ui';
+import { AppBar, AppCanvas, Avatar, Divider, Dialog, IconButton, LeftNav, MenuItem, RaisedButton, Snackbar, Styles, TextField } from 'material-ui';
 
 import FullWidthSection from './Full-width-section';
 import LoginPopupComponent from './components/LoginPopupComponent';
+import ForgotPW from './components/ForgotPW';
 
 let { Colors, Spacing, Typography } = Styles;
 //let ThemeManager = Styles.ThemeManager;
@@ -23,19 +21,21 @@ export default class AppComponent extends Component {
     this.onLeftNavChange = this.onLeftNavChange.bind(this);
     this.onHeaderClick = this.onHeaderClick.bind(this);
     this.onRegisterClick = this.onRegisterClick.bind(this);
-    this._handleRegisterCancel = this._handleRegisterCancel.bind(this);
-    this._handleRegisterSubmit = this._handleRegisterSubmit.bind(this);
-    this._handleRequestClose = this._handleRequestClose.bind(this);
+    this._handleRegisterClose = this._handleRegisterClose.bind(this);
     this.onLoginClick = this.onLoginClick.bind(this);
     this.handleLogout = this.handleLogout.bind(this);
     this.authHandler = this.authHandler.bind(this);
     this.onProfileClick = this.onProfileClick.bind(this);
-    this.keyDown = this.keyDown.bind(this);
+    this.onForgotClick = this.onForgotClick.bind(this);
+    this.onForgotCancel = this.onForgotCancel.bind(this);
+    this.handleSnackClose = this.handleSnackClose.bind(this);
     this.state = ({
       navOpen: false,
       selectedPage: '',
       openDialogScrollable: false,
-      error: null,
+      openDialogForgot: false,
+      loginError: null,
+      snackopen: false,
       userInfo: null
     })
   }
@@ -92,26 +92,27 @@ export default class AppComponent extends Component {
 
 // Original version - using temporary (buggy) solution for now
 //    let title =
-//    this.props.history.isActive('/') ? 'Compass' :
-//    this.props.history.isActive('dashboard') ? 'Dashboard' :
-//    this.props.history.isActive('explorerwithnav') ? 'Explore' :
-//    this.props.history.isActive('profile') ? 'Profile' : '';
+//    this.context.router.isActive('/') ? 'SagePath' :
+//    this.context.router.isActive('dashboard') ? 'Dashboard' :
+//    this.context.router.isActive('explorerwithnav') ? 'Explore' :
+//    this.context.router.isActive('profile') ? 'Profile' : '';
 
     //Title rendering (according to active Page)
     let title =
-    this.state.selectedPage === '/' ? 'Compass' :
-    this.state.selectedPage === 'howworks' ? 'How Compass Works' :
+    this.state.selectedPage === '/' ? 'SagePath' :
+    this.state.selectedPage === 'howworks' ? 'How SagePath Works' :
     this.state.selectedPage === 'explorerwithnav' ? 'Explore' :
-    this.state.selectedPage === 'profile' ? 'Profile' : 'Compass';
+    this.state.selectedPage === 'profile' ? 'Profile' : 'SagePath';
 
     //Render in User's Focus list
-    let focusList;
+    let focusList = [];
     if (this.state.userInfo) {
       if (this.state.userInfo.Focus) {
-        let focusListPre = Object.keys(this.state.userInfo.Focus)
-        focusList = focusListPre.map(function(focus) {
-          return (<p id="navProfileDetails">{focus}</p>);
-        }, this);
+        for (let key in this.state.userInfo.Focus) {
+          if (this.state.userInfo.Focus[key].userTied === true) {
+            focusList.push(<p id="navProfileDetails">{key}</p>);
+          }
+        }
       }
     }
 
@@ -125,7 +126,7 @@ export default class AppComponent extends Component {
               color={Colors.deepOrange300}
               backgroundColor={Colors.purple500}
               size={70}
-              src={this.state.userInfo.profilePic ? this.state.userInfo.profilePic.url() : null }>
+              src={this.state.userInfo.profilePic ? this.state.userInfo.profilePic : null }>
               { this.state.userInfo.profilePic ? null : this.state.userInfo.firstName.substring(0,1).concat(this.state.userInfo.lastName.substring(0,1)) }
             </Avatar>
           </div>
@@ -149,14 +150,16 @@ export default class AppComponent extends Component {
           <TextField
             ref='emailLogin'
             hintText="Enter your Email"
-            style={{width: '70%'}} />
+            style={{width: '70%'}}
+            onEnterKeyDown={this.onLoginClick} />
           <TextField
             ref='pwLogin'
             hintText="Enter your password"
             type="password"
-            style={{width: '70%'}} />
+            style={{width: '70%'}}
+            onEnterKeyDown={this.onLoginClick} />
           <div id="loginDivs">
-            <p id="navbarLinks">Forgot Password?</p>
+            <p id="navbarLinks" onTouchTap={this.onForgotClick}>Forgot Password?</p>
             <p id="navbarLinks" onTouchTap={this.onRegisterClick}>Register Now!</p>
           </div>
           <div id="loginButton">
@@ -178,39 +181,47 @@ export default class AppComponent extends Component {
           onLeftIconButtonTouchTap={this.onLeftIconButtonTouchTap}
           title={title}
           zDepth={0} />
-
         <Dialog
-          ref="registerPopup"
+          title="Forgot Password"
+          autoDetectWindowHeight={true}
+          open={this.state.openDialogForgot}>
+            <ForgotPW onClose={this.onForgotCancel} />
+          </Dialog>
+        <Dialog
           title="Register"
           autoDetectWindowHeight={true}
-          open={this.state.openDialogScrollable}
-          onRequestClose={this._handleRequestClose}>
-            <LoginPopupComponent onClose={this._handleRegisterCancel} onRegister={this._handleRegisterSubmit} errorMsg={this.state.error} />
+          open={this.state.openDialogScrollable}>
+            <LoginPopupComponent onClose={this._handleRegisterClose} />
         </Dialog>
 
         <LeftNav
           docked={false}
           open={this.state.navOpen}
           onRequestChange={navOpen => this.setState({navOpen})}>
-          <div style={styles.div} onTouchTap={this.onHeaderClick}>Compass</div>
+          <div style={styles.div} onTouchTap={this.onHeaderClick}>SagePath</div>
           {userSection}
           <Divider />
           <MenuItem value='/' primaryText='Landing' style={this.state.selectedPage === '/' ? {color: Colors.pink500} : null} onTouchTap={this.onLeftNavChange.bind(null, '/')} />
-          <MenuItem value='howworks' primaryText='How Compass Works' style={this.state.selectedPage === 'howworks' ? {color: Colors.pink500} : null} onTouchTap={this.onLeftNavChange.bind(null, 'howworks')} />
+          <MenuItem value='howworks' primaryText='How SagePath Works' style={this.state.selectedPage === 'howworks' ? {color: Colors.pink500} : null} onTouchTap={this.onLeftNavChange.bind(null, 'howworks')} />
           <MenuItem value='explorerwithnav' primaryText='Explore' style={this.state.selectedPage === 'explorerwithnav' ? {color: Colors.pink500} : null} onTouchTap={this.onLeftNavChange.bind(null, 'explorerwithnav')} />
         </LeftNav>
 
-      {this.props.children}
+      {React.cloneElement(this.props.children, {userInfo: this.state.userInfo})}
 
       <FullWidthSection style={styles.footer}>
         <p style={styles.p}>
-          &copy; Compass
+          &copy; SagePath
         </p>
         <br />
         <p style={styles.p}>
           Working hard to maximize the human potential.
         </p>
       </FullWidthSection>
+      <Snackbar
+        open={this.state.snackopen}
+        message={this.state.loginError}
+        autoHideDuration={1500}
+        onRequestClose={this.handleSnackClose} />
       </AppCanvas>
     );
   }
@@ -220,7 +231,7 @@ export default class AppComponent extends Component {
   }
 
   onLeftNavChange(route) {
-    this.props.history.pushState(null, route);
+    this.context.router.push(route);
     this.setState({
       selectedPage: route,
       navOpen: false
@@ -228,7 +239,7 @@ export default class AppComponent extends Component {
   }
 
   onHeaderClick() {
-    this.props.history.pushState(null, '/');
+    this.context.router.push('/');
     this.setState({
       selectedPage: '/',
       navOpen: false
@@ -236,7 +247,7 @@ export default class AppComponent extends Component {
   }
 
   onProfileClick() {
-    this.props.history.pushState(null, 'profile');
+    this.context.router.push('profile');
     this.setState({
       selectedPage: 'profile',
       navOpen: false
@@ -248,18 +259,16 @@ export default class AppComponent extends Component {
     let email = this.refs.emailLogin.getValue();
     let password = this.refs.pwLogin.getValue();
     if (email.length && password.length) {
-
       base.authWithPassword({
         email: email,
         password: password
       }, this.authHandler);
-
     } else {
-      this.setState({ error: 'Please enter all fields' });
+      this.setState({
+        loginError: 'Please enter all fields',
+        snackopen: true
+      });
     }
-    setTimeout(function(){
-      this.setState({navOpen: false});
-    }.bind(this),500);
   }
 
   handleLogout() {
@@ -277,7 +286,10 @@ export default class AppComponent extends Component {
     // Create a callback to handle the result of the authentication
     if (error) {
       console.log("Login Failed!", error);
-      this.setState({ error: 'Login Failed!' });
+      this.setState({
+        loginError: 'Login Failed!',
+        snackopen: true
+      });
     } else {
       console.log("Authenticated successfully with payload:", authData);
       let userEndPoint = 'users/' + authData.uid;
@@ -289,79 +301,29 @@ export default class AppComponent extends Component {
   }
 
   onRegisterClick() {
-    this.setState({
-      openDialogScrollable: true
-    });
+    this.setState({ openDialogScrollable: true });
   }
 
-  _handleRegisterCancel() {
-    this.setState({
-      openDialogScrollable: false
-    });
+  _handleRegisterClose() {
+    this.setState({ openDialogScrollable: false });
   }
 
-  _handleRegisterSubmit(firstname, lastname, org, email, occupation, id, password) {
-    let self = this;
-    if (firstname.length && lastname.length && org.length && email.length && occupation.length && id.length && password.length) {
-      console.log('signup');
-
-      base.createUser({
-        email: email,
-        password: password
-      }, function(error, userData) {
-        if (error) {
-          switch (error.code) {
-            case "EMAIL_TAKEN":
-              console.log("The new user account cannot be created because the email is already in use.");
-              self.setState({ error: 'The new user account cannot be created because the email is already in use.' });
-              break;
-            case "INVALID_EMAIL":
-              console.log("The specified email is not a valid email.");
-              self.setState({ error: 'The specified email is not a valid email.' });
-              break;
-            default:
-              console.log("Error creating user:", error);
-          }
-        } else {
-          console.log("Successfully created user account with uid:", userData.uid);
-          let childEndPoint = 'users/' + userData.uid;
-          base.post(childEndPoint, {
-            data: {
-              username: id,
-              firstName: firstname,
-              lastName: lastname,
-              organization: org,
-              occupation: occupation
-            },
-            then() {
-              self.setState({
-                error: null,
-                openDialogScrollable: false
-              });
-            }
-          });
-        }
-      });
-    } else {
-      this.setState({ error: 'Please enter all fields' });
-    }
+  onForgotClick() {
+    this.setState({ openDialogForgot: true });
   }
 
-  _handleRequestClose(buttonClicked) {
-    if (!buttonClicked) return;
-    this.setState({
-      openDialogScrollable: false
-    });
+  onForgotCancel() {
+    this.setState({ openDialogForgot: false });
   }
 
-  //Supposed to be "on click Enter, close navbar"
-  keyDown(e) {
-    if (e.keyCode === 13) {
-      this.onLoginClick();
-    }
+  handleSnackClose() {
+    this.setState({ snackopen: false });
   }
 }
 
+AppComponent.contextTypes = {
+  router: React.PropTypes.object.isRequired
+};
+
 AppComponent.propTypes = {
-  history: PropTypes.object
 };

@@ -16,25 +16,29 @@ var _muiThemeable2 = _interopRequireDefault(_muiThemeable);
 
 var _styles = require('./utils/styles');
 
-var _styles2 = _interopRequireDefault(_styles);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
 
 var propTypes = {
   /**
-   * CSS class that will be added to the divider's root element
+   * The css class name of the root element.
    */
   className: _react2.default.PropTypes.string,
 
   /**
-   * If true, the divider will be indented 72px
+   * If true, the `Divider` will be indented `72px`.
    */
   inset: _react2.default.PropTypes.bool,
 
   /**
-   * Override the inline-styles of the list divider's root element
+   * The material-ui theme applied to this component.
+   * @ignore
+   */
+  muiTheme: _react2.default.PropTypes.object.isRequired,
+
+  /**
+   * Override the inline-styles of the root element.
    */
   style: _react2.default.PropTypes.object
 };
@@ -43,12 +47,12 @@ var defaultProps = {
   inset: false
 };
 
-var Divider = function Divider(_ref) {
-  var inset = _ref.inset;
-  var muiTheme = _ref.muiTheme;
-  var style = _ref.style;
+var Divider = function Divider(props) {
+  var inset = props.inset;
+  var muiTheme = props.muiTheme;
+  var style = props.style;
 
-  var other = _objectWithoutProperties(_ref, ['inset', 'muiTheme', 'style']);
+  var other = _objectWithoutProperties(props, ['inset', 'muiTheme', 'style']);
 
   var styles = {
     root: {
@@ -61,7 +65,7 @@ var Divider = function Divider(_ref) {
     }
   };
 
-  return _react2.default.createElement('hr', _extends({}, other, { style: _styles2.default.prepareStyles(muiTheme, styles.root, style) }));
+  return _react2.default.createElement('hr', _extends({}, other, { style: (0, _styles.prepareStyles)(muiTheme, (0, _styles.mergeStyles)(styles.root, style)) }));
 };
 
 Divider.displayName = 'Divider';

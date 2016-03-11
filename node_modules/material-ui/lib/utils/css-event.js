@@ -12,8 +12,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 exports.default = {
   _testSupportedProps: function _testSupportedProps(props) {
-    var i = undefined,
-        el = document.createElement('div');
+    var i = undefined;
+    var el = document.createElement('div');
 
     for (i in props) {
       if (props.hasOwnProperty(i) && el.style[i] !== undefined) {

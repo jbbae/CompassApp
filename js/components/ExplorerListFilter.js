@@ -8,78 +8,71 @@ var authData = base.getAuth();
 export default class ExplorerListFilter extends Component {
   constructor() {
     super();
-    this.state = ({
-      userInfo: null
-    })
-  }
-
-  componentDidMount() {
-    if (authData) {
-      let userEndPoint = 'users/' + authData.uid + '/' + this.props.exploreType;
-      this.ref = base.bindToState(userEndPoint, {
-        context: this,
-        state: 'userInfo'
-      });
-    } else {
-      this.setState({userInfo: null});
-    }
   }
 
   render() {
     let userPrefSwitch = true;
 
-    if ( !this.props.likeShow || !this.props.neutralShow || !this.props.dislikeShow ) {
-      if ( this.props.likeShow && this.props.neutralShow && !this.props.dislikeShow ) {
-        for (var key in this.state.userInfo) {
-          if (!this.state.userInfo[key].likeStatus && this.props.filtertarget === key) {
-            userPrefSwitch = false;
-            break;
-          }
-        }
+    if (authData) {
+      let userEndPoint = 'users/' + authData.uid + '/' + this.props.exploreType;
+      this.ref = base.fetch(userEndPoint, {
+        context: this,
+        then(data) {
+          if ( !this.props.likeShow || !this.props.neutralShow || !this.props.dislikeShow ) {
+            if ( this.props.likeShow && this.props.neutralShow && !this.props.dislikeShow ) {
+              for (var key in data) {
+                if (!data[key].likeStatus && this.props.filtertarget === key) {
+                  userPrefSwitch = false;
+                  break;
+                }
+              }
 
-      } else if ( this.props.likeShow && !this.props.neutralShow && this.props.dislikeShow ) {
-        userPrefSwitch = false;
-        for (var key in this.state.userInfo) {
-          if (this.props.filtertarget === key) {
-            userPrefSwitch = true;
-            break;
-          }
-        }
+            } else if ( this.props.likeShow && !this.props.neutralShow && this.props.dislikeShow ) {
+              userPrefSwitch = false;
+              for (var key in data) {
+                if (this.props.filtertarget === key) {
+                  userPrefSwitch = true;
+                  break;
+                }
+              }
 
-      } else if ( !this.props.likeShow && this.props.neutralShow && this.props.dislikeShow ) {
-        for (var key in this.state.userInfo) {
-          if (this.state.userInfo[key].likeStatus && this.props.filtertarget === key) {
-            userPrefSwitch = false;
-            break;
-          }
-        }
+            } else if ( !this.props.likeShow && this.props.neutralShow && this.props.dislikeShow ) {
+              for (var key in data) {
+                if (data[key].likeStatus && this.props.filtertarget === key) {
+                  userPrefSwitch = false;
+                  break;
+                }
+              }
 
-      } else if ( this.props.likeShow && !this.props.neutralShow && !this.props.dislikeShow ) {
-        userPrefSwitch = false;
-        for (var key in this.state.userInfo) {
-          if (this.state.userInfo[key].likeStatus && this.props.filtertarget === key) {
-            userPrefSwitch = true;
-            break;
-          }
-        }
+            } else if ( this.props.likeShow && !this.props.neutralShow && !this.props.dislikeShow ) {
+              userPrefSwitch = false;
+              for (var key in data) {
+                if (data[key].likeStatus && this.props.filtertarget === key) {
+                  userPrefSwitch = true;
+                  break;
+                }
+              }
 
-      } else if ( !this.props.likeShow && this.props.neutralShow && !this.props.dislikeShow ) {
-        for (var key in this.state.userInfo) {
-          if (this.props.filtertarget === key) {
-            userPrefSwitch = false;
-            break;
-          }
-        }
+            } else if ( !this.props.likeShow && this.props.neutralShow && !this.props.dislikeShow ) {
+              for (var key in data) {
+                if (this.props.filtertarget === key) {
+                  userPrefSwitch = false;
+                  break;
+                }
+              }
 
-      } else if ( !this.props.likeShow && !this.props.neutralShow && this.props.dislikeShow ) {
-        userPrefSwitch = false;
-        for (var key in this.state.userInfo) {
-          if (!this.state.userInfo[key].likeStatus && this.props.filtertarget === key) {
-            userPrefSwitch = true;
-            break;
+            } else if ( !this.props.likeShow && !this.props.neutralShow && this.props.dislikeShow ) {
+              userPrefSwitch = false;
+              for (var key in data) {
+                if (!data[key].likeStatus && this.props.filtertarget === key) {
+                  userPrefSwitch = true;
+                  break;
+                }
+              }
+            }
           }
         }
-      }
+      });
     }
 
     if (this.props.exploreType === 'Path') {

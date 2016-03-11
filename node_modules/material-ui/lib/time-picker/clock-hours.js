@@ -24,13 +24,9 @@ var _clockPointer = require('./clock-pointer');
 
 var _clockPointer2 = _interopRequireDefault(_clockPointer);
 
-var _lightRawTheme = require('../styles/raw-themes/light-raw-theme');
+var _getMuiTheme = require('../styles/getMuiTheme');
 
-var _lightRawTheme2 = _interopRequireDefault(_lightRawTheme);
-
-var _themeManager = require('../styles/theme-manager');
-
-var _themeManager2 = _interopRequireDefault(_themeManager);
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -79,7 +75,7 @@ var ClockHours = _react2.default.createClass({
   },
   getInitialState: function getInitialState() {
     return {
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : _themeManager2.default.getMuiTheme(_lightRawTheme2.default)
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)()
     };
   },
   getChildContext: function getChildContext() {
@@ -237,8 +233,10 @@ var ClockHours = _react2.default.createClass({
       { ref: 'clock', style: this.prepareStyles(styles.root) },
       _react2.default.createElement(_clockPointer2.default, { hasSelected: true, value: hours, type: 'hour' }),
       numbers,
-      _react2.default.createElement('div', { ref: 'mask', style: this.prepareStyles(styles.hitMask), onTouchMove: this.handleTouchMove,
-        onTouchEnd: this.handleTouchEnd, onMouseUp: this.handleUp, onMouseMove: this.handleMove })
+      _react2.default.createElement('div', {
+        ref: 'mask', style: this.prepareStyles(styles.hitMask), onTouchMove: this.handleTouchMove,
+        onTouchEnd: this.handleTouchEnd, onMouseUp: this.handleUp, onMouseMove: this.handleMove
+      })
     );
   }
 });

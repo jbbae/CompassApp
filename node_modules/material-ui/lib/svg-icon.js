@@ -18,13 +18,9 @@ var _transitions = require('./styles/transitions');
 
 var _transitions2 = _interopRequireDefault(_transitions);
 
-var _lightRawTheme = require('./styles/raw-themes/light-raw-theme');
+var _getMuiTheme = require('./styles/getMuiTheme');
 
-var _lightRawTheme2 = _interopRequireDefault(_lightRawTheme);
-
-var _themeManager = require('./styles/theme-manager');
-
-var _themeManager2 = _interopRequireDefault(_themeManager);
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -69,7 +65,7 @@ var SvgIcon = _react2.default.createClass({
     /**
      * Allows you to redifine what the coordinates
      * without units mean inside an svg element. For example,
-     * if the SVG element is 500(width) by 200(height), and you
+     * if the SVG element is 500 (width) by 200 (height), and you
      * pass viewBox="0 0 50 20", this means that the coordinates inside
      * the svg will go from the top left corner (0,0) to bottom right (50,20)
      * and each unit will be worth 10px.
@@ -98,7 +94,7 @@ var SvgIcon = _react2.default.createClass({
   getInitialState: function getInitialState() {
     return {
       hovered: false,
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : _themeManager2.default.getMuiTheme(_lightRawTheme2.default)
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)()
     };
   },
   getChildContext: function getChildContext() {
@@ -136,7 +132,7 @@ var SvgIcon = _react2.default.createClass({
     var offColor = color ? color : style && style.fill ? style.fill : this.state.muiTheme.rawTheme.palette.textColor;
     var onColor = hoverColor ? hoverColor : offColor;
 
-    var mergedStyles = this.prepareStyles({
+    var mergedStyles = this.mergeStyles({
       display: 'inline-block',
       height: 24,
       width: 24,
@@ -155,8 +151,9 @@ var SvgIcon = _react2.default.createClass({
     return _react2.default.createElement(
       'svg',
       _extends({}, other, events, {
-        style: mergedStyles,
-        viewBox: viewBox }),
+        style: this.prepareStyles(mergedStyles),
+        viewBox: viewBox
+      }),
       children
     );
   }

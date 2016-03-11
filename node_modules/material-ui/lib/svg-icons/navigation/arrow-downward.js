@@ -27,7 +27,7 @@ var NavigationArrowDownward = _react2.default.createClass({
     return _react2.default.createElement(
       _svgIcon2.default,
       this.props,
-      _react2.default.createElement('path', { fill: '#010101', d: 'M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z' })
+      _react2.default.createElement('path', { d: 'M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z' })
     );
   }
 });

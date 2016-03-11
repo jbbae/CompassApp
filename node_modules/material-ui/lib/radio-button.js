@@ -30,13 +30,9 @@ var _radioButtonChecked = require('./svg-icons/toggle/radio-button-checked');
 
 var _radioButtonChecked2 = _interopRequireDefault(_radioButtonChecked);
 
-var _lightRawTheme = require('./styles/raw-themes/light-raw-theme');
+var _getMuiTheme = require('./styles/getMuiTheme');
 
-var _lightRawTheme2 = _interopRequireDefault(_lightRawTheme);
-
-var _themeManager = require('./styles/theme-manager');
-
-var _themeManager2 = _interopRequireDefault(_themeManager);
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -46,12 +42,46 @@ var RadioButton = _react2.default.createClass({
   displayName: 'RadioButton',
 
   propTypes: {
+    /**
+     * Used internally by `RadioButtonGroup`.
+     */
+    /* Checked if true. */
     checked: _react2.default.PropTypes.bool,
+
+    /**
+     * Disabled if true.
+     */
     disabled: _react2.default.PropTypes.bool,
+
+    /**
+     * Overrides the inline-styles of the icon element.
+     */
     iconStyle: _react2.default.PropTypes.object,
+
+    /**
+     * Used internally by `RadioButtonGroup`. Use the `labelPosition` property of `RadioButtonGroup` instead.
+     */
+    /* Where the label will be placed next to the radio button. */
     labelPosition: _react2.default.PropTypes.oneOf(['left', 'right']),
+
+    /**
+     * Overrides the inline-styles of the RadioButton element label.
+     */
     labelStyle: _react2.default.PropTypes.object,
+
+    /**
+     * Callback function for checked event.
+     */
     onCheck: _react2.default.PropTypes.func,
+
+    /**
+     * Override the inline-styles of the root element.
+     */
+    style: _react2.default.PropTypes.object,
+
+    /**
+     * The value of our radio button component.
+     */
     value: _react2.default.PropTypes.string
   },
 
@@ -66,9 +96,16 @@ var RadioButton = _react2.default.createClass({
 
   mixins: [_stylePropable2.default],
 
+  getDefaultProps: function getDefaultProps() {
+    return {
+      checked: false,
+      disabled: false,
+      labelPosition: 'right'
+    };
+  },
   getInitialState: function getInitialState() {
     return {
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : _themeManager2.default.getMuiTheme(_lightRawTheme2.default)
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)()
     };
   },
   getChildContext: function getChildContext() {
@@ -172,14 +209,14 @@ var RadioButton = _react2.default.createClass({
     var enhancedSwitchProps = {
       ref: 'enhancedSwitch',
       inputType: 'radio',
-      switched: this.props.checked || false,
+      switched: this.props.checked,
       switchElement: radioButtonElement,
       rippleColor: rippleColor,
       iconStyle: iconStyle,
       labelStyle: labelStyle,
       onSwitch: this._handleCheck,
       onParentShouldUpdate: this._handleStateChange,
-      labelPosition: this.props.labelPosition ? this.props.labelPosition : 'right'
+      labelPosition: this.props.labelPosition
     };
 
     return _react2.default.createElement(_enhancedSwitch2.default, _extends({}, other, enhancedSwitchProps));

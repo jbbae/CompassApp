@@ -30,13 +30,9 @@ var _menu = require('../menus/menu');
 
 var _menu2 = _interopRequireDefault(_menu);
 
-var _lightRawTheme = require('../styles/raw-themes/light-raw-theme');
+var _getMuiTheme = require('../styles/getMuiTheme');
 
-var _lightRawTheme2 = _interopRequireDefault(_lightRawTheme);
-
-var _themeManager = require('../styles/theme-manager');
-
-var _themeManager2 = _interopRequireDefault(_themeManager);
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 
 var _popover = require('../popover/popover');
 
@@ -54,32 +50,114 @@ var IconMenu = _react2.default.createClass({
   displayName: 'IconMenu',
 
   propTypes: {
+    /**
+     * This is the point on the icon where the menu
+     * targetOrigin will stick to.
+     * Options:
+     * vertical: [top, middle, bottom]
+     * horizontal: [left, center, right].
+     */
     anchorOrigin: _propTypes2.default.origin,
+
+    /**
+     * Should be used to pass `MenuItem` components.
+     */
     children: _react2.default.PropTypes.node,
 
     /**
      * The css class name of the root element.
      */
     className: _react2.default.PropTypes.string,
+
+    /**
+     * If true, menu will close after an item is touchTapped.
+     */
     closeOnItemTouchTap: _react2.default.PropTypes.bool,
+
+    /**
+     * This is the IconButton to render. This button will open the menu.
+     */
     iconButtonElement: _react2.default.PropTypes.element.isRequired,
+
+    /**
+     * The style object to use to override underlying icon style.
+     */
     iconStyle: _react2.default.PropTypes.object,
+
+    /**
+     * The style object to use to override underlying menu style.
+     */
     menuStyle: _react2.default.PropTypes.object,
+
+    /**
+     * Fired when a menu item is touchTapped.
+     */
     onItemTouchTap: _react2.default.PropTypes.func,
+
+    /**
+     * Fired when keyobard focuses on element.
+     */
     onKeyboardFocus: _react2.default.PropTypes.func,
+
+    /**
+     * Fired when mouse is pressed on element.
+     */
     onMouseDown: _react2.default.PropTypes.func,
+
+    /**
+     * Fired when mouse enters the element.
+     */
     onMouseEnter: _react2.default.PropTypes.func,
+
+    /**
+     * Fired when mouse leaves the element.
+     */
     onMouseLeave: _react2.default.PropTypes.func,
+
+    /**
+     * Fired when mouse is lifted inside the element.
+     */
     onMouseUp: _react2.default.PropTypes.func,
+
+    /**
+     * Callback function that is fired when the open state
+     * of the menu is requested to be changed. The provided
+     * open argument determines whether the menu is requested
+     * to be opened or closed. Also, the reason argument states
+     * why the menu got closed or opened. It can be 'keyboard',
+     * 'iconTap' for open action and 'enter', 'escape', 'itemTap',
+     * 'clickAway' for close action.
+     */
     onRequestChange: _react2.default.PropTypes.func,
+
+    /**
+     * Fired when element is touch tapped.
+     */
     onTouchTap: _react2.default.PropTypes.func,
+
+    /**
+     * Controls whether the IconMenu is opened or not.
+     */
     open: _react2.default.PropTypes.bool,
 
     /**
      * Override the inline-styles of the root element.
      */
     style: _react2.default.PropTypes.object,
+
+    /**
+     * This is the point on the menu which will stick to the menu
+     * origin.
+     * Options:
+     * vertical: [top, middle, bottom]
+     * horizontal: [left, center, right].
+     */
     targetOrigin: _propTypes2.default.origin,
+
+    /**
+     * Sets the delay in milliseconds before closing the
+     * menu when an item is clicked.
+     */
     touchTapCloseDelay: _react2.default.PropTypes.number
   },
 
@@ -123,7 +201,7 @@ var IconMenu = _react2.default.createClass({
     }
 
     return {
-      muiTheme: this.context.muiTheme ? this.context.muiTheme : _themeManager2.default.getMuiTheme(_lightRawTheme2.default),
+      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)(),
       iconButtonRef: this.props.iconButtonElement.props.ref || 'iconButton',
       menuInitiallyKeyboardFocused: false,
       open: false
@@ -256,7 +334,7 @@ var IconMenu = _react2.default.createClass({
       }
     };
 
-    var mergedRootStyles = this.prepareStyles(styles.root, style);
+    var mergedRootStyles = this.mergeStyles(styles.root, style);
     var mergedMenuStyles = this.mergeStyles(styles.menu, menuStyle);
 
     var iconButton = _react2.default.cloneElement(iconButtonElement, {
@@ -277,7 +355,8 @@ var IconMenu = _react2.default.createClass({
         onEscKeyDown: this._handleMenuEscKeyDown,
         onItemTouchTap: this._handleItemTouchTap,
         zDepth: 0,
-        style: mergedMenuStyles }),
+        style: mergedMenuStyles
+      }),
       this.props.children
     );
 
@@ -290,7 +369,8 @@ var IconMenu = _react2.default.createClass({
         onMouseEnter: onMouseEnter,
         onMouseUp: onMouseUp,
         onTouchTap: onTouchTap,
-        style: mergedRootStyles },
+        style: this.prepareStyles(mergedRootStyles)
+      },
       iconButton,
       _react2.default.createElement(
         _popover2.default,
@@ -302,7 +382,8 @@ var IconMenu = _react2.default.createClass({
           childContextTypes: this.constructor.childContextTypes,
           useLayerForClickAway: false,
           onRequestClose: this.close,
-          context: this.context },
+          context: this.context
+        },
         menu
       )
     );

@@ -59,21 +59,20 @@ export default class AppLeftNav extends Component {
 
 //Modify this function to work with onTouchTap modifications
   onLeftNavChange(route) {
-    this.props.history.pushState(null, route);
-    this.setState({
-      selectedPage: route
-    });
+    this.context.router.push(route);
+    this.setState({ selectedPage: route });
   }
 
   onHeaderClick() {
-    this.props.history.pushState(null, '/');
-    this.setState({
-      selectedPage: '/'
-    });
+    this.context.router.push('/');
+    this.setState({ selectedPage: '/' });
   }
 }
 
+AppLeftNav.contextTypes = {
+  router: React.PropTypes.object.isRequired
+};
+
 AppLeftNav.propTypes = {
-  history: PropTypes.object,
   open: PropTypes.bool
 };
